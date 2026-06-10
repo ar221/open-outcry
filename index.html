@@ -23,7 +23,7 @@
     padding: 0 56px;
     border-left: 1px solid var(--r-line); border-right: 1px solid var(--r-line);
   }
-  body.chrome-console .stage { background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px); background-size: 100% 4px; }
+  .stage.oo-scanlines { background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px); background-size: 100% 4px; }
 
   header.oo-rail { position: sticky; top: 0; z-index: 10; background: var(--r-stage); }
   #reg-toggle {
@@ -37,13 +37,13 @@
 
   section.plate { padding: 88px 0; border-bottom: 1px solid var(--r-line); position: relative; }
   footer { position: sticky; bottom: 0; z-index: 10; background: var(--r-stage); }
-  .oo-tape > div { padding: 7px 0; }
+  .oo-tape .oo-tickwrap { padding: 7px 0; }
   .up { color: var(--oo-green); } .down { color: var(--oo-red); }
   .voice { color: var(--r-voice); }
 </style>
 </head>
-<body class="reg-console chrome-console">
-<div class="stage reg-console" id="stage">
+<body class="reg-console">
+<div class="stage reg-console oo-scanlines" id="stage">
 
   <header class="oo-rail">
     <span>&gt; <span class="voice">open-outcry</span>/brand-book · v1.0</span>
@@ -65,7 +65,7 @@
   </main>
 
   <footer>
-    <div class="oo-tape"><div class="oo-tickwrap" id="tape"></div></div>
+    <div class="oo-tape" aria-hidden="true"><div class="oo-tickwrap" id="tape"></div></div>
   </footer>
 
 </div>
@@ -75,9 +75,11 @@ const stage = document.getElementById('stage');
 const toggle = document.getElementById('reg-toggle');
 toggle.addEventListener('click', () => {
   const toBroadcast = stage.classList.contains('reg-console');
-  stage.classList.toggle('reg-console', !toBroadcast);
-  stage.classList.toggle('reg-broadcast', toBroadcast);
-  document.body.classList.toggle('chrome-console', !toBroadcast);
+  for (const el of [document.body, stage]) {
+    el.classList.toggle('reg-console', !toBroadcast);
+    el.classList.toggle('reg-broadcast', toBroadcast);
+  }
+  stage.classList.toggle('oo-scanlines', !toBroadcast);
   toggle.textContent = toBroadcast ? '[ REGISTER: BROADCAST ]' : '[ REGISTER: CONSOLE ]';
 });
 
@@ -85,7 +87,7 @@ toggle.addEventListener('click', () => {
 function buildTape() {
   const css = [...document.styleSheets].find(s => (s.href||'').includes('tokens.css'));
   let tokens = 0;
-  try { for (const r of css.cssRules) if (r.cssText) tokens += (r.cssText.match(/--oo-/g)||[]).length; } catch(e) {}
+  try { for (const r of css.cssRules) if (r.cssText) tokens += (r.cssText.match(/--oo-[\w-]+\s*:/g)||[]).length; } catch(e) {}
   const sections = document.querySelectorAll('main section').length;
   const seg = ` TOKENS <span class="up">${tokens}</span> · SECTIONS <span class="voice">${sections}</span> · REGISTERS <span class="voice">2</span> · FAKE METRICS <span class="down">0</span> · EASING CURVES <span class="down">0</span> · SQUARE CORNERS <span class="up">ALL</span> ·`;
   document.getElementById('tape').innerHTML = seg.repeat(6);
