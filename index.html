@@ -58,7 +58,7 @@
 <div class="stage reg-console oo-scanlines" id="stage">
 
   <header class="oo-rail">
-    <span>&gt; <span class="voice">open-outcry</span>/brand-book · v1.2</span>
+    <span>&gt; <span class="voice">open-outcry</span>/brand-book · v1.3</span>
     <span style="display:flex; gap:16px; align-items:center;">
       <button id="reg-toggle" type="button">[ REGISTER: CONSOLE ]</button>
       <span><span class="oo-dot"></span> LIVE</span>
@@ -97,9 +97,10 @@
           <p style="font-size:13px; color:var(--oo-muted); margin-top:14px;">Green-black CRT. Pixelify display. Amber command ink. Dashboards, terminal output, dense UI.</p>
         </div>
       </div>
-      <div class="oo-pane" style="margin-top:24px; padding:20px 28px; display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:13px;"><span class="voice">REGISTER LAW</span> — every artifact picks ONE dominant register. The other appears only as a quotation. Never 50/50 on a plate.</span>
-        <span class="oo-kicker">THE TAPE RUNS THROUGH BOTH <span aria-hidden="true">↓</span></span>
+      <div class="oo-pane" style="margin-top:24px; padding:20px 28px; display:flex; justify-content:space-between; align-items:center; gap:24px;">
+        <span style="font-size:13px;"><span class="voice">REGISTER LAW</span> — every artifact picks ONE dominant register. The other appears only as a quotation. Never 50/50 on a plate.<br>
+        <span class="voice">COROLLARY (v1.3)</span> — controls are chrome; chrome is always mono. A broadcast plate may contain machine affordances, but controls do not become broadcast typography — buttons, toggles, filters, copy actions, and command affordances stay mono/chrome regardless of the plate's dominant register.</span>
+        <span class="oo-kicker" style="flex-shrink:0;">THE TAPE RUNS THROUGH BOTH <span aria-hidden="true">↓</span></span>
       </div>
     </section>
     <section class="oo-plate" id="s02">
@@ -161,6 +162,22 @@
             <tr><td style="padding:6px 0;"><span class="oo-cursor" aria-label="blinking cursor"></span></td><td style="color:var(--r-fg-dim)">the heartbeat</td></tr>
           </table>
           <p style="font-size:11px; color:var(--oo-ghost); margin-top:14px;">No icon packs. No emoji. Window dots only when mimicking terminal chrome.</p>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px;">
+        <div class="oo-pane" style="padding:24px;">
+          <div class="oo-kicker" style="margin-bottom:12px;">CONTROLS — .oo-btn · v1.3 · chrome only</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="oo-pane oo-pane--armed oo-hover oo-btn" href="#s04">Do it</a>
+            <a class="oo-pane oo-hover oo-btn" href="#s04">Log blocker</a>
+          </div>
+          <p style="font-size:11px; color:var(--oo-ghost); margin-top:14px; line-height:1.8;">compose on .oo-pane (+ --armed) and .oo-hover — hover-arm + black-on-voice press come free. Controls are chrome; chrome is always mono, even on a broadcast plate (§01 corollary).</p>
+        </div>
+        <div class="oo-pane" style="padding:24px; font-size:12px; line-height:2.2;">
+          <div class="oo-kicker" style="margin-bottom:12px;">v1.3 CONTRACT NOTES</div>
+          <span class="voice">--oo-gutter</span> <span style="color:var(--r-fg-dim)">— stage padding and .oo-plate--bleed share one token (56px / 20px narrow)</span><br>
+          <span class="voice">.oo-rail--sticky</span> <span style="color:var(--r-fg-dim)">— pins chrome; opaque background-color baked in (see TRAP, components.css)</span><br>
+          <span class="voice">:where(.oo-stat-value)</span> <span style="color:var(--r-fg-dim)">— base ink at zero specificity; semantic ink wins: <span class="oo-stat-value up" style="display:inline; font-size:18px;">+78%</span> <span class="oo-stat-value down" style="display:inline; font-size:18px;">-1/9</span></span>
         </div>
       </div>
       <div class="oo-pane" style="margin-top:24px; padding:24px; text-align:center;">
