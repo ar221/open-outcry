@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   OPEN OUTCRY — design tokens v1.1
+   OPEN OUTCRY — design tokens v1.3
    One identity. Two registers. One tape.
    Variables + register alias layer ONLY — classes live in components.css.
    Spec: ™ Open Outcry Design Language Spec 2026-06-09
@@ -55,6 +55,13 @@
   /* ── Hardware ── */
   --oo-radius: 2px;          /* square corners: 0–2px max */
   --oo-stroke: 1px;
+  --oo-gutter: 56px;         /* horizontal stage gutter — consumer stages pad with it,
+                                .oo-plate--bleed mirrors it negative; one token, no mirroring */
+}
+
+/* narrow widths tighten the gutter (matches components.css breakpoint) */
+@media (max-width: 720px) {
+  :root { --oo-gutter: 20px; }
 }
 
 /* ── Register alias layer ──

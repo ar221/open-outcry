@@ -1,11 +1,17 @@
 /* ═══════════════════════════════════════════════════════════
-   OPEN OUTCRY — components v1.2
+   OPEN OUTCRY — components v1.3
    Import tokens.css first; these classes consume --r-* / --oo-* .
+
+   ▲ TRAP — never use the `background:` shorthand on an element carrying
+   .oo-scanlines (or any scanline background-image): the shorthand resets
+   background-image and silently erases the scanlines at equal specificity.
+   Always `background-color:`.
 
    Inventory:
    · textures      — .oo-scanlines · .oo-grain · .oo-vignette
    · hardware      — .oo-pane · .oo-pane--armed · .oo-warning
-   · rails & tape  — .oo-rail · .oo-rail--foot · .oo-tape
+   · controls      — .oo-btn (compose on .oo-pane + .oo-hover)
+   · rails & tape  — .oo-rail · .oo-rail--foot · .oo-rail--sticky · .oo-tape
    · glyphs        — .oo-kicker · .oo-dot · .oo-cursor
    · ink           — .up · .down · .voice
    · links         — .oo-link
@@ -57,6 +63,15 @@
 
 /* ── Footer rail variant ── */
 .oo-rail--foot { border-bottom: none; border-top: 1px solid var(--r-line); }
+
+/* ── Sticky chrome: pins a rail (or the footer tape) over scrolling plates.
+      Opaque fill is mandatory or plates ghost through; background-color, never
+      the `background:` shorthand — see TRAP at top of file. ── */
+.oo-rail--sticky {
+  position: sticky; top: 0; z-index: 10;
+  background-color: var(--r-stage);
+}
+footer.oo-rail--sticky { top: auto; bottom: 0; }
 
 /* ── Glyphs & cursor ── */
 .oo-kicker {
@@ -129,7 +144,7 @@
 
 /* ── Plates: one section of a surface ── */
 .oo-plate { padding: 88px 0; border-bottom: 1px solid var(--r-line); position: relative; }
-.oo-plate--bleed { margin: 0 -56px; padding: 120px 56px; overflow: hidden; }
+.oo-plate--bleed { margin: 0 calc(-1 * var(--oo-gutter)); padding: 120px var(--oo-gutter); overflow: hidden; }
 
 /* ── Layout grids ── */
 .oo-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -148,7 +163,25 @@
   display: block; margin-top: 10px;
   font-family: var(--oo-font-mono);
   font-size: clamp(28px, 3.5vw, 40px);
-  color: var(--r-fg); line-height: 1.1;
+  line-height: 1.1;
+}
+/* base ink at zero specificity — semantic ink (.up / .down / .voice) on the
+   same element always wins, regardless of source order. No nesting idiom needed. */
+:where(.oo-stat-value) { color: var(--r-fg); }
+
+/* Controls are chrome; chrome is always mono. A broadcast plate may contain
+   machine affordances, but controls do not become broadcast typography.
+   Buttons, toggles, filters, copy actions, and command affordances use
+   mono/chrome treatment regardless of the plate's dominant register. */
+/* ── Button: type + layout layer only — compose on .oo-pane (+ .oo-pane--armed
+      for the primary action) and .oo-hover, which supplies hover-arm and the
+      black-on-voice :active invert. ── */
+.oo-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 11px 16px; min-height: 42px;
+  font-family: var(--oo-font-mono); font-size: 12px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--r-voice); text-decoration: none;
 }
 
 /* ── Prose: body-paragraph measure ── */
@@ -184,7 +217,8 @@
 
 /* ── Narrow widths: single column, tamed display sizes ── */
 @media (max-width: 720px) {
-  .oo-plate--bleed { margin: 0 -20px; padding: 80px 20px; }
+  /* horizontal bleed follows --oo-gutter (re-declared narrow in tokens.css) */
+  .oo-plate--bleed { padding-top: 80px; padding-bottom: 80px; }
   .oo-grid-2, .oo-grid-3 { grid-template-columns: 1fr; }
   .oo-display-console, .oo-display-broadcast { font-size: clamp(20px, 7.5vw, 40px); }
   .oo-plate-card { aspect-ratio: auto; min-height: 180px; }
