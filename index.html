@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPEN OUTCRY — the living brand book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: auto; } /* machines don't smooth-scroll */
+  body {
+    background: var(--oo-void);
+    color: var(--r-fg);
+    font-family: var(--oo-font-mono);
+    font-size: var(--oo-type-body);
+    line-height: 1.6;
+  }
+  .stage {
+    max-width: 1080px; margin: 0 auto; min-height: 100vh;
+    background: var(--r-stage); position: relative;
+    padding: 0 56px;
+    border-left: 1px solid var(--r-line); border-right: 1px solid var(--r-line);
+  }
+  body.chrome-console .stage { background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px); background-size: 100% 4px; }
+
+  header.oo-rail { position: sticky; top: 0; z-index: 10; background: var(--r-stage); }
+  #reg-toggle {
+    font-family: var(--oo-font-mono); font-size: 11px; letter-spacing: .08em;
+    background: transparent; color: var(--r-voice);
+    border: 1px solid var(--r-voice); border-radius: var(--oo-radius);
+    padding: 4px 12px; cursor: crosshair;
+    transition: background .15s linear, color .15s linear;
+  }
+  #reg-toggle:hover { background: var(--r-voice); color: var(--oo-void); }
+
+  section.plate { padding: 88px 0; border-bottom: 1px solid var(--r-line); position: relative; }
+  footer { position: sticky; bottom: 0; z-index: 10; background: var(--r-stage); }
+  .oo-tape > div { padding: 7px 0; }
+  .up { color: var(--oo-green); } .down { color: var(--oo-red); }
+  .voice { color: var(--r-voice); }
+</style>
+</head>
+<body class="reg-console chrome-console">
+<div class="stage reg-console" id="stage">
+
+  <header class="oo-rail">
+    <span>&gt; <span class="voice">open-outcry</span>/brand-book · v1.0</span>
+    <span style="display:flex; gap:16px; align-items:center;">
+      <button id="reg-toggle" type="button">[ REGISTER: CONSOLE ]</button>
+      <span><span class="oo-dot"></span> LIVE</span>
+    </span>
+  </header>
+
+  <main id="book">
+    <!-- §00 cover -->
+    <!-- §01 concept -->
+    <!-- §02 palette -->
+    <!-- §03 type -->
+    <!-- §04 anatomy+glyphs -->
+    <!-- §05 motion -->
+    <!-- §06 gallery -->
+    <!-- §07 checklist -->
+  </main>
+
+  <footer>
+    <div class="oo-tape"><div class="oo-tickwrap" id="tape"></div></div>
+  </footer>
+
+</div>
+<script>
+// ── register switcher: flips page chrome between registers ──
+const stage = document.getElementById('stage');
+const toggle = document.getElementById('reg-toggle');
+toggle.addEventListener('click', () => {
+  const toBroadcast = stage.classList.contains('reg-console');
+  stage.classList.toggle('reg-console', !toBroadcast);
+  stage.classList.toggle('reg-broadcast', toBroadcast);
+  document.body.classList.toggle('chrome-console', !toBroadcast);
+  toggle.textContent = toBroadcast ? '[ REGISTER: BROADCAST ]' : '[ REGISTER: CONSOLE ]';
+});
+
+// ── the tape: real numbers from the document itself, doubled for seamless loop ──
+function buildTape() {
+  const css = [...document.styleSheets].find(s => (s.href||'').includes('tokens.css'));
+  let tokens = 0;
+  try { for (const r of css.cssRules) if (r.cssText) tokens += (r.cssText.match(/--oo-/g)||[]).length; } catch(e) {}
+  const sections = document.querySelectorAll('main section').length;
+  const seg = ` TOKENS <span class="up">${tokens}</span> · SECTIONS <span class="voice">${sections}</span> · REGISTERS <span class="voice">2</span> · FAKE METRICS <span class="down">0</span> · EASING CURVES <span class="down">0</span> · SQUARE CORNERS <span class="up">ALL</span> ·`;
+  document.getElementById('tape').innerHTML = seg.repeat(6);
+}
+window.addEventListener('load', buildTape);
+</script>
+</body>
+</html>
