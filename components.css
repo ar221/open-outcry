@@ -21,7 +21,8 @@
   background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px);
   background-size: 100% 4px;
 }
-.oo-grain, .oo-vignette { position: relative; }
+/* texture hosts self-position; as .oo-overlay they go absolute instead */
+.oo-grain:not(.oo-overlay), .oo-vignette:not(.oo-overlay) { position: relative; }
 .oo-grain::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
@@ -54,7 +55,7 @@
 
 /* ── Glyphs & cursor ── */
 .oo-kicker {
-  font-family: var(--oo-font-mono); font-size: 11px;
+  font-family: var(--oo-font-mono); font-size: 12px;
   letter-spacing: .18em; text-transform: uppercase; color: var(--r-muted);
 }
 .oo-dot {
@@ -132,7 +133,7 @@
 .oo-warning .oo-kicker { color: var(--oo-red); }
 
 /* ── Register quotation: machine pane quoted inside broadcast ── */
-.oo-register-quote { background-color: var(--oo-console-pane); padding: 10px 14px; font-size: 10px; color: var(--oo-fg-dim); }
+.oo-register-quote { background-color: var(--oo-console-pane); padding: 10px 14px; font-size: 11px; color: var(--oo-fg-dim); }
 
 /* ── Overlay + content lift (grain / beam hosts) ── */
 .oo-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
@@ -149,6 +150,6 @@
 @media (max-width: 720px) {
   .oo-plate--bleed { margin: 0 -20px; padding: 80px 20px; }
   .oo-grid-2, .oo-grid-3 { grid-template-columns: 1fr; }
-  .oo-display-console, .oo-display-broadcast { font-size: clamp(20px, 7.5vw, 40px) !important; }
+  .oo-display-console, .oo-display-broadcast { font-size: clamp(20px, 7.5vw, 40px); }
   .oo-plate-card { aspect-ratio: auto; min-height: 180px; }
 }
