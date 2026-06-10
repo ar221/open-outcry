@@ -163,6 +163,7 @@ function buildPalette() {
   ];
   const cs = getComputedStyle(document.documentElement);
   const board = document.getElementById('palette-board');
+  board.innerHTML = '';
   for (const g of groups) {
     const pane = document.createElement('div');
     pane.className = 'oo-pane oo-hover';
@@ -170,8 +171,9 @@ function buildPalette() {
     let rows = `<div class="oo-kicker" style="margin-bottom:10px;">${g.name}</div>`;
     for (const t of g.tokens) {
       const v = cs.getPropertyValue(t).trim();
-      const light = ['--oo-amber','--oo-peach','--oo-fg','--oo-fg-warm','--oo-green'].includes(t);
-      rows += `<div style="background:${v}; color:${light ? '#1a1106' : 'var(--oo-fg-dim)'}; font-size:10px; padding:8px 10px; display:flex; justify-content:space-between;"><span>${t}</span><span>${v}</span></div>`;
+      const shown = v || 'MISSING';
+      const light = ['--oo-amber','--oo-amber-dim','--oo-peach','--oo-terracotta','--oo-fg','--oo-fg-warm','--oo-fg-dim','--oo-green','--oo-green-deep','--oo-blue','--oo-violet'].includes(t);
+      rows += `<div style="background:${v}; color:${light ? '#1a1106' : 'var(--oo-fg-dim)'}; font-size:10px; padding:8px 10px; display:flex; justify-content:space-between;"><span>${t}</span><span>${shown}</span></div>`;
     }
     pane.innerHTML = rows;
     board.appendChild(pane);
