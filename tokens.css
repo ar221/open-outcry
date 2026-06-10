@@ -59,8 +59,8 @@
 
 /* ── Register alias layer ──
    Components consume --r-* and work in either register. */
-/* console is the default register; .reg-broadcast overrides */
-:root, .reg-console {
+/* console is the default register; .reg-broadcast overrides; .oo-register-quote self-registers as console (a quotation is always machine voice) */
+:root, .reg-console, .oo-register-quote {
   --r-stage:     var(--oo-console-stage);
   --r-pane:      var(--oo-console-pane);
   --r-smoke:     var(--oo-console-smoke);

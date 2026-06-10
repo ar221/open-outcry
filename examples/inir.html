@@ -29,8 +29,6 @@
   header.oo-rail { position: sticky; top: 0; z-index: 10; background: var(--r-stage); }
   footer { position: sticky; bottom: 0; z-index: 10; background: var(--r-stage); }
   .oo-tape .oo-tickwrap { padding: 7px 0; }
-  /* MISSING PRIMITIVE approximation: components.css has no anchor treatment */
-  a { color: var(--r-voice); text-decoration: none; border-bottom: 1px solid var(--r-voice-dim); }
   @media (max-width: 720px) {
     .stage { padding: 0 20px; }
     header.oo-rail .oo-kicker { display: none; }
@@ -58,7 +56,7 @@
         <h1 class="oo-display-broadcast" style="margin-top:28px; max-width:16ch;">
           A desktop shell that behaves like <em>a mission console.</em><span class="oo-cursor" aria-hidden="true"></span>
         </h1>
-        <p style="color:var(--r-fg-dim); max-width:54ch; margin-top:28px;">
+        <p class="oo-prose" style="margin-top:28px;">
           iNiR is a <span class="voice">Quickshell</span> shell for the
           <span class="voice">niri</span> Wayland compositor. Bar, dock, overview,
           sidebars, lock, command room — one process, one design grammar,
@@ -96,12 +94,12 @@
     <!-- ── THE MACHINE, QUOTED ── -->
     <section class="oo-plate">
       <div class="oo-kicker">// 02 · THE MACHINE, QUOTED</div>
-      <p style="color:var(--r-fg-dim); max-width:54ch; margin-top:20px; font-size:14px;">
+      <p class="oo-prose" style="margin-top:20px;">
         Every surface is an IPC target. The same call works from a terminal,
         a script, or a niri keybind — taken verbatim from
-        <a href="https://github.com/ar221/iNiR">the repo's</a> <span class="voice">docs/IPC.md</span>:
+        <a class="oo-link" href="https://github.com/ar221/iNiR">the repo's</a> <span class="voice">docs/IPC.md</span>:
       </p>
-      <div class="oo-pane reg-console oo-scanlines oo-register-quote" style="margin-top:24px; font-size:12px; line-height:2; padding:18px 22px;">
+      <div class="oo-register-quote oo-register-quote--block" style="margin-top:24px;">
         <span class="voice">$</span> inir overview toggle<br>
         <span style="color:var(--oo-muted)"># the same target, bound in niri config (kdl):</span><br>
         <span style="color:var(--oo-fg)">bind "Mod+Space" { spawn "inir" "overview" "toggle"; }</span><span class="oo-cursor" aria-hidden="true"></span>
@@ -113,29 +111,29 @@
     <section class="oo-plate">
       <div class="oo-kicker">// 03 · COUNTED FROM THE REPO · HARVESTED 2026-06-10</div>
       <div class="oo-grid-3" style="margin-top:32px;">
-        <div class="oo-pane oo-hover" style="padding:22px 26px;">
+        <div class="oo-pane oo-stat">
           <div class="oo-kicker">QML FILES</div>
-          <p style="font-family:var(--oo-font-mono); font-size:40px; color:var(--r-fg); margin-top:8px;">878</p>
+          <span class="oo-stat-value">878</span>
         </div>
-        <div class="oo-pane oo-hover" style="padding:22px 26px;">
+        <div class="oo-pane oo-stat">
           <div class="oo-kicker">LINES OF QML</div>
-          <p style="font-family:var(--oo-font-mono); font-size:40px; color:var(--r-fg); margin-top:8px;">208,718</p>
+          <span class="oo-stat-value">208,718</span>
         </div>
-        <div class="oo-pane oo-hover" style="padding:22px 26px;">
+        <div class="oo-pane oo-stat">
           <div class="oo-kicker">GIT COMMITS</div>
-          <p style="font-family:var(--oo-font-mono); font-size:40px; color:var(--r-fg); margin-top:8px;">1,826</p>
+          <span class="oo-stat-value">1,826</span>
         </div>
-        <div class="oo-pane oo-hover" style="padding:22px 26px;">
+        <div class="oo-pane oo-stat">
           <div class="oo-kicker">SERVICES</div>
-          <p style="font-family:var(--oo-font-mono); font-size:40px; color:var(--r-fg); margin-top:8px;">80</p>
+          <span class="oo-stat-value">80</span>
         </div>
-        <div class="oo-pane oo-hover" style="padding:22px 26px;">
+        <div class="oo-pane oo-stat">
           <div class="oo-kicker">MODULE FAMILIES</div>
-          <p style="font-family:var(--oo-font-mono); font-size:40px; color:var(--r-fg); margin-top:8px;">30</p>
+          <span class="oo-stat-value">30</span>
         </div>
-        <div class="oo-pane oo-hover" style="padding:22px 26px;">
+        <div class="oo-pane oo-stat">
           <div class="oo-kicker">HELPER SCRIPTS</div>
-          <p style="font-family:var(--oo-font-mono); font-size:40px; color:var(--r-fg); margin-top:8px;">109</p>
+          <span class="oo-stat-value">109</span>
         </div>
       </div>
       <p style="font-size:12px; color:var(--oo-ghost); margin-top:20px;">Counts from <span class="voice">~/Github/inir</span> on 2026-06-10. No projections, no rounding up.</p>
@@ -143,8 +141,8 @@
 
     <!-- ── FOOTER INDEX ── -->
     <section class="oo-plate" style="border-bottom:none;">
-      <div class="oo-rail" style="border-bottom:none; border-top:1px solid var(--r-line); padding:14px 0;">
-        <span>iNiR · first production consumer of <a href="../index.html">open-outcry</a> v1.1</span>
+      <div class="oo-rail oo-rail--foot" style="padding:14px 0;">
+        <span>iNiR · first production consumer of <a class="oo-link" href="../index.html">open-outcry</a> v1.2</span>
         <span class="oo-kicker">REGISTER: BROADCAST · TOKENS UNTOUCHED</span>
       </div>
     </section>

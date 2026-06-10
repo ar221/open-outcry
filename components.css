@@ -1,19 +1,21 @@
 /* ═══════════════════════════════════════════════════════════
-   OPEN OUTCRY — components v1.1
+   OPEN OUTCRY — components v1.2
    Import tokens.css first; these classes consume --r-* / --oo-* .
 
    Inventory:
    · textures      — .oo-scanlines · .oo-grain · .oo-vignette
    · hardware      — .oo-pane · .oo-pane--armed · .oo-warning
-   · rails & tape  — .oo-rail · .oo-tape
+   · rails & tape  — .oo-rail · .oo-rail--foot · .oo-tape
    · glyphs        — .oo-kicker · .oo-dot · .oo-cursor
    · ink           — .up · .down · .voice
+   · links         — .oo-link
    · display type  — .oo-display-console · .oo-display-broadcast
    · motion        — .oo-tickwrap · .oo-scanbeam · .oo-hover · .oo-draw-path
    · plates        — .oo-plate · .oo-plate--bleed · .oo-plate-card · .oo-specimen
+   · stat & prose  — .oo-stat · .oo-stat-value · .oo-prose
    · layout        — .oo-grid-2 · .oo-grid-2--wide · .oo-grid-3
    · stacking      — .oo-overlay · .oo-content
-   · quotation     — .oo-register-quote
+   · quotation     — .oo-register-quote · .oo-register-quote--block
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Textures ── */
@@ -53,6 +55,9 @@
   overflow: hidden; white-space: nowrap;
 }
 
+/* ── Footer rail variant ── */
+.oo-rail--foot { border-bottom: none; border-top: 1px solid var(--r-line); }
+
 /* ── Glyphs & cursor ── */
 .oo-kicker {
   font-family: var(--oo-font-mono); font-size: 12px;
@@ -71,6 +76,15 @@
 /* ── Ink ── */
 .up { color: var(--oo-green); } .down { color: var(--oo-red); }
 .voice { color: var(--r-voice); }
+
+/* ── Links ── */
+.oo-link {
+  color: var(--r-voice);
+  text-decoration: underline;
+  text-decoration-color: var(--r-voice-dim);
+  text-underline-offset: 3px;
+}
+.oo-link:hover { text-decoration-color: var(--r-voice); }
 
 /* ── Display type ── */
 .oo-display-console {
@@ -128,12 +142,34 @@
 /* ── Big specimen pane ── */
 .oo-specimen { padding: 48px; position: relative; overflow: hidden; }
 
+/* ── Stat lockup: kicker + big number (compose with .oo-pane) ── */
+.oo-stat { padding: 24px 28px; }
+.oo-stat-value {
+  display: block; margin-top: 10px;
+  font-family: var(--oo-font-mono);
+  font-size: clamp(28px, 3.5vw, 40px);
+  color: var(--r-fg); line-height: 1.1;
+}
+
+/* ── Prose: body-paragraph measure ── */
+.oo-prose { color: var(--r-fg-dim); max-width: 54ch; }
+
 /* ── Warning pane ── */
 .oo-warning { border-color: rgba(224, 69, 90, .4); }
 .oo-warning .oo-kicker { color: var(--oo-red); }
 
-/* ── Register quotation: machine pane quoted inside broadcast ── */
-.oo-register-quote { background-color: var(--oo-console-pane); padding: 10px 14px; font-size: 11px; color: var(--oo-fg-dim); }
+/* ── Register quotation: machine pane quoted inside broadcast.
+      Self-contained — one class carries pane hardware, scanlines, and
+      the console register (see tokens.css alias selector). ── */
+.oo-register-quote {
+  background-color: var(--oo-console-pane);
+  background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 100% 4px;
+  border: var(--oo-stroke) solid var(--r-line);
+  border-radius: var(--oo-radius);
+  padding: 10px 14px; font-size: 11px; color: var(--oo-fg-dim);
+}
+.oo-register-quote--block { padding: 18px 22px; font-size: 12px; line-height: 2; }
 
 /* ── Overlay + content lift (grain / beam hosts) ── */
 .oo-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
