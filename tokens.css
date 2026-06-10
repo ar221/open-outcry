@@ -58,7 +58,8 @@
 
 /* ── Register alias layer ──
    Components consume --r-* and work in either register. */
-.reg-console {
+/* console is the default register; .reg-broadcast overrides */
+:root, .reg-console {
   --r-stage:     var(--oo-console-stage);
   --r-pane:      var(--oo-console-pane);
   --r-smoke:     var(--oo-console-smoke);
@@ -90,6 +91,7 @@
   background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px);
   background-size: 100% 4px;
 }
+.oo-grain, .oo-vignette { position: relative; }
 .oo-grain::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
@@ -137,12 +139,12 @@
 
 /* ── Display type ── */
 .oo-display-console {
-  font-family: var(--oo-font-pixel); text-transform: uppercase;
+  font-family: var(--oo-font-pixel); font-size: var(--oo-display-console); text-transform: uppercase;
   color: var(--oo-amber); letter-spacing: -0.02em; line-height: 1.02;
   text-shadow: 0 0 24px var(--oo-amber-glow);
 }
 .oo-display-broadcast {
-  font-family: var(--oo-font-serif); color: var(--oo-fg-warm);
+  font-family: var(--oo-font-serif); font-size: var(--oo-display-broadcast); color: var(--oo-fg-warm);
   font-weight: 560; line-height: 1.08; letter-spacing: -0.01em;
 }
 .oo-display-broadcast em {
@@ -176,4 +178,5 @@
 @media (prefers-reduced-motion: reduce) {
   .oo-cursor, .oo-tickwrap, .oo-scanbeam, .oo-draw-path { animation: none !important; }
   .oo-draw-path { stroke-dashoffset: 0; }
+  .oo-scanbeam { display: none; }
 }
