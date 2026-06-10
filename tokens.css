@@ -172,7 +172,7 @@
   box-shadow: 0 0 18px var(--r-glow), inset 0 0 12px var(--r-glow);
   transform: translateY(-1px);
 }
-.oo-draw-path { stroke-dasharray: 480; stroke-dashoffset: 480; }
+.oo-draw-path { stroke-dasharray: 660; stroke-dashoffset: 660; }
 .oo-draw-path.is-drawing { animation: oo-draw 2.6s linear forwards; }
 
 @media (prefers-reduced-motion: reduce) {

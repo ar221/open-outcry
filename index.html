@@ -59,7 +59,7 @@
       <div style="position:relative;">
         <div class="oo-kicker">&lt; document = <span style="color:var(--oo-terracotta)">"brand book"</span> &gt; <span aria-hidden="true">- - - - - - - - - - - -</span></div>
         <h1 class="oo-display-broadcast" style="font-size:var(--oo-display-broadcast); margin-top:28px; max-width:14ch; min-height:3.3em;">
-          Open Outcry — <em id="typed-accent"></em><span class="oo-cursor"></span>
+          Open Outcry — <em id="typed-accent"></em><span class="oo-cursor" aria-label="blinking cursor"></span>
         </h1>
         <p style="color:var(--r-fg-dim); max-width:52ch; margin-top:28px;">
           One identity. Two registers. One tape. The era when markets ran on human
@@ -237,11 +237,11 @@ function buildPalette() {
 }
 window.addEventListener('load', buildPalette);
 // ── SVG line-draw fires when the diagram enters view ──
-const drawObserver = new IntersectionObserver(entries => {
+const svgDrawObserver = new IntersectionObserver(entries => {
   for (const e of entries) if (e.isIntersecting) e.target.classList.add('is-drawing');
 }, { threshold: 0.4 });
 window.addEventListener('load', () =>
-  document.querySelectorAll('.oo-draw-path').forEach(p => drawObserver.observe(p)));
+  document.querySelectorAll('.oo-draw-path').forEach(p => svgDrawObserver.observe(p)));
 window.addEventListener('load', buildTape);
 </script>
 </body>
