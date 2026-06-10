@@ -22,13 +22,12 @@
   }
   .stage {
     max-width: 1080px; margin: 0 auto; min-height: 100vh;
-    background: var(--r-stage); position: relative;
-    padding: 0 56px;
+    background-color: var(--r-stage); position: relative;
+    padding: 0 var(--oo-gutter);
     border-left: 1px solid var(--r-line); border-right: 1px solid var(--r-line);
   }
   .stage.oo-scanlines { background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px); background-size: 100% 4px; }
 
-  header.oo-rail { position: sticky; top: 0; z-index: 10; background: var(--r-stage); }
   #reg-toggle {
     font-family: var(--oo-font-mono); font-size: 11px; letter-spacing: .08em;
     background: transparent; color: var(--r-voice);
@@ -38,14 +37,12 @@
   }
   #reg-toggle:hover { background: var(--r-voice); color: var(--oo-void); }
 
-  footer { position: sticky; bottom: 0; z-index: 10; background: var(--r-stage); }
   .oo-tape .oo-tickwrap { padding: 7px 0; }
 
   .book-bleed { margin-inline: -28px; }
 
   /* narrow widths: tighter gutters; remaining inline grids collapse */
   @media (max-width: 720px) {
-    .stage { padding: 0 20px; }
     .book-bleed { margin-inline: 0; }
     main [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
     /* book-local: beat this document's inline specimen font-sizes */
@@ -57,7 +54,7 @@
 <body class="reg-console">
 <div class="stage reg-console oo-scanlines" id="stage">
 
-  <header class="oo-rail">
+  <header class="oo-rail oo-rail--sticky">
     <span>&gt; <span class="voice">open-outcry</span>/brand-book · v1.3</span>
     <span style="display:flex; gap:16px; align-items:center;">
       <button id="reg-toggle" type="button">[ REGISTER: CONSOLE ]</button>
@@ -283,7 +280,7 @@
     </section>
   </main>
 
-  <footer>
+  <footer class="oo-rail--sticky">
     <div class="oo-tape" aria-hidden="true"><div class="oo-tickwrap" id="tape"></div></div>
   </footer>
 
