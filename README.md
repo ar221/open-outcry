@@ -1,5 +1,7 @@
 # Open Outcry
 
+**Live:** https://ar221.github.io/open-outcry/
+
 Ayaz's personal design language. Dual register: **Broadcast** (editorial serif, coffee-dark)
 × **Console** (pixel amber CRT), glued by **the Tape** (ticker rails, market semantics).
 
