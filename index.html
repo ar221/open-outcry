@@ -55,10 +55,10 @@
 
   <main id="book">
     <section class="plate reg-broadcast" id="s00" style="background:var(--r-stage); margin:0 -56px; padding:120px 56px; overflow:hidden;">
-      <div class="oo-grain" style="position:absolute; inset:0;"></div>
+      <div class="oo-grain" style="position:absolute; inset:0; pointer-events:none;" aria-hidden="true"></div>
       <div style="position:relative;">
-        <div class="oo-kicker">&lt; document = <span style="color:var(--oo-terracotta)">"brand book"</span> &gt; - - - - - - - - - - - -</div>
-        <h1 class="oo-display-broadcast" style="font-size:var(--oo-display-broadcast); margin-top:28px; max-width:14ch;">
+        <div class="oo-kicker">&lt; document = <span style="color:var(--oo-terracotta)">"brand book"</span> &gt; <span aria-hidden="true">- - - - - - - - - - - -</span></div>
+        <h1 class="oo-display-broadcast" style="font-size:var(--oo-display-broadcast); margin-top:28px; max-width:14ch; min-height:3.3em;">
           Open Outcry — <em id="typed-accent"></em><span class="oo-cursor"></span>
         </h1>
         <p style="color:var(--r-fg-dim); max-width:52ch; margin-top:28px;">
@@ -73,10 +73,10 @@
       <div class="oo-kicker">// 01 · THE TWO REGISTERS</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:32px;">
         <div class="oo-pane reg-broadcast oo-hover" style="background:var(--oo-broadcast-stage); padding:32px; position:relative; overflow:hidden;">
-          <div class="oo-grain" style="position:absolute; inset:0;"></div>
-          <div class="oo-kicker">BROADCAST — the human voice</div>
-          <p class="oo-display-broadcast" style="font-size:30px; margin-top:16px;">Theses, heroes, <em>rhetoric.</em></p>
-          <p style="font-size:13px; color:var(--oo-muted-warm); margin-top:14px;">Coffee-dark grain. Fraunces serif. One italic peach phrase per plate. Landing pages, openings, quotes.</p>
+          <div class="oo-grain" style="position:absolute; inset:0; pointer-events:none; z-index:0;" aria-hidden="true"></div>
+          <div class="oo-kicker" style="position:relative; z-index:1;">BROADCAST — the human voice</div>
+          <p class="oo-display-broadcast" style="font-size:30px; margin-top:16px; position:relative; z-index:1;">Theses, heroes, <em>rhetoric.</em></p>
+          <p style="font-size:13px; color:var(--oo-muted-warm); margin-top:14px; position:relative; z-index:1;">Coffee-dark grain. Fraunces serif. One italic peach phrase per plate. Landing pages, openings, quotes.</p>
         </div>
         <div class="oo-pane reg-console oo-hover oo-scanlines" style="background:var(--oo-console-stage); padding:32px; position:relative; overflow:hidden;">
           <div class="oo-scanbeam"></div>
@@ -87,7 +87,7 @@
       </div>
       <div class="oo-pane" style="margin-top:24px; padding:20px 28px; display:flex; justify-content:space-between; align-items:center;">
         <span style="font-size:13px;"><span class="voice">REGISTER LAW</span> — every artifact picks ONE dominant register. The other appears only as a quotation. Never 50/50 on a plate.</span>
-        <span class="oo-kicker">THE TAPE RUNS THROUGH BOTH ↓</span>
+        <span class="oo-kicker">THE TAPE RUNS THROUGH BOTH <span aria-hidden="true">↓</span></span>
       </div>
     </section>
     <!-- §02 palette -->
@@ -130,6 +130,7 @@ function buildTape() {
 function typeAccent() {
   const el = document.getElementById('typed-accent');
   const text = 'a brand with two voices.';
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = text; return; }
   let i = 0;
   (function tick() {
     el.textContent = text.slice(0, ++i);
