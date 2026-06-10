@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OPEN OUTCRY — the living brand book</title>
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tokens.css">
@@ -40,6 +41,16 @@
   .oo-tape .oo-tickwrap { padding: 7px 0; }
   .up { color: var(--oo-green); } .down { color: var(--oo-red); }
   .voice { color: var(--r-voice); }
+
+  /* narrow widths: single column, tighter gutters, tamed display sizes */
+  @media (max-width: 720px) {
+    .stage { padding: 0 20px; }
+    #s00 { margin: 0 -20px !important; padding: 80px 20px !important; }
+    main [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+    main .oo-display-console, main .oo-display-broadcast { font-size: clamp(20px, 7.5vw, 40px) !important; }
+    #s00 h1 { font-size: clamp(32px, 10vw, 54px) !important; }
+    .oo-pane[style*="aspect-ratio"] { aspect-ratio: auto !important; min-height: 180px; }
+  }
 </style>
 </head>
 <body class="reg-console">
@@ -113,7 +124,7 @@
           <p class="oo-display-broadcast" style="font-size:54px; margin-top:18px;">As agents got powerful, markdown became <em>a restricting format.</em></p>
         </div>
       </div>
-      <div class="oo-pane reg-console oo-scanlines" style="background-color:var(--oo-console-stage); padding:48px; margin-top:16px;">
+      <div class="oo-pane reg-console oo-scanlines" style="background-color:var(--oo-console-stage); padding:48px; margin-top:16px; overflow:hidden;">
         <div class="oo-kicker">PIXELIFY SANS — console display · all caps · trailing period · glow</div>
         <p class="oo-display-console" style="font-size:58px; margin-top:18px;">WHY THIS WORKS.</p>
       </div>
@@ -237,7 +248,21 @@
       </div>
       <p style="font-size:12px; color:var(--oo-ghost); margin-top:20px;">iNiR / Quickshell adoption: console tokens at 50% glow, no captured-frame chrome — tokens only, beside Courier Console.</p>
     </section>
-    <!-- §07 checklist -->
+    <section class="plate" id="s07" style="border-bottom:none;">
+      <div class="oo-kicker">// 07 · MINIMUM ON-BRAND CHECKLIST</div>
+      <div class="oo-pane" style="margin-top:28px; padding:32px 40px; font-size:13px; line-height:2.4;">
+        <span class="voice">▸</span> one dominant register; other only as quotation<br>
+        <span class="voice">▸</span> one dominant first-read object<br>
+        <span class="voice">▸</span> top rail with path + state<br>
+        <span class="voice">▸</span> voice accent matches register (amber↔console · peach↔broadcast)<br>
+        <span class="voice">▸</span> semantic color only encodes state; data may go loud<br>
+        <span class="voice">▸</span> square corners · thin strokes · smoky panes<br>
+        <span class="voice">▸</span> glyphs as syntax, not decoration<br>
+        <span class="voice">▸</span> motion linear/steps from sanctioned vocabulary<br>
+        <span class="voice">▸</span> copy names mechanism + consequence<br>
+        <span style="color:var(--oo-green)">▸</span> <span class="oo-display-broadcast" style="font-size:18px;">would a serious operator broadcast this <em>from a live desk?</em></span>
+      </div>
+    </section>
   </main>
 
   <footer>
