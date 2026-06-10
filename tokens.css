@@ -103,7 +103,7 @@
 
 /* ── Plate hardware ── */
 .oo-pane {
-  background: var(--r-smoke);
+  background-color: var(--r-smoke);
   border: var(--oo-stroke) solid var(--r-line);
   border-radius: var(--oo-radius);
 }
