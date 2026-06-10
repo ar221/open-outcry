@@ -180,3 +180,6 @@
   .oo-draw-path { stroke-dashoffset: 0; }
   .oo-scanbeam { display: none; }
 }
+
+/* armed panes invert on click — black-on-voice */
+.oo-hover:active { background: var(--r-voice); color: var(--oo-void); }

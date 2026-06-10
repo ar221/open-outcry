@@ -121,7 +121,7 @@
         <div class="oo-grain" style="position:absolute; inset:0; pointer-events:none; z-index:0;" aria-hidden="true"></div>
         <div style="position:relative; z-index:1;">
           <div class="oo-kicker">FRAUNCES — broadcast display · the italic carries the accent</div>
-          <p class="oo-display-broadcast" style="font-size:54px; margin-top:18px;">As agents got powerful, markdown became <em>a restricting format.</em></p>
+          <p class="oo-display-broadcast" style="font-size:54px; margin-top:18px;">As agents took over the work, markdown became <em>a restricting format.</em></p>
         </div>
       </div>
       <div class="oo-pane reg-console oo-scanlines" style="background-color:var(--oo-console-stage); padding:48px; margin-top:16px; overflow:hidden;">
@@ -281,16 +281,17 @@ toggle.addEventListener('click', () => {
     el.classList.toggle('reg-broadcast', toBroadcast);
   }
   stage.classList.toggle('oo-scanlines', !toBroadcast);
+  stage.classList.toggle('oo-grain', toBroadcast);
   toggle.textContent = toBroadcast ? '[ REGISTER: BROADCAST ]' : '[ REGISTER: CONSOLE ]';
 });
 
-// ── the tape: real numbers from the document itself, doubled for seamless loop ──
+// ── the tape: real numbers from the document itself, doubled for a gapless loop ──
 function buildTape() {
   const css = [...document.styleSheets].find(s => (s.href||'').includes('tokens.css'));
   let tokens = 0;
   try { for (const r of css.cssRules) if (r.cssText) tokens += (r.cssText.match(/--oo-[\w-]+\s*:/g)||[]).length; } catch(e) {}
   const sections = document.querySelectorAll('main section').length;
-  const seg = ` TOKENS <span class="up">${tokens}</span> · SECTIONS <span class="voice">${sections}</span> · REGISTERS <span class="voice">2</span> · FAKE METRICS <span class="down">0</span> · EASING CURVES <span class="down">0</span> · SQUARE CORNERS <span class="up">ALL</span> ·`;
+  const seg = ` TOKENS <span class="up">${tokens || 'n/a'}</span> · SECTIONS <span class="voice">${sections}</span> · REGISTERS <span class="voice">2</span> · FAKE METRICS <span class="down">0</span> · EASING CURVES <span class="down">0</span> · SQUARE CORNERS <span class="up">ALL</span> ·`;
   document.getElementById('tape').innerHTML = seg.repeat(6);
 }
 // ── typed accent: steps(), no easing ──
