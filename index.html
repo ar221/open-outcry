@@ -125,7 +125,43 @@
         <span style="color:var(--oo-ghost)">&gt; rejected alternates: playfair display, instrument serif, silkscreen (fallback)</span>
       </div>
     </section>
-    <!-- §04 anatomy+glyphs -->
+    <section class="plate" id="s04">
+      <div class="oo-kicker">// 04 · PLATE ANATOMY + GLYPHS AS SYNTAX</div>
+      <div style="display:grid; grid-template-columns:3fr 2fr; gap:24px; margin-top:32px;">
+        <div class="oo-pane oo-scanlines" style="background:var(--oo-console-stage); padding:0; overflow:hidden;">
+          <div class="oo-rail" style="padding:10px 20px;"><span>&gt; <span class="voice">memory</span>/why-it-works</span><span><span class="oo-dot"></span> AUDITED</span></div>
+          <div style="padding:28px 20px 36px;">
+            <div class="oo-kicker">// THE MECHANISM</div>
+            <p class="oo-display-console" style="font-size:30px; margin-top:10px;">ONE FIRST-READ OBJECT.</p>
+            <p style="font-size:12px; color:var(--oo-muted); margin-top:12px; max-width:42ch;">Hard left edge. Void carries atmosphere — do not fill every corner.</p>
+          </div>
+          <div class="oo-rail" style="border-bottom:none; border-top:1px solid var(--r-line); padding:8px 20px; font-size:10px;"><span>03 / 16</span><span aria-hidden="true">● ● <span class="voice">●</span> ● ●</span><span>press -&gt; to continue</span></div>
+        </div>
+        <div class="oo-pane" style="padding:24px; font-size:13px;">
+          <div class="oo-kicker" style="margin-bottom:14px;">GLYPHS — ASCII AS SYNTAX</div>
+          <table style="width:100%; border-collapse:collapse; font-size:12px;">
+            <tr><td class="voice" style="padding:6px 0; width:90px;">&gt;</td><td style="color:var(--r-fg-dim)">prompt · path · console bullet</td></tr>
+            <tr><td class="voice" style="padding:6px 0;">&lt; k = "v" &gt;</td><td style="color:var(--r-fg-dim)">broadcast kicker</td></tr>
+            <tr><td class="voice" style="padding:6px 0;">//</td><td style="color:var(--r-fg-dim)">section eyebrow</td></tr>
+            <tr><td style="padding:6px 0;"><span class="oo-dot"></span></td><td style="color:var(--r-fg-dim)">live status</td></tr>
+            <tr><td class="voice" style="padding:6px 0;">▸</td><td style="color:var(--r-fg-dim)">row marker</td></tr>
+            <tr><td class="voice" style="padding:6px 0;">-&gt;</td><td style="color:var(--r-fg-dim)">progression</td></tr>
+            <tr><td style="padding:6px 0;"><span class="oo-cursor"></span></td><td style="color:var(--r-fg-dim)">the heartbeat</td></tr>
+          </table>
+          <p style="font-size:11px; color:var(--oo-ghost); margin-top:14px;">No icon packs. No emoji. Window dots only when mimicking terminal chrome.</p>
+        </div>
+      </div>
+      <div class="oo-pane" style="margin-top:24px; padding:24px; text-align:center;">
+        <div class="oo-kicker" style="margin-bottom:12px;">SVG — MONOLINE BLUEPRINT · draws only when it explains</div>
+        <svg width="640" height="90" viewBox="0 0 640 90" fill="none" style="max-width:100%;" role="img" aria-label="Blueprint price path with entry and stop markers">
+          <path class="oo-draw-path" d="M16 70 L120 70 L160 26 L300 26 L340 70 L470 70 L510 44 L624 44" stroke="var(--oo-amber)" stroke-width="2" stroke-linejoin="miter"/>
+          <circle cx="160" cy="26" r="4" fill="var(--oo-green)"/>
+          <circle cx="340" cy="70" r="4" fill="var(--oo-red)"/>
+          <text x="170" y="20" fill="var(--oo-muted)" font-family="JetBrains Mono" font-size="10">entry</text>
+          <text x="350" y="84" fill="var(--oo-muted)" font-family="JetBrains Mono" font-size="10">stop</text>
+        </svg>
+      </div>
+    </section>
     <!-- §05 motion -->
     <!-- §06 gallery -->
     <!-- §07 checklist -->
@@ -200,6 +236,12 @@ function buildPalette() {
   }
 }
 window.addEventListener('load', buildPalette);
+// ── SVG line-draw fires when the diagram enters view ──
+const drawObserver = new IntersectionObserver(entries => {
+  for (const e of entries) if (e.isIntersecting) e.target.classList.add('is-drawing');
+}, { threshold: 0.4 });
+window.addEventListener('load', () =>
+  document.querySelectorAll('.oo-draw-path').forEach(p => drawObserver.observe(p)));
 window.addEventListener('load', buildTape);
 </script>
 </body>
