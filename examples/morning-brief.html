@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <!-- ═══════════════════════════════════════════════════════════
 FRICTION LOG (second consumer) — examples/morning-brief.html
-Contract under test: tokens.css v1.1 + components.css v1.2 (FROZEN — untouched)
+Contract under test: tokens.css v1.1 + components.css v1.2 (frozen at the time)
+v1.3 UPDATE (2026-06-10): this log was the evidence that lifted the freeze.
+Promoted items below are marked PROMOTED v1.3; the page now consumes them.
+Unpromoted observations stay logged as still-deferred evidence.
 Source data: ™ Morning Brief — 2026-06-09 — CRT Field-Console — generated.html
-Every page-local rule below is friction evidence. Honest count: 9 page-local
-rule groups + 2 page-local utility classes the contract arguably owes us.
+Every page-local rule below was friction evidence. Honest count at v1.2: 9
+page-local rule groups + 2 page-local utility classes the contract owed us.
 
 ── VERDICTS ON THE TWO STANDING QUESTIONS ──
 
-1. --oo-gutter: PAIN REAPPEARED. Third copy of the gutter coupling now exists
+1. --oo-gutter: PROMOTED v1.3. PAIN REAPPEARED. Third copy of the gutter coupling now exists
    (index.html, inir.html, this file). `.oo-plate--bleed` hardcodes -56px
    margins (and -20px under 720px) inside the frozen contract, so every
    consumer stage MUST declare `padding: 0 56px` desktop / `0 20px` narrow
@@ -17,7 +20,7 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
    tokens.css and make both `.oo-plate--bleed` and consumer stages consume
    it. This is the single clearest v1.3 candidate.
 
-2. Shared sticky chrome: PAIN REAPPEARED, identically. Header rail and
+2. Shared sticky chrome: PROMOTED v1.3 as .oo-rail--sticky. PAIN REAPPEARED, identically. Header rail and
    footer tape again needed page-local `position: sticky` + `z-index` +
    an opaque background re-declaration (rules ② below) — byte-for-byte the
    same glue inir.html wrote. Two consumers, same three lines each.
@@ -28,21 +31,22 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
 
 ── PRIMITIVES I WISHED EXISTED ──
 
-· ACTION/BUTTON HARDWARE. Biggest gap this consumer hit. The hero needs
+· ACTION/BUTTON HARDWARE. PROMOTED v1.3 as .oo-btn — admitted as CHROME
+  ONLY (controls are chrome; chrome is always mono). Biggest gap this consumer hit. The hero needs
   three CTAs ("Do it" / "Log blocker" / "Close"). Closest contract fit is
   composing .oo-pane + .oo-hover (which even gives the black-on-voice
   :active invert for free — good press feel), but display/padding/type
   had to be page-local (.mb-btn, rule ④). First consumer had zero CTAs so
   this never surfaced. Candidate: `.oo-btn` = pane hardware + mono 12px
   uppercase + inline-flex + padding, hover/active from .oo-hover.
-· STAT DELTA SLOT. .oo-stat/.oo-stat-value carry kicker + number but real
+· STAT DELTA SLOT. STILL DEFERRED. .oo-stat/.oo-stat-value carry kicker + number but real
   telemetry always has a third line ("source: jobs.json", "99 GiB free").
   Page-local .mb-delta (rule ⑤). Candidate: `.oo-stat-delta`.
-· 4-UP GRID. TRAP cockpit is naturally four numbers. Contract stops at
+· 4-UP GRID. STILL DEFERRED. TRAP cockpit is naturally four numbers. Contract stops at
   .oo-grid-3, so .mb-grid-4 is page-local (rule ⑥). Borderline — could
   also be solved with a documented `style="grid-template-columns:..."`
   idiom instead of a class.
-· LEDGER / RECEIPT ROWS. Source Ledger is label+path rows — pure Open
+· LEDGER / RECEIPT ROWS. STILL DEFERRED. Source Ledger is label+path rows — pure Open
   Outcry territory (receipts!) yet no primitive. Page-local .mb-ledger
   (rule ⑦). Candidate worth designing properly, not rushing.
 · HERO SPLIT. Command board hero = wide editorial column + narrow machine
@@ -50,16 +54,19 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
   Probably fine to leave page-local — hero ratios are page personality.
 
 ── PAGE-LOCAL RULES, FULL LIST ──
- ① shell reset + body + .stage (3rd copy of consumer shell boilerplate)
- ② sticky header/footer chrome (see verdict 2)
+ ① shell reset + body + .stage (3rd copy of consumer shell boilerplate;
+   gutter coupling RETIRED v1.3 — stage now pads with var(--oo-gutter))
+ ② sticky header/footer chrome — RETIRED v1.3, replaced by .oo-rail--sticky
  ③ .mb-hero grid (1.5fr/1fr split + narrow collapse)
- ④ .mb-btn action hardware (see button gap)
- ⑤ .mb-delta stat third line
- ⑥ .mb-grid-4 (+ narrow collapse to 2-up)
- ⑦ .mb-ledger receipt rows
+ ④ .mb-btn action hardware — RETIRED v1.3, replaced by .oo-btn
+ ⑤ .mb-delta stat third line (STILL DEFERRED)
+ ⑥ .mb-grid-4 (+ narrow collapse to 2-up) (STILL DEFERRED)
+ ⑦ .mb-ledger receipt rows (STILL DEFERRED)
  ⑧ .oo-tape .oo-tickwrap padding (copied verbatim from inir.html — second
    copy; the tape arguably owes itself vertical padding in-contract)
- ⑨ narrow glue: stage gutter 20px, kicker hidden in header, buttons wrap
+   (STILL DEFERRED)
+ ⑨ narrow glue: kicker hidden in header, buttons wrap (stage gutter 20px
+   RETIRED v1.3 — tokens.css re-declares --oo-gutter narrow)
 
 ── WHAT WORKED / NOTES ──
 · .oo-register-quote--block: first real use, and it earned its keep — ONE
@@ -71,12 +78,15 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
   background-image). Same discipline on the sticky chrome and the hero
   plate fill. Trap did NOT bite because it was pre-briefed — it WILL bite
   the first consumer that isn't. Strong case for a components.css header
-  comment warning about it.
+  comment warning about it. → DOCUMENTED v1.3: warning now heads
+  components.css, and .oo-rail--sticky bakes background-color in.
 · Register law was easy to hold everywhere EXCEPT the hero CTAs: buttons
   are machine affordances (mono, uppercase) living on a broadcast plate.
   Resolved by reading them as tape/chrome voice (kickers are mono on
   broadcast plates already), not as a register breach — but the spec
   should say this out loud: "controls are chrome, chrome is always mono."
+  → CODIFIED v1.3: the rule now sits verbatim above .oo-btn in
+  components.css and in the spec's v1.3 changelog.
 · INK vs STAT-VALUE precedence (found during in-browser verify): `.up` /
   `.down` on the same element as `.oo-stat-value` silently lose — both are
   single-class selectors and .oo-stat-value's `color` is declared later in
@@ -86,6 +96,9 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
   `color: var(--r-fg)` only as a fallback (e.g. `.oo-stat-value:where(...)`)
   so ink classes can win. Real semantic-state coloring is core to a stat
   primitive on a trading-flavored brand; this will bite every consumer.
+  → FIXED v1.3: base ink moved to :where(.oo-stat-value) (zero specificity);
+  nesting workaround removed from this page — ink classes sit directly on
+  the value element now.
 · Inline styles: this file follows the first consumer's idiom of inline
   style="" for one-off spacing. Counted honestly, ~30 inline declarations.
   Not contract gaps individually, but margin-top rhythm (14/20/24/28/32px)
@@ -123,25 +136,16 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
     max-width: 1080px; margin: 0 auto; min-height: 100vh;
     /* TRAP: background-color, never shorthand — .oo-scanlines lives here */
     background-color: var(--r-stage); position: relative;
-    padding: 0 56px; /* must mirror .oo-plate--bleed's hardcoded -56px (--oo-gutter, see log) */
+    padding: 0 var(--oo-gutter); /* same token .oo-plate--bleed mirrors negative (v1.3) */
     border-left: 1px solid var(--r-line); border-right: 1px solid var(--r-line);
   }
 
-  /* ② sticky chrome (reappeared — see log verdict 2) */
-  header.oo-rail { position: sticky; top: 0; z-index: 10; background-color: var(--r-stage); }
-  footer { position: sticky; bottom: 0; z-index: 10; background-color: var(--r-stage); }
+  /* ② sticky chrome — RETIRED v1.3 (.oo-rail--sticky in markup) */
 
   /* ③ hero command-board split */
   .mb-hero { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 28px; align-items: start; }
 
-  /* ④ action hardware — contract gap, composed on .oo-pane + .oo-hover */
-  .mb-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 11px 16px; min-height: 42px;
-    font-family: var(--oo-font-mono); font-size: 12px; font-weight: 700;
-    letter-spacing: .08em; text-transform: uppercase;
-    color: var(--r-voice); text-decoration: none;
-  }
+  /* ④ action hardware — RETIRED v1.3, promoted as .oo-btn */
 
   /* ⑤ stat third line — contract gap */
   .mb-delta { display: block; margin-top: 8px; font-size: 12px; color: var(--r-muted); line-height: 1.5; }
@@ -161,9 +165,8 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
   /* ⑧ tape breathing room (copied from first consumer) */
   .oo-tape .oo-tickwrap { padding: 7px 0; }
 
-  /* ⑨ narrow: dispatch packet */
+  /* ⑨ narrow: dispatch packet (stage gutter now follows --oo-gutter) */
   @media (max-width: 720px) {
-    .stage { padding: 0 20px; } /* mirrors contract's -20px bleed override */
     header.oo-rail .oo-kicker { display: none; }
     .mb-hero { grid-template-columns: 1fr; }
     .mb-grid-4 { grid-template-columns: 1fr 1fr; }
@@ -174,7 +177,7 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
 <body>
 <div class="stage oo-scanlines oo-grain">
 
-  <header class="oo-rail">
+  <header class="oo-rail oo-rail--sticky">
     <span>&gt; <span class="voice">open-outcry</span>/examples/morning-brief</span>
     <span style="display:flex; gap:16px; align-items:center;">
       <span class="oo-kicker">SECOND CONSUMER · 2026-06-09 DATA</span>
@@ -201,9 +204,9 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
               leave a receipt. The door is Job Bank.
             </p>
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:28px;">
-              <a class="oo-pane oo-pane--armed oo-hover mb-btn" href="https://www.jobbank.gc.ca/login?redirect_url=/myaccount">Do it</a>
-              <a class="oo-pane oo-hover mb-btn" href="file:///home/ayaz/Documents/Ayaz%20OS/03%20Projects/Job%20Hunt/02%20Applications/%E2%84%A2%20Job%20Bank%20Blocker%20Log%20%E2%80%94%202026-05-20.md">Log blocker</a>
-              <a class="oo-pane oo-hover mb-btn" href="file:///home/ayaz/Documents/Ayaz%20OS/03%20Projects/Job%20Hunt/%E2%84%A2%20Job%20Hunt%20%E2%80%94%20Tasks.md">Close</a>
+              <a class="oo-pane oo-pane--armed oo-hover oo-btn" href="https://www.jobbank.gc.ca/login?redirect_url=/myaccount">Do it</a>
+              <a class="oo-pane oo-hover oo-btn" href="file:///home/ayaz/Documents/Ayaz%20OS/03%20Projects/Job%20Hunt/02%20Applications/%E2%84%A2%20Job%20Bank%20Blocker%20Log%20%E2%80%94%202026-05-20.md">Log blocker</a>
+              <a class="oo-pane oo-hover oo-btn" href="file:///home/ayaz/Documents/Ayaz%20OS/03%20Projects/Job%20Hunt/%E2%84%A2%20Job%20Hunt%20%E2%80%94%20Tasks.md">Close</a>
             </div>
           </div>
 
@@ -272,7 +275,7 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
         </div>
         <div class="oo-pane oo-stat">
           <div class="oo-kicker">DUE</div>
-          <span class="oo-stat-value"><span class="up">0</span></span>
+          <span class="oo-stat-value up">0</span>
         </div>
         <div class="oo-pane oo-stat">
           <div class="oo-kicker">WEAK LINKS</div>
@@ -324,17 +327,17 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
       <div class="oo-grid-3" style="margin-top:28px;">
         <div class="oo-pane oo-stat">
           <div class="oo-kicker">SERVICES</div>
-          <span class="oo-stat-value"><span class="up">0 failed</span></span>
+          <span class="oo-stat-value up">0 failed</span>
           <span class="mb-delta">no failed units returned by live check</span>
         </div>
         <div class="oo-pane oo-stat">
           <div class="oo-kicker">DISK</div>
-          <span class="oo-stat-value"><span class="up">78%</span></span>
+          <span class="oo-stat-value up">78%</span>
           <span class="mb-delta">used · 99 GiB free · source: shutil.disk_usage</span>
         </div>
         <div class="oo-pane oo-warning oo-stat">
           <div class="oo-kicker">HERMES CRON</div>
-          <span class="oo-stat-value"><span class="down">1 / 9</span></span>
+          <span class="oo-stat-value down">1 / 9</span>
           <span class="mb-delta">failures / jobs · source: jobs.json</span>
         </div>
       </div>
@@ -356,7 +359,7 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
       <dl class="mb-ledger" style="margin-top:28px;">
         <div><dt>Generator</dt><dd>/home/ayaz/Github/dotfiles/scripts/brief-me</dd></div>
         <div><dt>Style kit (source)</dt><dd>/home/ayaz/Documents/Ayaz OS/06 System/™ CRT Field-Console Brand Book v2.html</dd></div>
-        <div><dt>Restyle kit (mock)</dt><dd>~/Github/open-outcry — tokens.css v1.1 + components.css v1.2, frozen</dd></div>
+        <div><dt>Restyle kit (mock)</dt><dd>~/Github/open-outcry — tokens.css + components.css v1.3 (freeze lifted by this page's friction log)</dd></div>
         <div><dt>Visual standard</dt><dd>/home/ayaz/Documents/Ayaz OS/03 Projects/System/01 Specs/™ Ayaz OS Visual Artifact Standard.md</dd></div>
         <div><dt>Job tasks</dt><dd>/home/ayaz/Documents/Ayaz OS/03 Projects/Job Hunt/™ Job Hunt — Tasks.md</dd></div>
         <div><dt>Cron state</dt><dd>/home/ayaz/.hermes/profiles/alfred/cron/jobs.json</dd></div>
@@ -371,14 +374,14 @@ rule groups + 2 page-local utility classes the contract arguably owes us.
     <!-- ── FOOTER INDEX ── -->
     <section class="oo-plate" style="border-bottom:none; padding:32px 0;">
       <div class="oo-rail oo-rail--foot" style="padding:14px 0;">
-        <span>morning-brief · second consumer of <a class="oo-link" href="../index.html">open-outcry</a> v1.2</span>
-        <span class="oo-kicker">REGISTER LAW HELD · TOKENS UNTOUCHED · MARKETS POINTER-ONLY</span>
+        <span>morning-brief · second consumer of <a class="oo-link" href="../index.html">open-outcry</a> v1.3</span>
+        <span class="oo-kicker">REGISTER LAW HELD · FRICTION LOG → v1.3 · MARKETS POINTER-ONLY</span>
       </div>
     </section>
 
   </main>
 
-  <footer>
+  <footer class="oo-rail--sticky">
     <div class="oo-tape" aria-hidden="true"><div class="oo-tickwrap">
        21 OPEN TASKS · 5299 CARDS · <span class="up">0 DUE</span> · 3480 WEAK LINKS · <span class="up">SERVICES 0 FAILED</span> · <span class="up">DISK 78%</span> · <span class="down">CRON 1/9 FAIL</span> ·
        21 OPEN TASKS · 5299 CARDS · <span class="up">0 DUE</span> · 3480 WEAK LINKS · <span class="up">SERVICES 0 FAILED</span> · <span class="up">DISK 78%</span> · <span class="down">CRON 1/9 FAIL</span> ·

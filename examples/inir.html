@@ -23,14 +23,11 @@
   .stage {
     max-width: 1080px; margin: 0 auto; min-height: 100vh;
     background: var(--r-stage); position: relative;
-    padding: 0 56px;
+    padding: 0 var(--oo-gutter);
     border-left: 1px solid var(--r-line); border-right: 1px solid var(--r-line);
   }
-  header.oo-rail { position: sticky; top: 0; z-index: 10; background: var(--r-stage); }
-  footer { position: sticky; bottom: 0; z-index: 10; background: var(--r-stage); }
   .oo-tape .oo-tickwrap { padding: 7px 0; }
   @media (max-width: 720px) {
-    .stage { padding: 0 20px; }
     header.oo-rail .oo-kicker { display: none; }
   }
 </style>
@@ -38,7 +35,7 @@
 <body class="reg-broadcast">
 <div class="stage reg-broadcast oo-grain">
 
-  <header class="oo-rail">
+  <header class="oo-rail oo-rail--sticky">
     <span>&gt; <span class="voice">open-outcry</span>/examples/inir</span>
     <span style="display:flex; gap:16px; align-items:center;">
       <span class="oo-kicker">REGISTER: BROADCAST</span>
@@ -149,7 +146,7 @@
 
   </main>
 
-  <footer>
+  <footer class="oo-rail--sticky">
     <div class="oo-tape" aria-hidden="true"><div class="oo-tickwrap">
        QML FILES <span class="up">878</span> · SERVICES <span class="voice">80</span> · MODULES <span class="voice">30</span> · COMMITS <span class="up">1,826</span> · FAKE METRICS <span class="down">0</span> · HARVESTED <span class="voice">2026-06-10</span> ·
        QML FILES <span class="up">878</span> · SERVICES <span class="voice">80</span> · MODULES <span class="voice">30</span> · COMMITS <span class="up">1,826</span> · FAKE METRICS <span class="down">0</span> · HARVESTED <span class="voice">2026-06-10</span> ·
