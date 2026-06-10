@@ -162,7 +162,44 @@
         </svg>
       </div>
     </section>
-    <!-- §05 motion -->
+    <section class="plate" id="s05">
+      <div class="oo-kicker">// 05 · MOTION — linear or steps(). machines don't ease-in-out.</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:32px;">
+        <div class="oo-pane" style="padding:20px;">
+          <div class="oo-kicker" style="margin-bottom:10px;">CORE 1 — TYPED + CURSOR</div>
+          <span style="font-size:13px;">&gt; <span id="motion-typed"></span><span class="oo-cursor" aria-hidden="true"></span></span>
+        </div>
+        <div class="oo-pane" style="padding:20px; overflow:hidden;">
+          <div class="oo-kicker" style="margin-bottom:10px;">CORE 2 — TICKER RAIL · real numbers only</div>
+          <div class="oo-tape" style="border:none;" aria-hidden="true"><div class="oo-tickwrap" style="font-size:11px;"> SECTIONS <span class="up">8</span> · MOTIFS <span class="voice">6</span> · BANNED <span class="down">4</span> · SECTIONS <span class="up">8</span> · MOTIFS <span class="voice">6</span> · BANNED <span class="down">4</span> ·</div></div>
+        </div>
+        <div class="oo-pane" style="padding:20px; position:relative; overflow:hidden;">
+          <div class="oo-scanbeam"></div>
+          <div class="oo-kicker" style="margin-bottom:10px;">CORE 3 — SCAN-BEAM ON IDLE</div>
+          <span style="font-size:12px; color:var(--r-muted);">ambient CRT presence · subtle, never loud</span>
+        </div>
+        <div class="oo-pane oo-hover" style="padding:20px;">
+          <div class="oo-kicker" style="margin-bottom:10px;">CORE 4 — HOVER-ARM ▸ try me</div>
+          <span style="font-size:12px; color:var(--r-muted);">border ignites · 1px lift · crosshair · click inverts</span>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <div class="oo-pane" style="padding:20px; border-style:dashed;">
+          <div class="oo-kicker" style="margin-bottom:10px;">SCOPED — SVG LINE-DRAW · diagrams only (see §04)</div>
+          <div class="oo-kicker" style="margin-top:6px;">SCOPED — TWEAK PANELS · playgrounds only ↓</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-top:12px; font-size:11px;">
+            <label for="glow-knob" style="width:48px;">glow</label>
+            <input id="glow-knob" type="range" min="0" max="48" value="24" style="flex:1; accent-color:var(--oo-amber);">
+            <span class="voice" id="glow-val">24px</span>
+          </div>
+          <p class="oo-display-console" id="glow-target" style="font-size:22px; margin-top:10px;">TOUCH THE SYSTEM.</p>
+        </div>
+        <div class="oo-pane" style="padding:20px; border-color:rgba(224,69,90,.4);">
+          <div class="oo-kicker" style="color:var(--oo-red); margin-bottom:10px;"><span aria-hidden="true">▲ </span>BANNED</div>
+          <p style="font-size:12px; color:var(--r-fg-dim); line-height:2;">glitch loops as default state · parallax soup · bounce / elastic easing · chromatic aberration on instructional text · animated gradient decoration</p>
+        </div>
+      </div>
+    </section>
     <!-- §06 gallery -->
     <!-- §07 checklist -->
   </main>
@@ -242,6 +279,26 @@ const svgDrawObserver = new IntersectionObserver(entries => {
 }, { threshold: 0.4 });
 window.addEventListener('load', () =>
   document.querySelectorAll('.oo-draw-path').forEach(p => svgDrawObserver.observe(p)));
+// ── motion lab: looping typewriter + live glow knob ──
+function motionTyped() {
+  const el = document.getElementById('motion-typed');
+  const text = 'initializing subsystem...';
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = text; return; }
+  let i = 0;
+  (function tick() {
+    el.textContent = text.slice(0, i = (i + 1) % (text.length + 14));
+    setTimeout(tick, 76);
+  })();
+}
+function wireKnob() {
+  const knob = document.getElementById('glow-knob');
+  knob.addEventListener('input', () => {
+    document.getElementById('glow-target').style.textShadow =
+      `0 0 ${knob.value}px var(--oo-amber-glow)`;
+    document.getElementById('glow-val').textContent = `${knob.value}px`;
+  });
+}
+window.addEventListener('load', () => { motionTyped(); wireKnob(); });
 window.addEventListener('load', buildTape);
 </script>
 </body>
