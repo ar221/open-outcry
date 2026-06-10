@@ -54,8 +54,42 @@
   </header>
 
   <main id="book">
-    <!-- §00 cover -->
-    <!-- §01 concept -->
+    <section class="plate reg-broadcast" id="s00" style="background:var(--r-stage); margin:0 -56px; padding:120px 56px; overflow:hidden;">
+      <div class="oo-grain" style="position:absolute; inset:0;"></div>
+      <div style="position:relative;">
+        <div class="oo-kicker">&lt; document = <span style="color:var(--oo-terracotta)">"brand book"</span> &gt; - - - - - - - - - - - -</div>
+        <h1 class="oo-display-broadcast" style="font-size:var(--oo-display-broadcast); margin-top:28px; max-width:14ch;">
+          Open Outcry — <em id="typed-accent"></em><span class="oo-cursor"></span>
+        </h1>
+        <p style="color:var(--r-fg-dim); max-width:52ch; margin-top:28px;">
+          One identity. Two registers. One tape. The era when markets ran on human
+          voices — <span class="voice">open</span> is the machinery,
+          <span class="voice">outcry</span> is the voice.
+        </p>
+        <p class="oo-kicker" style="margin-top:48px;">GOVERNING TEST — does it feel like a serious operator broadcasting from a live desk?</p>
+      </div>
+    </section>
+    <section class="plate" id="s01">
+      <div class="oo-kicker">// 01 · THE TWO REGISTERS</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:32px;">
+        <div class="oo-pane reg-broadcast oo-hover" style="background:var(--oo-broadcast-stage); padding:32px; position:relative; overflow:hidden;">
+          <div class="oo-grain" style="position:absolute; inset:0;"></div>
+          <div class="oo-kicker">BROADCAST — the human voice</div>
+          <p class="oo-display-broadcast" style="font-size:30px; margin-top:16px;">Theses, heroes, <em>rhetoric.</em></p>
+          <p style="font-size:13px; color:var(--oo-muted-warm); margin-top:14px;">Coffee-dark grain. Fraunces serif. One italic peach phrase per plate. Landing pages, openings, quotes.</p>
+        </div>
+        <div class="oo-pane reg-console oo-hover oo-scanlines" style="background:var(--oo-console-stage); padding:32px; position:relative; overflow:hidden;">
+          <div class="oo-scanbeam"></div>
+          <div class="oo-kicker">CONSOLE — the machine voice</div>
+          <p class="oo-display-console" style="font-size:26px; margin-top:16px;">Mechanisms. Data. Warnings.</p>
+          <p style="font-size:13px; color:var(--oo-muted); margin-top:14px;">Green-black CRT. Pixelify display. Amber command ink. Dashboards, terminal output, dense UI.</p>
+        </div>
+      </div>
+      <div class="oo-pane" style="margin-top:24px; padding:20px 28px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13px;"><span class="voice">REGISTER LAW</span> — every artifact picks ONE dominant register. The other appears only as a quotation. Never 50/50 on a plate.</span>
+        <span class="oo-kicker">THE TAPE RUNS THROUGH BOTH ↓</span>
+      </div>
+    </section>
     <!-- §02 palette -->
     <!-- §03 type -->
     <!-- §04 anatomy+glyphs -->
@@ -92,6 +126,17 @@ function buildTape() {
   const seg = ` TOKENS <span class="up">${tokens}</span> · SECTIONS <span class="voice">${sections}</span> · REGISTERS <span class="voice">2</span> · FAKE METRICS <span class="down">0</span> · EASING CURVES <span class="down">0</span> · SQUARE CORNERS <span class="up">ALL</span> ·`;
   document.getElementById('tape').innerHTML = seg.repeat(6);
 }
+// ── typed accent: steps(), no easing ──
+function typeAccent() {
+  const el = document.getElementById('typed-accent');
+  const text = 'a brand with two voices.';
+  let i = 0;
+  (function tick() {
+    el.textContent = text.slice(0, ++i);
+    if (i < text.length) setTimeout(tick, 64);
+  })();
+}
+window.addEventListener('load', typeAccent);
 window.addEventListener('load', buildTape);
 </script>
 </body>
