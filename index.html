@@ -90,7 +90,20 @@
         <span class="oo-kicker">THE TAPE RUNS THROUGH BOTH <span aria-hidden="true">↓</span></span>
       </div>
     </section>
-    <!-- §02 palette -->
+    <section class="plate" id="s02">
+      <div class="oo-kicker">// 02 · COLOR — read live from tokens.css</div>
+      <h2 class="oo-display-console" style="font-size:40px; margin-top:20px;">DATA EARNS COLOR.</h2>
+      <div id="palette-board" style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:32px;"></div>
+      <div class="oo-pane" style="margin-top:24px; padding:20px 28px; font-size:13px; line-height:2;">
+        <span class="voice">DISCIPLINE</span> —
+        1. plate = 90% surface + text + ONE voice accent ·
+        2. semantic color only encodes state ·
+        3. charts may go polychrome ·
+        4. <span class="down">blue is never a background</span> ·
+        5. glow belongs to titles + live dots ·
+        6. corners 0–2px
+      </div>
+    </section>
     <!-- §03 type -->
     <!-- §04 anatomy+glyphs -->
     <!-- §05 motion -->
@@ -138,6 +151,33 @@ function typeAccent() {
   })();
 }
 window.addEventListener('load', typeAccent);
+// ── palette board: rendered from computed tokens, not hardcoded ──
+function buildPalette() {
+  const groups = [
+    { name: 'SURFACES', tokens: ['--oo-void','--oo-console-stage','--oo-console-pane','--oo-broadcast-stage','--oo-broadcast-pane'] },
+    { name: 'VOICE RAMP', tokens: ['--oo-amber','--oo-amber-dim','--oo-peach','--oo-terracotta'] },
+    { name: 'TEXT', tokens: ['--oo-fg','--oo-fg-warm','--oo-fg-dim','--oo-muted','--oo-ghost'] },
+    { name: 'THE TAPE', tokens: ['--oo-green','--oo-green-deep','--oo-red'] },
+    { name: 'RARE INK', tokens: ['--oo-blue','--oo-violet'] },
+    { name: 'LINES', tokens: ['--oo-line','--oo-line-warm','--oo-pane-border'] },
+  ];
+  const cs = getComputedStyle(document.documentElement);
+  const board = document.getElementById('palette-board');
+  for (const g of groups) {
+    const pane = document.createElement('div');
+    pane.className = 'oo-pane oo-hover';
+    pane.style.padding = '16px';
+    let rows = `<div class="oo-kicker" style="margin-bottom:10px;">${g.name}</div>`;
+    for (const t of g.tokens) {
+      const v = cs.getPropertyValue(t).trim();
+      const light = ['--oo-amber','--oo-peach','--oo-fg','--oo-fg-warm','--oo-green'].includes(t);
+      rows += `<div style="background:${v}; color:${light ? '#1a1106' : 'var(--oo-fg-dim)'}; font-size:10px; padding:8px 10px; display:flex; justify-content:space-between;"><span>${t}</span><span>${v}</span></div>`;
+    }
+    pane.innerHTML = rows;
+    board.appendChild(pane);
+  }
+}
+window.addEventListener('load', buildPalette);
 window.addEventListener('load', buildTape);
 </script>
 </body>
