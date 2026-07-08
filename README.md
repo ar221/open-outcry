@@ -19,9 +19,10 @@ Ayaz's personal design language. Dual register: **Broadcast** (editorial serif, 
   - `.oo-display-console` / `.oo-display-broadcast` — the two display voices
   - `.oo-tickwrap` / `.oo-scanbeam` / `.oo-hover` / `.oo-draw-path` — sanctioned motion
   - `.oo-plate` / `.oo-plate--bleed` / `.oo-plate-card` / `.oo-specimen` — section plates and specimen cards
-  - `.oo-stat` / `.oo-stat-value` — stat lockup: kicker + big mono number (compose with `.oo-pane`)
+  - `.oo-stat` / `.oo-stat-value` / `.oo-stat-delta` — stat lockup: kicker + big mono number + source/context third line (compose with `.oo-pane`). Zero-state rule: semantic ink only on non-zero counts
   - `.oo-prose` — body-paragraph measure (dim ink, 54ch)
-  - `.oo-grid-2` / `.oo-grid-2--wide` / `.oo-grid-3` — layout grids (collapse to 1 column under 720px)
+  - `.oo-stage` — the consumer shell: centered 1080px stage, gutter padding, side strokes, register-aware fill
+  - `.oo-grid-2` / `.oo-grid-2--wide` / `.oo-grid-3` / `.oo-grid-4` — layout grids, all `minmax(0,1fr)` (collapse under 720px; grid-4 → 2-up)
   - `.oo-overlay` / `.oo-content` — texture-overlay host and z-lifted content
   - `.oo-register-quote` — one machine pane quoted inside broadcast; self-registering — the one class carries pane hardware, scanlines, and the console register. `--block` variant for multi-line quotes
 - `index.html` — the living brand book / documentation. Open it; it demonstrates its own rules.
