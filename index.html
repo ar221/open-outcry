@@ -20,13 +20,7 @@
     font-size: var(--oo-type-body);
     line-height: 1.6;
   }
-  .stage {
-    max-width: 1080px; margin: 0 auto; min-height: 100vh;
-    background-color: var(--r-stage); position: relative;
-    padding: 0 var(--oo-gutter);
-    border-left: 1px solid var(--r-line); border-right: 1px solid var(--r-line);
-  }
-  .stage.oo-scanlines { background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px); background-size: 100% 4px; }
+  /* stage shell RETIRED v1.4 — .oo-stage in markup (this file was the 5th copy) */
 
   #reg-toggle {
     font-family: var(--oo-font-mono); font-size: 11px; letter-spacing: .08em;
@@ -37,7 +31,7 @@
   }
   #reg-toggle:hover { background: var(--r-voice); color: var(--oo-void); }
 
-  .oo-tape .oo-tickwrap { padding: 7px 0; }
+  /* tape padding RETIRED v1.4 — in contract */
 
   .book-bleed { margin-inline: -28px; }
 
@@ -52,10 +46,10 @@
 </style>
 </head>
 <body class="reg-console">
-<div class="stage reg-console oo-scanlines" id="stage">
+<div class="oo-stage reg-console oo-scanlines" id="stage">
 
   <header class="oo-rail oo-rail--sticky">
-    <span>&gt; <span class="voice">open-outcry</span>/brand-book · v1.3</span>
+    <span>&gt; <span class="voice">open-outcry</span>/brand-book · v1.4</span>
     <span style="display:flex; gap:16px; align-items:center;">
       <button id="reg-toggle" type="button">[ REGISTER: CONSOLE ]</button>
       <span><span class="oo-dot"></span> LIVE</span>
@@ -171,10 +165,14 @@
           <p style="font-size:11px; color:var(--oo-ghost); margin-top:14px; line-height:1.8;">compose on .oo-pane (+ --armed) and .oo-hover — hover-arm + black-on-voice press come free. Controls are chrome; chrome is always mono, even on a broadcast plate (§01 corollary).</p>
         </div>
         <div class="oo-pane" style="padding:24px; font-size:12px; line-height:2.2;">
-          <div class="oo-kicker" style="margin-bottom:12px;">v1.3 CONTRACT NOTES</div>
+          <div class="oo-kicker" style="margin-bottom:12px;">v1.3 / v1.4 CONTRACT NOTES</div>
           <span class="voice">--oo-gutter</span> <span style="color:var(--r-fg-dim)">— stage padding and .oo-plate--bleed share one token (56px / 20px narrow)</span><br>
           <span class="voice">.oo-rail--sticky</span> <span style="color:var(--r-fg-dim)">— pins chrome; opaque background-color baked in (see TRAP, components.css)</span><br>
-          <span class="voice">:where(.oo-stat-value)</span> <span style="color:var(--r-fg-dim)">— base ink at zero specificity; semantic ink wins: <span class="oo-stat-value up" style="display:inline; font-size:18px;">+78%</span> <span class="oo-stat-value down" style="display:inline; font-size:18px;">-1/9</span></span>
+          <span class="voice">:where(.oo-stat-value)</span> <span style="color:var(--r-fg-dim)">— base ink at zero specificity; semantic ink wins: <span class="oo-stat-value up" style="display:inline; font-size:18px;">+78%</span> <span class="oo-stat-value down" style="display:inline; font-size:18px;">-1/9</span></span><br>
+          <span class="voice">.oo-stage</span> <span style="color:var(--r-fg-dim)">— v1.4: the consumer shell, promoted after its fifth copy (this very page carries it now)</span><br>
+          <span class="voice">.oo-grid-4</span> <span style="color:var(--r-fg-dim)">— v1.4: 4-up stat row; all grids now minmax(0,1fr) so long mono numbers can't tear the stage</span><br>
+          <span class="voice">.oo-stat-delta</span> <span style="color:var(--r-fg-dim)">— v1.4: source/context third line under a stat value: <span class="oo-stat-delta" style="display:inline; margin:0;">source: jobs.json · 99 GiB free</span></span><br>
+          <span class="voice">zero-state ink</span> <span style="color:var(--r-fg-dim)">— v1.4 rule: a zero in a pending-stat stays base ink; semantic color is earned by non-zero state only</span>
         </div>
       </div>
       <div class="oo-pane" style="margin-top:24px; padding:24px; text-align:center;">

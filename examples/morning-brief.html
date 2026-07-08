@@ -3,6 +3,8 @@
 FRICTION LOG (second consumer) — examples/morning-brief.html
 Contract under test: tokens.css v1.1 + components.css v1.2 (frozen at the time)
 v1.3 UPDATE (2026-06-10): this log was the evidence that lifted the freeze.
+v1.4 UPDATE (2026-07-07): consumers #3/#4 re-hit ⑤⑥⑧ and the stage shell —
+promoted; this page now consumes .oo-stage/.oo-grid-4/.oo-stat-delta.
 Promoted items below are marked PROMOTED v1.3; the page now consumes them.
 Unpromoted observations stay logged as still-deferred evidence.
 Source data: ™ Morning Brief — 2026-06-09 — CRT Field-Console — generated.html
@@ -39,10 +41,10 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
   had to be page-local (.mb-btn, rule ④). First consumer had zero CTAs so
   this never surfaced. Candidate: `.oo-btn` = pane hardware + mono 12px
   uppercase + inline-flex + padding, hover/active from .oo-hover.
-· STAT DELTA SLOT. STILL DEFERRED. .oo-stat/.oo-stat-value carry kicker + number but real
+· STAT DELTA SLOT. PROMOTED v1.4 as .oo-stat-delta. .oo-stat/.oo-stat-value carry kicker + number but real
   telemetry always has a third line ("source: jobs.json", "99 GiB free").
   Page-local .mb-delta (rule ⑤). Candidate: `.oo-stat-delta`.
-· 4-UP GRID. STILL DEFERRED. TRAP cockpit is naturally four numbers. Contract stops at
+· 4-UP GRID. PROMOTED v1.4 as .oo-grid-4 (minmax(0,1fr) baked in). TRAP cockpit is naturally four numbers. Contract stops at
   .oo-grid-3, so .mb-grid-4 is page-local (rule ⑥). Borderline — could
   also be solved with a documented `style="grid-template-columns:..."`
   idiom instead of a class.
@@ -54,17 +56,17 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
   Probably fine to leave page-local — hero ratios are page personality.
 
 ── PAGE-LOCAL RULES, FULL LIST ──
- ① shell reset + body + .stage (3rd copy of consumer shell boilerplate;
-   gutter coupling RETIRED v1.3 — stage now pads with var(--oo-gutter))
+ ① shell reset + body + .stage — stage RETIRED v1.4, replaced by .oo-stage
+   (gutter coupling had already been retired v1.3)
  ② sticky header/footer chrome — RETIRED v1.3, replaced by .oo-rail--sticky
  ③ .mb-hero grid (1.5fr/1fr split + narrow collapse)
  ④ .mb-btn action hardware — RETIRED v1.3, replaced by .oo-btn
- ⑤ .mb-delta stat third line (STILL DEFERRED)
- ⑥ .mb-grid-4 (+ narrow collapse to 2-up) (STILL DEFERRED)
+ ⑤ .mb-delta stat third line — RETIRED v1.4, replaced by .oo-stat-delta
+ ⑥ .mb-grid-4 — RETIRED v1.4, replaced by .oo-grid-4
  ⑦ .mb-ledger receipt rows (STILL DEFERRED)
  ⑧ .oo-tape .oo-tickwrap padding (copied verbatim from inir.html — second
    copy; the tape arguably owes itself vertical padding in-contract)
-   (STILL DEFERRED)
+   — PROMOTED v1.4: contract now pads .oo-tape .oo-tickwrap
  ⑨ narrow glue: kicker hidden in header, buttons wrap (stage gutter 20px
    RETIRED v1.3 — tokens.css re-declares --oo-gutter narrow)
 
@@ -132,13 +134,7 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
     font-size: var(--oo-type-body);
     line-height: 1.6;
   }
-  .stage {
-    max-width: 1080px; margin: 0 auto; min-height: 100vh;
-    /* TRAP: background-color, never shorthand — .oo-scanlines lives here */
-    background-color: var(--r-stage); position: relative;
-    padding: 0 var(--oo-gutter); /* same token .oo-plate--bleed mirrors negative (v1.3) */
-    border-left: 1px solid var(--r-line); border-right: 1px solid var(--r-line);
-  }
+  /* ① stage shell — RETIRED v1.4 (.oo-stage in markup; this was copy #3 of 5) */
 
   /* ② sticky chrome — RETIRED v1.3 (.oo-rail--sticky in markup) */
 
@@ -147,11 +143,9 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
 
   /* ④ action hardware — RETIRED v1.3, promoted as .oo-btn */
 
-  /* ⑤ stat third line — contract gap */
-  .mb-delta { display: block; margin-top: 8px; font-size: 12px; color: var(--r-muted); line-height: 1.5; }
+  /* ⑤ stat third line — RETIRED v1.4 (.oo-stat-delta in markup) */
 
-  /* ⑥ 4-up grid — contract stops at grid-3 */
-  .mb-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  /* ⑥ 4-up grid — RETIRED v1.4 (.oo-grid-4 in markup, minmax(0,1fr) baked in) */
 
   /* ⑦ ledger receipt rows — contract gap */
   .mb-ledger { font-size: 12px; }
@@ -162,20 +156,18 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
   .mb-ledger dt { color: var(--r-muted); letter-spacing: .06em; text-transform: uppercase; }
   .mb-ledger dd { color: var(--r-fg-dim); word-break: break-all; font-family: var(--oo-font-mono); }
 
-  /* ⑧ tape breathing room (copied from first consumer) */
-  .oo-tape .oo-tickwrap { padding: 7px 0; }
+  /* ⑧ tape breathing room — RETIRED v1.4 (in contract) */
 
   /* ⑨ narrow: dispatch packet (stage gutter now follows --oo-gutter) */
   @media (max-width: 720px) {
     header.oo-rail .oo-kicker { display: none; }
     .mb-hero { grid-template-columns: 1fr; }
-    .mb-grid-4 { grid-template-columns: 1fr 1fr; }
     .mb-ledger > div { grid-template-columns: 1fr; gap: 2px; }
   }
 </style>
 </head>
 <body>
-<div class="stage oo-scanlines oo-grain">
+<div class="oo-stage oo-scanlines oo-grain">
 
   <header class="oo-rail oo-rail--sticky">
     <span>&gt; <span class="voice">open-outcry</span>/examples/morning-brief</span>
@@ -248,17 +240,17 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
         <div class="oo-pane oo-pane--armed oo-stat oo-hover">
           <div class="oo-kicker">JOB HUNT</div>
           <span class="oo-stat-value">21</span>
-          <span class="mb-delta">open tasks · next: A+ Core 1 recovery sprint — Professor Messer restart block</span>
+          <span class="oo-stat-delta">open tasks · next: A+ Core 1 recovery sprint — Professor Messer restart block</span>
         </div>
         <div class="oo-pane oo-stat oo-hover">
           <div class="oo-kicker">VAULT CAPTURES</div>
           <span class="oo-stat-value">31</span>
-          <span class="mb-delta">inbox captures · <span class="up">0</span> fresh clippings</span>
+          <span class="oo-stat-delta">inbox captures · <span class="up">0</span> fresh clippings</span>
         </div>
         <div class="oo-pane oo-stat oo-hover">
           <div class="oo-kicker">ALFRED HANDOFFS</div>
           <span class="oo-stat-value">2</span>
-          <span class="mb-delta">pending in the bridge inbox</span>
+          <span class="oo-stat-delta">pending in the bridge inbox</span>
         </div>
       </div>
       <p style="font-size:12px; color:var(--oo-ghost); margin-top:16px;">MAIL: source unavailable — mail (skipped). Honest gap, not zero pressure.</p>
@@ -268,7 +260,7 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
     <section class="oo-plate">
       <div class="oo-kicker">// 03</div>
       <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">Memory Cockpit</h2>
-      <div class="mb-grid-4" style="margin-top:28px;">
+      <div class="oo-grid-4" style="margin-top:28px;">
         <div class="oo-pane oo-stat">
           <div class="oo-kicker">TRAP CARDS</div>
           <span class="oo-stat-value">5299</span>
@@ -328,17 +320,17 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
         <div class="oo-pane oo-stat">
           <div class="oo-kicker">SERVICES</div>
           <span class="oo-stat-value up">0 failed</span>
-          <span class="mb-delta">no failed units returned by live check</span>
+          <span class="oo-stat-delta">no failed units returned by live check</span>
         </div>
         <div class="oo-pane oo-stat">
           <div class="oo-kicker">DISK</div>
           <span class="oo-stat-value up">78%</span>
-          <span class="mb-delta">used · 99 GiB free · source: shutil.disk_usage</span>
+          <span class="oo-stat-delta">used · 99 GiB free · source: shutil.disk_usage</span>
         </div>
         <div class="oo-pane oo-warning oo-stat">
           <div class="oo-kicker">HERMES CRON</div>
           <span class="oo-stat-value down">1 / 9</span>
-          <span class="mb-delta">failures / jobs · source: jobs.json</span>
+          <span class="oo-stat-delta">failures / jobs · source: jobs.json</span>
         </div>
       </div>
       <div class="oo-pane oo-warning" style="padding:20px 26px; margin-top:16px;">

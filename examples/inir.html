@@ -20,20 +20,14 @@
     font-size: var(--oo-type-body);
     line-height: 1.6;
   }
-  .stage {
-    max-width: 1080px; margin: 0 auto; min-height: 100vh;
-    background: var(--r-stage); position: relative;
-    padding: 0 var(--oo-gutter);
-    border-left: 1px solid var(--r-line); border-right: 1px solid var(--r-line);
-  }
-  .oo-tape .oo-tickwrap { padding: 7px 0; }
+  /* stage shell + tape padding RETIRED v1.4 — .oo-stage in markup, padding in contract */
   @media (max-width: 720px) {
     header.oo-rail .oo-kicker { display: none; }
   }
 </style>
 </head>
 <body class="reg-broadcast">
-<div class="stage reg-broadcast oo-grain">
+<div class="oo-stage reg-broadcast oo-grain">
 
   <header class="oo-rail oo-rail--sticky">
     <span>&gt; <span class="voice">open-outcry</span>/examples/inir</span>
