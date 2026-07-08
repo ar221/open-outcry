@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   OPEN OUTCRY — components v1.3
+   OPEN OUTCRY — components v1.4
    Import tokens.css first; these classes consume --r-* / --oo-* .
 
    ▲ TRAP — never use the `background:` shorthand on an element carrying
@@ -18,8 +18,8 @@
    · display type  — .oo-display-console · .oo-display-broadcast
    · motion        — .oo-tickwrap · .oo-scanbeam · .oo-hover · .oo-draw-path
    · plates        — .oo-plate · .oo-plate--bleed · .oo-plate-card · .oo-specimen
-   · stat & prose  — .oo-stat · .oo-stat-value · .oo-prose
-   · layout        — .oo-grid-2 · .oo-grid-2--wide · .oo-grid-3
+   · stat & prose  — .oo-stat · .oo-stat-value · .oo-stat-delta · .oo-prose
+   · layout        — .oo-stage · .oo-grid-2 · .oo-grid-2--wide · .oo-grid-3 · .oo-grid-4
    · stacking      — .oo-overlay · .oo-content
    · quotation     — .oo-register-quote · .oo-register-quote--block
    ═══════════════════════════════════════════════════════════ */
@@ -60,6 +60,8 @@
   color: var(--r-muted); border-top: 1px solid var(--r-line);
   overflow: hidden; white-space: nowrap;
 }
+/* breathing room lives on the moving strip (v1.4 — third consumer copy) */
+.oo-tape .oo-tickwrap { padding: 7px 0; }
 
 /* ── Footer rail variant ── */
 .oo-rail--foot { border-bottom: none; border-top: 1px solid var(--r-line); }
@@ -142,14 +144,31 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
 /* armed panes invert on click — black-on-voice */
 .oo-hover:active { background: var(--r-voice); color: var(--oo-void); }
 
+/* ── Stage: the consumer shell (promoted v1.4 — the brand book itself was the
+      FIFTH copy of this boilerplate; every consumer had rebuilt it verbatim).
+      Register-aware via --r-*; pads with the same --oo-gutter that
+      .oo-plate--bleed mirrors negative. Fill is background-color because the
+      stage usually carries .oo-scanlines — see TRAP at top of file. ── */
+.oo-stage {
+  max-width: 1080px; margin: 0 auto; min-height: 100vh;
+  background-color: var(--r-stage); position: relative;
+  padding: 0 var(--oo-gutter);
+  border-left: var(--oo-stroke) solid var(--r-line);
+  border-right: var(--oo-stroke) solid var(--r-line);
+}
+
 /* ── Plates: one section of a surface ── */
 .oo-plate { padding: 88px 0; border-bottom: 1px solid var(--r-line); position: relative; }
 .oo-plate--bleed { margin: 0 calc(-1 * var(--oo-gutter)); padding: 120px var(--oo-gutter); overflow: hidden; }
 
-/* ── Layout grids ── */
-.oo-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+/* ── Layout grids ──
+      minmax(0, 1fr) everywhere (v1.4): bare 1fr tracks inherit min-width:auto,
+      so one long mono number (a 40px quote) silently widens its track past the
+      stage. Found live on the daybreak index desk. ── */
+.oo-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .oo-grid-2--wide { gap: 24px; }
-.oo-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.oo-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.oo-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 
 /* ── Gallery plate: 16:9 specimen card ── */
 .oo-plate-card { aspect-ratio: 16/9; padding: 28px; position: relative; overflow: hidden; }
@@ -166,8 +185,18 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
   line-height: 1.1;
 }
 /* base ink at zero specificity — semantic ink (.up / .down / .voice) on the
-   same element always wins, regardless of source order. No nesting idiom needed. */
+   same element always wins, regardless of source order. No nesting idiom needed.
+   ZERO-STATE RULE (v1.4): semantic ink is for live state — a zero in a "pending"
+   stat stays base ink (a red 0 is a false alarm); color the value only when the
+   count is non-zero. */
 :where(.oo-stat-value) { color: var(--r-fg); }
+
+/* ── Stat third line: source / delta / context under the big number
+      (promoted v1.4 — copied verbatim by two consumers as .mb-delta/.db-delta) ── */
+.oo-stat-delta {
+  display: block; margin-top: 8px;
+  font-size: 12px; color: var(--r-muted); line-height: 1.5;
+}
 
 /* Controls are chrome; chrome is always mono. A broadcast plate may contain
    machine affordances, but controls do not become broadcast typography.
@@ -219,7 +248,8 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
 @media (max-width: 720px) {
   /* horizontal bleed follows --oo-gutter (re-declared narrow in tokens.css) */
   .oo-plate--bleed { padding-top: 80px; padding-bottom: 80px; }
-  .oo-grid-2, .oo-grid-3 { grid-template-columns: 1fr; }
+  .oo-grid-2, .oo-grid-3 { grid-template-columns: minmax(0, 1fr); }
+  .oo-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .oo-display-console, .oo-display-broadcast { font-size: clamp(20px, 7.5vw, 40px); }
   .oo-plate-card { aspect-ratio: auto; min-height: 180px; }
 }
