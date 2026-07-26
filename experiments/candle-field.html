@@ -71,7 +71,12 @@
     inset: 0;
     z-index: 2;
     pointer-events: none;
-    background: radial-gradient(circle at 52% 46%, transparent 0 34%, rgba(2,3,2,.66) 92%);
+    /* Clear window tracks the subject: the camera orbits a fixed target that
+       projects to the centre of the frame at every aspect, and the field is a
+       wide short band, so the window is a centred ellipse rather than an
+       off-centre circle. Misaligning these two darkens the instrument and
+       spotlights the void. */
+    background: radial-gradient(ellipse 76% 68% at 50% 50%, transparent 0 40%, rgba(2,3,2,.66) 100%);
   }
   .lab-canvas,
   .lab-static {
