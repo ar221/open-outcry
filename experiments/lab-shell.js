@@ -140,6 +140,9 @@ export function createLab(config) {
 
       camera = new THREE.PerspectiveCamera(config.camera.fov, 1, 0.1, 160);
       camera.position.set(...config.camera.position);
+      // Aims the camera once, here, at init. If a lab mutates camera.position
+      // in its own update(ctx, dt), it must re-issue camera.lookAt(...) there
+      // itself — the shell does not re-aim per frame, so rotation goes stale.
       camera.lookAt(...config.camera.lookAt);
 
       config.build({ THREE, scene, camera, palette, pointer, data: config.data });
