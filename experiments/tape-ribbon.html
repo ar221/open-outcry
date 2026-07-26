@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#181210">
+<title>TAPE RIBBON — Open Outcry WebGL Lab 05</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; background: var(--oo-void); }
+  body {
+    color: var(--oo-fg-warm);
+    font-family: var(--oo-font-mono);
+    font-size: var(--oo-type-body);
+    line-height: 1.6;
+  }
+  button { font: inherit; }
+
+  /* ── Stage — BROADCAST ──
+     Same anatomy as Labs 02-04 (not .oo-stage: that primitive caps at 1080px
+     and the labs are 1440px instruments), but the register cues come from Lab
+     01, the only other Broadcast plate: broadcast stage temperature, film
+     grain, one warm radial bloom. Explicitly NO .oo-scanlines — scanlines are
+     a Console cue and this plate does not get to wear both registers. */
+  .lab-stage {
+    max-width: 1440px;
+    min-height: 100svh;
+    margin: 0 auto;
+    padding: 0 var(--oo-gutter);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--oo-broadcast-stage);
+    border-inline: var(--oo-stroke) solid var(--oo-line-warm);
+  }
+  /* One warm bloom, seated up-left behind the headline so the voice sits in the
+     light and the ribbon runs out of it. Lab 01's treatment, same token. */
+  .lab-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle at 27% 30%, var(--oo-peach-glow), transparent 44%);
+  }
+  /* Grain rides its own .oo-overlay host rather than the stage itself: the
+     component draws through ::before, and the stage's own ::before is already
+     spending that pseudo on the bloom. */
+  .lab-stage > *:not(.oo-overlay) { position: relative; z-index: 1; }
+
+  .lab-path { color: var(--oo-muted-warm); }
+  .lab-status strong { color: var(--oo-green); font-weight: 400; }
+  .lab-stage[data-renderer="fallback"] .lab-status strong { color: var(--oo-amber); }
+  .lab-stage[data-renderer="pending"] .lab-status strong { color: var(--oo-muted); }
+
+  /* ── Head: the voice, and it holds the first read ──
+     Register law, concretely: the Fraunces headline is the largest, warmest,
+     highest-contrast thing on the plate, and the ribbon is placed BELOW it and
+     pushed BACK in depth. Lab 02 was sent back twice for letting the
+     instrument win this contest; the fix here is compositional, not a filter.
+     Exactly one <em>: .oo-display-broadcast em already carries
+     `font-style: italic; color: var(--oo-peach)` from components.css v1.4, so
+     the accent is the contract's, not a page-local re-invention. */
+  .lab-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.34fr) minmax(250px, 0.66fr);
+    align-items: end;
+    gap: 20px 44px;
+    padding: 32px 0 22px;
+  }
+  /* The token clamp tops out at 96px, which sets 58 characters of sentence-case
+     Fraunces at five lines and eats the ribbon's whole band. Capped here so the
+     headline stays three lines at 1440 and keeps the vertical budget honest. */
+  .lab-title {
+    max-width: 24ch;
+    font-size: clamp(34px, 4.3vw, 62px);
+    letter-spacing: -0.015em;
+  }
+  .lab-aside { display: grid; gap: 12px; }
+  .lab-note { max-width: 44ch; font-size: 13px; }
+  .lab-source { color: var(--oo-muted-warm); font-size: 10px; }
+
+  /* ── Viewport: the machine quotation, behind and below the voice ──
+     Deliberately unbordered and filled with the stage colour (which is also the
+     renderer's clear colour), so the ribbon reads as running THROUGH the plate
+     rather than as a framed console instrument. A framed box would promote the
+     quotation to a second voice, which is the one thing §1 forbids here. */
+  .lab-viewport {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 34svh;
+    overflow: hidden;
+    background-color: var(--oo-broadcast-stage);
+  }
+  /* Two jobs, one pseudo: the top-weighted scrim seats the band back under the
+     headline, and the late-stopping ellipse keeps the tape's own figures out of
+     the darkened corners. Stops are late for the same reason as Labs 03-04 —
+     the reading matter runs close to the left and right edges. */
+  .lab-viewport::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background-image:
+      linear-gradient(180deg, rgba(24,18,16,.92) 0%, rgba(24,18,16,.34) 22%, transparent 46%),
+      radial-gradient(ellipse 98% 96% at 50% 56%, transparent 0 58%, rgba(2,3,2,.42) 100%);
+  }
+  .lab-canvas,
+  .lab-static {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* Letterboxed, not cropped: a sliced ribbon loses quotes off both ends, and
+     the fallback is a promotion gate. Matte is the stage, so the bars read as
+     bezel. */
+  .lab-static { background-color: var(--oo-broadcast-stage); }
+  .lab-static > svg { display: block; width: 100%; height: 100%; }
+  /* lab-shell.js swaps canvas/still with the `hidden` attribute. The UA rule
+     for [hidden] is weaker than any author `display`, so every element the
+     shell toggles has to restate it. Same trap as .oo-btn below. */
+  .lab-canvas[hidden],
+  .lab-static[hidden] { display: none; }
+
+  /* ── Readout: four real figures off the snapshot ──
+     Chrome, therefore mono, therefore no serif — same rail as Labs 02-04.
+     Deltas are budgeted to one line each: verify-lab.sh asserts the bottom of
+     the stat rail sits inside a 1440x900 frame, and a wrapped delta is exactly
+     what pushes it out. */
+  .lab-readout { padding: 16px 0 16px; }
+  .lab-readout .oo-stat { padding: 13px 16px; }
+  .lab-readout .oo-stat-value { margin-top: 5px; font-size: 19px; letter-spacing: .01em; }
+  .lab-readout .oo-stat-delta { margin-top: 4px; font-size: 10px; line-height: 1.45; }
+  .lab-readout .oo-kicker { font-size: 10px; }
+
+  /* ── Footer rail ──
+     v1.3 register-law corollary: controls are chrome and chrome is always mono,
+     regardless of the plate's dominant register. .oo-btn supplies the mono
+     face; nothing here inherits Fraunces. */
+  .lab-rail--foot { gap: 14px; flex-wrap: wrap; }
+  .lab-meta { color: var(--oo-muted-warm); }
+  .lab-control { min-height: 36px; padding: 8px 14px; font-size: 11px; }
+  /* .oo-btn declares display:inline-flex, which outranks the UA [hidden] rule
+     the shell uses to retire the control on the fallback path. */
+  .oo-btn[hidden] { display: none; }
+
+  @media (max-width: 900px) {
+    .lab-head { grid-template-columns: minmax(0, 1fr); padding-top: 24px; }
+    .lab-title { max-width: 26ch; }
+    .lab-note { max-width: none; }
+  }
+  @media (max-width: 720px) {
+    .oo-rail { font-size: 10px; letter-spacing: .02em; }
+    .lab-head { gap: 12px; padding: 20px 0 16px; }
+    /* components.css narrows .oo-display-broadcast to clamp(20px,7.5vw,40px);
+       this holds the headline just above that so it still wins the plate at
+       390px, where the ribbon has the squarer frame and more presence. */
+    .lab-title { max-width: none; font-size: clamp(26px, 7.6vw, 34px); }
+    .lab-note { font-size: 12px; }
+    .lab-viewport { min-height: 30svh; }
+    .lab-readout { padding: 14px 0 16px; }
+    .lab-readout .oo-stat-value { font-size: 17px; }
+    .lab-meta { line-height: 1.5; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lab-control { display: none; }
+  }
+</style>
+<noscript><style>
+  /* No script: the still is the plate. */
+  .lab-static[hidden] { display: block; }
+  .lab-canvas, .lab-control { display: none; }
+</style></noscript>
+</head>
+<body>
+<main class="lab-stage reg-broadcast" data-renderer="pending">
+  <div class="oo-grain oo-overlay" aria-hidden="true"></div>
+
+  <header class="oo-rail lab-rail">
+    <!-- Broadcast kicker form, not the Console `>` prompt. Mono, because a rail
+         is chrome. -->
+    <span class="lab-path">&lt; lab = <span class="voice">"tape-ribbon"</span> &gt;</span>
+    <span class="lab-status" data-lab-status>renderer / <strong>starting</strong></span>
+  </header>
+
+  <div class="lab-head">
+    <h1 class="oo-display-broadcast lab-title">The tape was always the product. <em>Everything else is chrome.</em></h1>
+    <div class="lab-aside">
+      <p class="oo-prose lab-note">Seven real quotes, painted to a canvas sheet and swept along a spline band. The ribbon is the machine quotation this register permits — it runs beneath the voice, in mono, and it never gets a serif.</p>
+      <div class="oo-kicker lab-source">SNAPSHOT 2026-07-26 &middot; ALPHA VANTAGE &middot; BAKED AT BUILD</div>
+    </div>
+  </div>
+
+  <div class="lab-viewport" data-lab-viewport aria-hidden="true">
+    <canvas class="lab-canvas" data-lab-canvas></canvas>
+    <!-- data-lab-static MUST sit on an HTML element, not on the <svg>.
+         `hidden` is an HTMLElement IDL attribute; SVGElement does not
+         implement it, so lab-shell.js's `el.static.hidden = false` writes a
+         dead expando and the still stays display:none forever. -->
+    <div class="lab-static" data-lab-static hidden>
+    <!-- Band, spine and text runs were generated from the SAME snapshot file
+         the live scene fetches (data/market-2026-07-26.json), so the figures
+         below are the figures on the mesh, character for character. Nothing
+         here is hand-typed from memory. -->
+    <svg viewBox="0 0 1400 340" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Static tape ribbon: a swept band carrying the 2026-07-26 quote tape — SPY 738.93 +0.10%, QQQ 684.23 -1.12%, IWM 291.17 -0.31%, DIA 518.76 +0.48%, GLD 371.90 +0.10%, TLT 83.25 +0.10%, VIXY 21.44 -1.56%. Four up, three down.">
+      <defs>
+        <radialGradient id="tr-bloom" cx="24%" cy="26%" r="52%">
+          <stop offset="0%" stop-color="#e8927c" stop-opacity="0.20"/>
+          <stop offset="100%" stop-color="#e8927c" stop-opacity="0"/>
+        </radialGradient>
+        <!-- The band's own centreline. Stroke-free: it exists only to carry the
+             tape text, exactly as the UV axis does on the live mesh. -->
+        <path id="tr-spine" fill="none" stroke="none" d="M 22 288 L 47.1 290 L 71.2 291 L 94.5 291.1 L 116.9 290.4 L 138.5 289 L 159.5 286.8 L 180 284.1 L 199.9 280.8 L 219.4 277 L 238.6 272.8 L 257.5 268.3 L 276.2 263.4 L 294.9 258.4 L 313.5 253.2 L 332.2 247.9 L 351.1 242.5 L 370.2 237.3 L 389.6 232.1 L 409.4 227.2 L 429.7 222.4 L 450.5 218 L 472 214 L 495.3 209.6 L 517.2 204.7 L 537.9 199.3 L 557.5 193.6 L 576.3 187.5 L 594.3 181.1 L 611.6 174.5 L 628.6 167.8 L 645.2 161 L 661.7 154.2 L 678.3 147.5 L 694.9 140.9 L 711.9 134.5 L 729.4 128.3 L 747.4 122.5 L 766.3 117 L 786 112 L 806.9 107.5 L 828.9 103.6 L 852.4 100.3 L 877.3 97.8 L 904 96 L 927 95.2 L 949.7 95 L 972 95.3 L 994.1 96.1 L 1015.9 97.2 L 1037.5 98.6 L 1058.9 100.2 L 1080.2 102 L 1101.3 103.9 L 1122.3 105.9 L 1143.3 107.8 L 1164.2 109.5 L 1185.1 111.1 L 1206 112.5 L 1227 113.5 L 1248.1 114.1 L 1269.3 114.3 L 1290.6 114 L 1312.1 113 L 1333.8 111.4 L 1355.8 109.1 L 1378 106"/>
+      </defs>
+
+      <rect width="1400" height="340" fill="#181210"/>
+      <rect width="1400" height="340" fill="url(#tr-bloom)"/>
+
+      <!-- The band: the spine offset by a half-width tapering 22px (near) to
+           13px (far), which is the flat-medium reading of the live mesh's
+           perspective taper. -->
+      <path fill="#0d0d0b" stroke="#241c18" stroke-width="1" d="M 20.3 309.9 L 45.8 311.8 L 70.7 312.6 L 94.7 312.6 L 117.9 311.8 L 140.3 310.1 L 162 307.8 L 183.1 304.8 L 203.6 301.3 L 223.6 297.3 L 243.2 292.9 L 262.4 288.1 L 281.4 283.1 L 300.3 277.8 L 319 272.5 L 337.7 267.1 L 356.4 261.6 L 375.3 256.3 L 394.5 251.1 L 414 246.1 L 433.9 241.3 L 454.3 236.8 L 475.5 232.7 L 499.1 228.1 L 521.6 222.9 L 542.8 217.3 L 563 211.2 L 582.2 204.8 L 600.5 198.2 L 618.2 191.4 L 635.3 184.5 L 652 177.5 L 668.5 170.6 L 684.8 163.8 L 701.2 157.2 L 717.9 150.8 L 734.9 144.6 L 752.4 138.8 L 770.7 133.4 L 789.9 128.4 L 810.1 123.9 L 831.5 120 L 854.3 116.6 L 878.7 114 L 904.8 112.1 L 927.3 111.2 L 949.6 110.8 L 971.6 111 L 993.4 111.5 L 1015 112.5 L 1036.4 113.8 L 1057.7 115.3 L 1078.8 116.9 L 1099.9 118.7 L 1121 120.5 L 1142 122.2 L 1163 123.9 L 1184.1 125.3 L 1205.2 126.6 L 1226.5 127.5 L 1247.8 128 L 1269.3 128 L 1291 127.5 L 1312.9 126.4 L 1335 124.7 L 1357.4 122.2 L 1379.8 118.9 L 1376.2 93.1 L 1354.2 96.1 L 1332.6 98.2 L 1311.3 99.6 L 1290.2 100.4 L 1269.2 100.6 L 1248.3 100.3 L 1227.6 99.5 L 1206.8 98.4 L 1186.1 96.9 L 1165.3 95.2 L 1144.5 93.3 L 1123.6 91.3 L 1102.6 89.2 L 1081.5 87.1 L 1060.1 85.2 L 1038.6 83.4 L 1016.8 81.8 L 994.7 80.6 L 972.4 79.7 L 949.7 79.2 L 926.7 79.3 L 903.2 79.9 L 876 81.6 L 850.4 84 L 826.4 87.2 L 803.7 91.1 L 782.2 95.6 L 761.8 100.6 L 742.4 106.1 L 723.8 112 L 706 118.2 L 688.6 124.6 L 671.7 131.2 L 655 137.8 L 638.5 144.5 L 621.9 151.2 L 605.1 157.7 L 588 164 L 570.4 170.1 L 552.1 176 L 532.9 181.4 L 512.8 186.5 L 491.5 191.1 L 468.5 195.3 L 446.8 199.2 L 425.5 203.6 L 404.8 208.3 L 384.7 213.2 L 365.1 218.3 L 345.8 223.5 L 326.8 228.7 L 308.1 233.8 L 289.5 238.9 L 271 243.8 L 252.6 248.4 L 234 252.7 L 215.2 256.7 L 196.2 260.3 L 176.9 263.3 L 157.1 265.9 L 136.8 267.8 L 115.8 269 L 94.2 269.6 L 71.8 269.3 L 48.4 268.2 L 23.7 266.1 Z"/>
+
+      <!-- Tape ink: symbol in --oo-fg, figure in --oo-green / --oo-red, mono
+           only. Start offsets are measured along the spine, so no run overruns
+           the band's far end — the flat analogue of the wrap-seam bound in
+           tape-ribbon.js. -->
+      <g font-family="JetBrains Mono, monospace" font-size="15" font-weight="700"
+         letter-spacing="1" dominant-baseline="central">
+      <text><textPath href="#tr-spine" startOffset="12"><tspan fill="#eee8df">SPY&#160;</tspan><tspan fill="#48dc7d">738.93&#160;+0.10%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="207.7"><tspan fill="#eee8df">QQQ&#160;</tspan><tspan fill="#e0455a">684.23&#160;-1.12%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="403.4"><tspan fill="#eee8df">IWM&#160;</tspan><tspan fill="#e0455a">291.17&#160;-0.31%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="599.1"><tspan fill="#eee8df">DIA&#160;</tspan><tspan fill="#48dc7d">518.76&#160;+0.48%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="794.8"><tspan fill="#eee8df">GLD&#160;</tspan><tspan fill="#48dc7d">371.90&#160;+0.10%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="990.5"><tspan fill="#eee8df">TLT&#160;</tspan><tspan fill="#48dc7d">83.25&#160;+0.10%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="1176.2"><tspan fill="#eee8df">VIXY&#160;</tspan><tspan fill="#e0455a">21.44&#160;-1.56%</tspan></textPath></text>
+      </g>
+
+      <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1.2">
+        <text x="20" y="26" fill="#7a6a5f">OPEN OUTCRY / TAPE RIBBON / STILL</text>
+        <text x="1380" y="26" text-anchor="end" fill="#686564">7 QUOTES &middot; 2026-07-26 &middot; NO NETWORK</text>
+      </g>
+    </svg>
+    </div>
+  </div>
+
+  <div class="oo-grid-4 lab-readout">
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; SNAPSHOT</span>
+      <span class="oo-stat-value">2026-07-26</span>
+      <span class="oo-stat-delta">Alpha Vantage &middot; baked, never fetched live</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; TAPE</span>
+      <span class="oo-stat-value">7 quotes</span>
+      <span class="oo-stat-delta">4 up &middot; 3 down &middot; one full ribbon cycle</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; WIDEST MOVE</span>
+      <span class="oo-stat-value down">-1.56%</span>
+      <span class="oo-stat-delta">VIXY 21.44 &middot; VIX itself unobtainable</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; BENCHMARK</span>
+      <span class="oo-stat-value up">738.93</span>
+      <span class="oo-stat-delta">SPY +0.10% &middot; same close as Lab 02</span>
+    </div>
+  </div>
+
+  <footer class="oo-rail oo-rail--foot lab-rail--foot">
+    <span class="lab-meta">BROADCAST DOMINANT / RIBBON QUOTED &middot; LINEAR FEED &middot; NO SERIF ON THE TAPE</span>
+    <button class="oo-btn oo-pane oo-hover lab-control" type="button" data-lab-control aria-pressed="false">[ PAUSE FEED ]</button>
+  </footer>
+
+</main>
+
+<script src="vendor/three.iife.js"></script>
+<script type="module" src="tape-ribbon.js"></script>
+</body>
+</html>
