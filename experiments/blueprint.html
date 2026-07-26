@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070807">
+<title>BLUEPRINT SCHEMATIC — Open Outcry WebGL Lab 04</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; background: var(--oo-void); }
+  body {
+    color: var(--oo-fg);
+    font-family: var(--oo-font-mono);
+    font-size: var(--oo-type-body);
+    line-height: 1.6;
+  }
+  button { font: inherit; }
+
+  /* ── Stage ──
+     Not .oo-stage: that primitive is capped at 1080px and the labs are
+     1440px instruments. Same anatomy, wider ceiling. */
+  .lab-stage {
+    max-width: 1440px;
+    min-height: 100svh;
+    margin: 0 auto;
+    padding: 0 var(--oo-gutter);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--oo-console-stage);   /* never `background:` — erases .oo-scanlines */
+    border-inline: var(--oo-stroke) solid var(--oo-line);
+  }
+
+  .lab-path { color: var(--oo-amber-dim); }
+  .lab-status strong { color: var(--oo-green); font-weight: 400; }
+  .lab-stage[data-renderer="fallback"] .lab-status strong { color: var(--oo-amber); }
+  .lab-stage[data-renderer="pending"] .lab-status strong { color: var(--oo-muted); }
+
+  /* ── Head: title + one line of intent ── */
+  .lab-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px 32px;
+    padding: 30px 0 20px;
+  }
+  .lab-title { max-width: 14ch; }
+  .lab-note { max-width: 52ch; font-size: 13px; }
+
+  /* ── Viewport: the dominant object ── */
+  .lab-viewport {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 62svh;
+    overflow: hidden;
+    background-color: var(--oo-void);
+    border: var(--oo-stroke) solid var(--oo-line);
+  }
+  .lab-viewport::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    /* A drawing has no tube. The vignette here only seats the plate inside its
+       frame — the schematic runs a labelled node close to every edge at both
+       aspects, so a Lab 02-style 40%-stop window would dim the very reading
+       matter the lab exists for. Same wide ellipse and late stop as Lab 03. */
+    background: radial-gradient(ellipse 99% 96% at 50% 50%, transparent 0 56%, rgba(2,3,2,.46) 100%);
+  }
+  .lab-canvas,
+  .lab-static {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* The still is letterboxed rather than cropped: a sliced schematic loses
+     edges, and losing edges is the one thing this lab cannot do. Matte matches
+     the stage so the bars read as bezel, not as a broken frame. */
+  .lab-static { background-color: var(--oo-console-stage); }
+  .lab-static > svg { display: block; width: 100%; height: 100%; }
+  /* lab-shell.js swaps canvas/still with the `hidden` attribute. The UA rule
+     for [hidden] is weaker than any author `display`, so every element the
+     shell toggles has to restate it. Same trap as .oo-btn below. */
+  .lab-canvas[hidden],
+  .lab-static[hidden] { display: none; }
+
+  /* ── Readout: four real figures, counted off the two sheets ── */
+  .lab-readout { padding: 18px 0 20px; }
+  .lab-readout .oo-stat { padding: 13px 16px; }
+  .lab-readout .oo-stat-value { margin-top: 5px; font-size: 19px; letter-spacing: .01em; }
+  .lab-readout .oo-stat-delta { margin-top: 4px; font-size: 10px; line-height: 1.45; }
+  .lab-readout .oo-kicker { font-size: 10px; }
+
+  /* ── Footer rail ── */
+  .lab-rail--foot { gap: 14px; flex-wrap: wrap; }
+  .lab-meta { color: var(--oo-muted); }
+  .lab-control { min-height: 36px; padding: 8px 14px; font-size: 11px; }
+  /* .oo-btn declares display:inline-flex, which outranks the UA [hidden] rule
+     the shell uses to retire the control on the fallback path. */
+  .oo-btn[hidden] { display: none; }
+
+  @media (max-width: 900px) {
+    .lab-head { padding-top: 24px; }
+    .lab-title { max-width: none; }
+  }
+  @media (max-width: 720px) {
+    .oo-rail { font-size: 10px; letter-spacing: .02em; }
+    .lab-head { gap: 12px; padding: 20px 0 16px; }
+    .lab-note { max-width: none; font-size: 12px; }
+    .lab-viewport { min-height: 54svh; }
+    .lab-readout { padding: 14px 0 16px; }
+    .lab-readout .oo-stat-value { font-size: 17px; }
+    .lab-meta { line-height: 1.5; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lab-control { display: none; }
+  }
+</style>
+<noscript><style>
+  /* No script: the still is the plate. */
+  .lab-static[hidden] { display: block; }
+  .lab-canvas, .lab-control { display: none; }
+</style></noscript>
+</head>
+<body>
+<main class="lab-stage oo-scanlines reg-console" data-renderer="pending">
+
+  <header class="oo-rail lab-rail">
+    <span class="lab-path">&gt; experiments/blueprint</span>
+    <span class="lab-status" data-lab-status>renderer / <strong>starting</strong></span>
+  </header>
+
+  <div class="lab-head">
+    <h1 class="oo-display-console lab-title">BLUEPRINT.</h1>
+    <p class="oo-prose lab-note">The repo drawing itself. Six files, nine audited edges. There is no <code>@import</code> anywhere here — components.css inherits through eighteen <code>var(--oo-*)</code> names, and every consumer <code>&lt;link&gt;</code>s both sheets. The direct token links are the dimmer strand.</p>
+  </div>
+
+  <div class="lab-viewport" data-lab-viewport>
+    <canvas class="lab-canvas" data-lab-canvas></canvas>
+    <!-- data-lab-static MUST sit on an HTML element, not on the <svg>.
+         `hidden` is an HTMLElement IDL attribute; SVGElement does not
+         implement it, so lab-shell.js's `el.static.hidden = false` writes a
+         dead expando and the still stays display:none forever. -->
+    <div class="lab-static" data-lab-static hidden>
+    <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Static dependency schematic of the Open Outcry repo: tokens.css feeds components.css through 18 var(--oo-*) references; components.css feeds index.html, examples/inir, examples/brief and experiments/*; all four consumers also link tokens.css directly. Six nodes, nine edges, no @import anywhere.">
+      <!-- Hand-authored. Same six nodes and same nine edges as the live plate,
+           fully drawn, orthogonally routed. Monoline SVG is the source language
+           of design-language §5, so the fallback here is not a degraded print
+           of the WebGL scene — it is the drawing in its native medium. -->
+      <rect width="1200" height="640" fill="#070807"/>
+
+      <!-- Drawing grid -->
+      <g stroke="#14130f" stroke-width="1">
+        <path d="M80 41 V599 M120 41 V599 M160 41 V599 M200 41 V599 M240 41 V599 M280 41 V599 M320 41 V599 M360 41 V599 M400 41 V599 M440 41 V599 M480 41 V599 M520 41 V599 M560 41 V599 M600 41 V599 M640 41 V599 M680 41 V599 M720 41 V599 M760 41 V599 M800 41 V599 M840 41 V599 M880 41 V599 M920 41 V599 M960 41 V599 M1000 41 V599 M1040 41 V599 M1080 41 V599 M1120 41 V599"/>
+        <path d="M41 80 H1159 M41 120 H1159 M41 160 H1159 M41 200 H1159 M41 240 H1159 M41 280 H1159 M41 320 H1159 M41 360 H1159 M41 400 H1159 M41 440 H1159 M41 480 H1159 M41 520 H1159 M41 560 H1159"/>
+      </g>
+      <rect x="40.5" y="40.5" width="1119" height="559" fill="none" stroke="#9b6822" stroke-width="1" opacity="0.5"/>
+
+      <!-- Sheet header -->
+      <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1.2">
+        <text x="41" y="30" fill="#b57b24">OPEN OUTCRY / DEPENDENCY SCHEMATIC / SHEET 04</text>
+        <text x="1159" y="30" text-anchor="end" fill="#686564">6 NODES / 9 EDGES / NO @IMPORT</text>
+      </g>
+
+      <!-- ── Direct strand: every consumer <link>s tokens.css itself ── -->
+      <g fill="none" stroke="#9b6822" stroke-width="2" stroke-linejoin="miter" stroke-linecap="butt" stroke-dasharray="7 5">
+        <path d="M600 112 V78"/>
+        <path d="M430 460 H95 V78 H1105 V460 H750"/>
+      </g>
+
+      <!-- ── Primary strand: the contract chain ── -->
+      <g fill="none" stroke="#f2a51f" stroke-width="2" stroke-linejoin="miter" stroke-linecap="butt">
+        <path d="M600 128 V252"/>
+        <path d="M600 268 V360"/>
+        <path d="M180 452 V360 H1000 V452"/>
+        <path d="M440 360 V452"/>
+        <path d="M740 360 V452"/>
+      </g>
+
+      <!-- ── Nodes: square hardware ── -->
+      <g>
+        <rect x="594" y="114" width="12" height="12" fill="#f2a51f"/>
+        <rect x="594" y="254" width="12" height="12" fill="#f2a51f"/>
+        <rect x="174" y="454" width="12" height="12" fill="#48dc7d"/>
+        <rect x="434" y="454" width="12" height="12" fill="#48dc7d"/>
+        <rect x="734" y="454" width="12" height="12" fill="#48dc7d"/>
+        <rect x="994" y="454" width="12" height="12" fill="#e8927c"/>
+      </g>
+
+      <!-- ── Node labels ── -->
+      <g font-family="JetBrains Mono, monospace" font-size="16" letter-spacing="0.5" fill="#f2a51f">
+        <text x="582" y="126" text-anchor="end">tokens.css</text>
+        <text x="582" y="266" text-anchor="end">components.css</text>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="16" letter-spacing="0.5" text-anchor="middle">
+        <text x="180" y="492" fill="#48dc7d">index.html</text>
+        <text x="440" y="492" fill="#48dc7d">examples/inir</text>
+        <text x="740" y="492" fill="#48dc7d">examples/brief</text>
+        <text x="1000" y="492" fill="#e8927c">experiments/*</text>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1" fill="#686564" text-anchor="middle">
+        <text x="180" y="510">BRAND BOOK</text>
+        <text x="440" y="510">EXAMPLE</text>
+        <text x="740" y="510">EXAMPLE</text>
+        <text x="1000" y="510">4 LABS</text>
+      </g>
+
+      <!-- ── Edge and node annotations ── -->
+      <g font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="0.8" fill="#686564">
+        <text x="618" y="126">v1.3 &middot; 37 CUSTOM PROPS</text>
+        <text x="618" y="266">v1.4 &middot; 38 CLASSES</text>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="0.6" fill="#b57b24">
+        <text x="618" y="196">var(--oo-*) &times; 18</text>
+        <text x="618" y="352">&lt;link rel=stylesheet&gt; &times; 4</text>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="0.6" fill="#9b6822">
+        <text x="108" y="300">&lt;link&gt; direct &times; 4</text>
+      </g>
+
+      <!-- ── Legend ── -->
+      <g fill="none" stroke-width="2" stroke-linecap="butt">
+        <path d="M62 549 H110" stroke="#f2a51f"/>
+        <path d="M62 575 H110" stroke="#9b6822" stroke-dasharray="7 5"/>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="0.6">
+        <text x="122" y="553" fill="#eee8df">PRIMARY &mdash; tokens.css &rarr; components.css &rarr; consumer</text>
+        <text x="122" y="579" fill="#686564">DIRECT &mdash; each consumer also links tokens.css itself</text>
+      </g>
+
+      <!-- ── Title block ── -->
+      <g fill="none" stroke="#9b6822" stroke-width="1" opacity="0.55">
+        <rect x="884.5" y="534.5" width="270" height="54"/>
+        <path d="M884.5 561.5 H1154.5"/>
+      </g>
+      <g font-family="JetBrains Mono, monospace" letter-spacing="0.8">
+        <text x="898" y="554" font-size="11" fill="#b57b24">OPEN OUTCRY &middot; SHEET 04 &middot; REV v1.4</text>
+        <text x="898" y="580" font-size="10" fill="#686564">MONOLINE / STATIC STILL / NO NETWORK</text>
+      </g>
+    </svg>
+    </div>
+  </div>
+
+  <div class="oo-grid-4 lab-readout">
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; CONTRACT</span>
+      <span class="oo-stat-value voice">v1.3 / v1.4</span>
+      <span class="oo-stat-delta">tokens.css &middot; components.css</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; TOKENS</span>
+      <span class="oo-stat-value">37</span>
+      <span class="oo-stat-delta">--oo-* custom properties &middot; 18 read by components</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; CLASSES</span>
+      <span class="oo-stat-value">38</span>
+      <span class="oo-stat-delta">.oo-* selectors &middot; zero custom properties declared</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; EDGES</span>
+      <span class="oo-stat-value">5 + 4</span>
+      <span class="oo-stat-delta">primary chain / direct token links &middot; no @import</span>
+    </div>
+  </div>
+
+  <footer class="oo-rail oo-rail--foot lab-rail--foot">
+    <span class="lab-meta">TOKENS -&gt; COMPONENTS -&gt; CONSUMERS &middot; v1.4 CONTRACT</span>
+    <button class="oo-btn oo-pane oo-hover lab-control" type="button" data-lab-control aria-pressed="false">[ PAUSE FEED ]</button>
+  </footer>
+
+</main>
+
+<script src="vendor/three.iife.js"></script>
+<script type="module" src="blueprint.js"></script>
+</body>
+</html>
