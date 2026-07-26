@@ -113,8 +113,36 @@ function paintTape(quotes) {
 // would pass the band through the camera.
 //
 // WIDE — a long shallow rise across a ~3.3:1 band.
-// NARROW — a short steep descent, y-dominant, so a near-square frame is filled
-// by the ribbon's own travel rather than by dollying in.
+// NARROW — a wave that crosses the frame and doubles back, so the band's own
+// travel both fills the frame and buys arc length. See the two notes below.
+//
+// ── Why the narrow sweep is a wave and not a diagonal ────────────────────
+// The first narrow sweep was a steep descent: 7.8 units of x against 11.2 of y.
+// Two separate failures followed from that one shape, and they are the same
+// failure seen from two directions.
+//
+//   Fill. The phone viewport is ~1.40:1 (350x250 measured at 390px). A spine
+//   whose bounding box is 0.70:1 can only be seated inside a 1.40:1 frame by
+//   binding on height, which leaves the lower-left and upper-right of the frame
+//   empty — closer to half the plate than a quarter. No amount of re-aiming
+//   fixes it; the solver was already re-centring correctly (solveFraming), the
+//   SHAPE was wrong. The spine's bounding box now runs ~9.6 x ~4.6 which, once
+//   the band's own width is added, lands near the frame's own 1.40 and binds on
+//   both axes at once.
+//
+//   Completeness. A diagonal's arc length is capped at the frame diagonal, so
+//   at readable glyph size only ~1.3 quotes were inside the frame — and 1.3 is
+//   the interval where NO whole quote need be present: the first render showed
+//   `518.76 +0.48%` entering with DIA already off the top and GLD leaving as
+//   `371.90 +0.` cut at the bottom. Mid-figure entry is honest for a tape only
+//   while whole quotes are also on screen; when nothing is whole the crop stops
+//   reading as a feed and reads as damage. A wave that crosses and doubles back
+//   carries ~1.85x the on-screen arc length of the diagonal it replaced, which
+//   at the same glyph size puts ~2.4 quotes inside the frame. Above 2.0 a whole
+//   symbol+price+percent triplet is present at EVERY offset — worst case is a
+//   part-quote at each edge with a complete one between them — so this is a
+//   bound, not a lucky frame. `repeat` is raised in step with the extra arc so
+//   the glyphs do not shrink to buy it.
 //
 // ── Depth range is a legibility budget, not a style choice ──
 // A first pass ran the sweep from z = 6 to z = -17. fitDistance has to contain
@@ -125,7 +153,7 @@ function paintTape(quotes) {
 // both plates (near:far magnification ~1.8x, not ~3x), and `repeat` — how many
 // tape cycles are wrapped along the band — is authored per layout instead. The
 // narrow plate shows about two and a half quotes at readable size rather than
-// all seven illegibly.
+// all seven illegibly — which is also the completeness floor, see above.
 const LAYOUTS = {
   wide: {
     aspectFloor: 1.6,
@@ -137,11 +165,11 @@ const LAYOUTS = {
   },
   narrow: {
     aspectFloor: 0,
-    aimZ: -1.8,
-    halfWidth: 1.0,
-    twist: 0.8,
-    repeat: 0.22,
-    spine: [[-3.9, 5.6, 0.6], [-1.8, 1.6, -0.8], [1.4, -1.4, -2.4], [3.9, -5.6, -4.2]],
+    aimZ: -1.6,
+    halfWidth: 1.24,
+    twist: 0.9,
+    repeat: 0.40,
+    spine: [[-4.8, -2.3, 0.5], [-1.6, 2.3, -0.6], [1.6, -2.3, -1.8], [4.8, 2.3, -3.0]],
   },
 };
 
@@ -206,7 +234,8 @@ function buildBand(THREE, layout, texture) {
     // price is a fabricated price, which is the one thing the tape may not do.
     uvs.push(t, 1, t, 0);
     // Every eighth rib is enough to bound the silhouette for the framing solve
-    // and keeps the per-frame fit cheap.
+    // and keeps the per-frame fit cheap. (An earlier `|| i === SEGMENTS` clause
+    // here was dead: at i === SEGMENTS, t is 1 and fails `t < 1 - FIT_TRIM`.)
     //
     // The outer FIT_TRIM of each end is deliberately NOT offered to the fit, so
     // the solver frames the band's middle and lets its ends run off the edges of
@@ -217,7 +246,7 @@ function buildBand(THREE, layout, texture) {
     // `291.17 -0.31%` with its IWM sheared off, a price with no symbol. Running
     // the ends past the frame instead is what a real tape does: quotes enter and
     // leave, and nothing on screen is ever a severed figure.
-    if ((i % 8 === 0 || i === SEGMENTS) && t > FIT_TRIM && t < 1 - FIT_TRIM) {
+    if (i % 8 === 0 && t > FIT_TRIM && t < 1 - FIT_TRIM) {
       fitPoints.push(
         [point.x - offset.x, point.y - offset.y, point.z - offset.z],
         [point.x + offset.x, point.y + offset.y, point.z + offset.z]
@@ -333,8 +362,20 @@ function buildRibbon(ctx) {
   // the wrapped sheet is a seamless infinite tape and every window onto it is a
   // contiguous slice of one.
   tapeTexture.repeat.set(LAYOUTS.wide.repeat, 1);
-  tapeTexture.minFilter = THREE.LinearFilter;
-  tapeTexture.generateMipmaps = false;
+  // Mipmapped, deliberately. The band foreshortens hard at its far end, so the
+  // tail samples the sheet far below one texel per pixel — exactly the regime
+  // where an unmipmapped LinearFilter aliases the thin strokes of a mono digit
+  // into sparkle. Both sheet dimensions (4096 x 128) are powers of two, so
+  // mipmaps AND RepeatWrapping are legal together even on the WebGL1 path.
+  // Anisotropy is what keeps the mip chain from over-blurring a surface this
+  // obliquely viewed. Asked for as a flat 8 rather than read off the renderer:
+  // lab-shell.js does not hand the renderer to build(), and three.js clamps the
+  // request to the hardware maximum on upload, so 8 is a ceiling request and
+  // never an unsupported one.
+  tapeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  tapeTexture.magFilter = THREE.LinearFilter;
+  tapeTexture.generateMipmaps = true;
+  tapeTexture.anisotropy = 8;
 
   // Webfonts can land after this module runs, in which case the sheet above was
   // painted in the fallback monospace. measureCycle re-measures in whatever
