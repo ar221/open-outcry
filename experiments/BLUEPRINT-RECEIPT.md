@@ -1,0 +1,73 @@
+# Blueprint Schematic — Experiment Receipt
+
+**Track:** fun; no promotion proposed  
+**Artifact:** `experiments/blueprint.html`  
+**Built:** 2026-07-26  
+**Design system:** Open Outcry — `tokens.css` v1.3 / `components.css` v1.4, Console register
+
+## What shipped
+
+- A Three.js drawing-office schematic of this repository's real CSS contract graph: two source sheets, four consumers, **nine** audited edges.
+- A five-pass framing solver that alternates re-centring the aim against the content's projected NDC extent with an expand-only layout spread, re-bisecting camera distance between passes, to `FILL_X 0.93` / `FILL_Y 0.90`.
+- Depth-cancelled annotation: each label's scale is multiplied by its own depth over the aim-plane depth, so drawing-office type is one size wherever it sits while depth is carried by line convergence and light fog.
+- Two layouts snapped — not lerped — at aspect 1.35, each putting every label in a half-plane containing no edge geometry, so no edge crosses a label structurally rather than by nudged z-values.
+- Three-stage linear reveal (contract link → `components.css` fan → four direct token links) with a near-full-strength pre-ink underlay, so all six file names are legible at every instant.
+- Static SVG fallback: orthogonally routed 2px amber monoline, square node markers, an outer dashed bus for the direct links, per-edge mechanism annotations, per-node meta, a two-strand legend and a title block.
+
+## Verification
+
+- `./verify-lab.sh blueprint` → `PASS [blueprint] desktop + phone + fallback`. Re-run fresh at Task 10 against HEAD `c1dc796`; still passes.
+- Asserted by that script: `node --check` on `blueprint.js` and `lab-shell.js`; `data-renderer="webgl"` at 1440×900; sized canvas; zero horizontal overflow at 1440 and 390; readout rail inside the 900px frame (measured 869px); `?render=fallback` → `data-renderer="fallback"` with a 555px-tall still.
+- **The schematic was verified true against the real files before any geometry was written**, with the commands recorded in the task report: `grep -n '@import'` across `tokens.css`, `components.css`, `index.html`, `examples/*.html`, `experiments/*.html` → **no hits anywhere in the repo**; `var(--oo-*)` unique names in `components.css` → 18 (30 refs); `var(--r-*)` unique names → 9 (28 refs); custom properties declared by `components.css` → **0**; `--oo-*` declarations in `tokens.css:root` → 37; `--r-*` declaration lines → 22 (11 alias names declared twice, once per register); a full `rel="stylesheet"` sweep across all seven consumer pages.
+- The new vertical-overflow assertion was proved to fire rather than assumed: injecting an overlong stat delta produced `FAIL [blueprint] readout rail past the bottom of the frame at 1440x900: 27px`; reverting restored PASS.
+- The runaway-framing bug was instrumented (`window.__bp`) rather than guessed at.
+- The reviewer's proposed composition remedy (curved consumer arc, `components.css` pushed left and down) was **built, captured and measured** — it moved ink out of the middle without putting any into the lower-left corner — then rejected with that evidence, and the finding recorded in-file so nobody re-runs it.
+- Full-reveal captures taken separately at `/tmp/oo-verify/bp-final-{desktop,phone}.png`, because the plain verify shots land mid-cycle.
+- Type size measured per glyph rather than described: ~6.3px per glyph for file names on desktop after round 2, against ~6.6 pre-round-1 and ~5.6 at the intermediate step.
+- **Not verified:** the JS runtime graph. The labs also depend on `vendor/three.iife.js` and `lab-shell.js` (and `depth-tape.html` on `depth-tape.bundle.js`); those edges are real and deliberately **not drawn**, because the plate announces one subsystem. Omission is a judgement, so it is stated rather than left implicit.
+- **Not verified:** compressed transfer size, real-device rendering, and whether the "flow goes up then down" objection that drove the y-order fix would have bothered anyone but the reviewer.
+
+## Critique
+
+### Keep
+
+- **Verifying the schematic corrected the plan.** The plan's six edges were wrong in two ways. First, three edges were missing: *every* consumer `<link>`s `tokens.css` directly, on the line above its `components.css` link, without exception — the plan's list implied `tokens.css` reaches `index.html` only by way of `components.css`, which is false and is exactly the kind of falsehood this plate exists to not tell. Six edges became **nine audited edges**, drawn as a visually distinct dimmer strand with the `> EDGES` readout reading `5 + 4` and the fallback legend naming both. Second, `tokens.css → components.css` is **not an `@import`** — there is no `@import` anywhere in this repo. The dependency is real but the mechanism is cascade inheritance: `components.css` declares **zero** custom properties and resolves 18 `var(--oo-*)` plus 9 `var(--r-*)` names that only `tokens.css` defines, which is what makes the *consumer* responsible for loading both sheets in the right order. The still annotates that edge `var(--oo-*) × 18` / `+ var(--r-*) × 9`, the page note says there is no `@import` here, and the sheet header reads `NO @IMPORT`.
+- Every readout figure is counted, not estimated, and says "decls" or "PROPS" where it means declarations: 59 is a count of declarations (37 `--oo-*` names + 22 `--r-*` declaration lines), unique names are 48, and 27 of 59 are read by `components.css`.
+- No edge touches any label at either aspect — confirmed by reading the plate, not by trusting the argument.
+- Depth-cancelled label scale is the right call and is worth keeping as a pattern: perspective belongs to the geometry, drawing-office annotation does not.
+- The desktop plate after round 2 beats its own fallback on structure and composition — a reversal of the round-1 answer, and stated as a reversal rather than smoothed over.
+
+### Watch
+
+- **Residual voids: ~5% top wedge and ~8% left strip, forced by strict tiering.** A thin wedge along the top between the frame edge and the `tokens → components` stroke, and a narrow strip down the far left below `index.html`'s label. Both are consequences of strict tiering: every stroke leaves one of two nodes that sit above every consumer, so the band above the topmost stroke cannot hold ink without lying about the flow. These are strips, not the ~15%-each dead triangles the round-1 build had.
+- **The live plate still loses to its own fallback on annotation density.** The still carries per-edge mechanism captions, the two-strand legend, the `59 PROPS · 37 --oo-* + 22 --r-*` node meta and a title block that the live plate does not. This was measured, not conceded: every caption added to the fan re-enters the geometry the layout works to keep clear, and the two attempts to add one are recorded below. Net — the live plate wins the first read and the composition; the still wins the inventory. That is the plan's stated intent for this lab, but it is not a claim that the live plate dominates.
+- **The `components.css` coupling note is suppressed on narrow because it rendered at ~3.4px per glyph.** `LAYOUTS.narrow.dropNotes = ['components']`; the sprite is still built and hidden, and the important part is that it leaves `fitPoints` so the fit stops paying for an ink box nobody can read. At 390px that caption was decoration, not information — 25 characters at 3.4px/glyph, spending the widest ink box on the plate to cost every file name ~9% of cap height. The figure still reads in the HTML readout at every width, on the desktop plate, and on the fallback.
+- **Relative type size in this plate is zero-sum, and the plate is at its floor.** Two experiments were run and reverted with measurements: a `tokens.css` caption carrying the 37/22 split pushed the left fit extent from −33.5 to −36.8 world units and cost every file name ~9% of cap height; raising `NOTE_SCALE` 0.80 → 0.92 did nothing at all, because the fit is bound by label ink on both axes so a bigger note sheet only increases the solved distance. There is no room for a further caption anywhere in this frame without pushing a file name under reading size.
+- **The phone plate does not fill the frame, and an earlier claim that it did is struck.** "The arc fills the frame corner to corner" was bounding-box true and optically generous: the graph occupies a diagonal band with lighter upper-left and lower-right triangles. Nine chords remain individually traceable, nothing is cropped, no crossings — but the fill claim is withdrawn and not reinstated. The two longest chords also crowd to roughly 0.5 world units (≈9px) near the bottom of the arc.
+- **Round 1's composition fix made the desktop plate worse before round 2 made it better.** The monotone y-descent that fixed the flow reading turned the graph into a diagonal band with an empty lower-left triangle and an empty strip above `index.html`. The bounding box still filled ~93%/~86% and the verify script was satisfied — which is the point: **93%/86% is containment, not composition, and a passing script waved a sheaf with two dead triangles through.**
+- Two real bugs the solver surfaced, both fixed and both worth remembering: gains anchored on the *solved* aim while the same loop moved that aim walked the layout 25 world units off and dollied the camera to `distance = 63`; and a world-fixed sprite in the consumer tier rendered `index.html` at about five pixels while `tokens.css` read cleanly.
+- The clipped stat deltas in the round-1 capture were caught by re-reading the capture, **not by the script** — `verify-lab.sh` asserted only *horizontal* overflow at that point. That gap is what produced the harness change below.
+- Page weight is roughly **780 KiB uncompressed** — `blueprint.html` 14.4 KB + `blueprint.js` 34.0 KB + `lab-shell.js` 8.3 KB + `vendor/three.iife.js` 726.6 KB + `tokens.css` 3.7 KB + `components.css` 11.8 KB. `blueprint.js` is 683 lines and the heaviest lab module by a wide margin; most of that is the framing solver and the two layout tables. Compressed transfer is unmeasured.
+
+## Contract friction
+
+`tokens.css` and `components.css` were not modified — which matters more here than elsewhere, since this is the lab that draws them. Recorded as evidence only; no contract change is proposed.
+
+1. **`.oo-stage` caps at 1080px.** The labs are 1440px instruments, so `.lab-stage` re-declares the stage anatomy with a wider ceiling. **Third lab in a row to pay this.**
+2. **`.oo-btn[hidden]` needs a page-local `[hidden] { display: none }` restatement.** `components.css:209` gives `.oo-btn` `display: inline-flex`, which outranks the UA `[hidden]` rule the shell uses to retire the pause control. **This recurs in every lab and reads as a `components.css` defect, not a lab quirk.** The same restatement is needed for `.lab-canvas` and `.lab-static`.
+3. **No viewport/canvas primitive.** `.lab-viewport`, `.lab-canvas`, `.lab-static` and the vignette are page-local in all four labs now, byte-for-byte apart from the vignette stop.
+4. **The vignette gradient is hand-tuned again, and in the same direction as Lab 03.** A wider ellipse with a later, half-strength stop than Lab 02's, because a drawing has no tube and this plate runs a labelled node close to every frame edge at both aspects — a 40%-stop window would dim the reading matter the lab exists for. **Three labs, three hand-derived values from the same starting rule; it wants a `--oo-vignette-*` token.**
+5. **Readout density overrides** — `.lab-readout .oo-stat { padding: 13px 16px }` plus smaller value and delta sizes, to fit four figures in one rail. Same overrides as Labs 02/03; a compact `.oo-stat` variant would absorb them.
+6. **`data-lab-static` must sit on a wrapper `<div>`**, never the `<svg>`, because `hidden` is an `HTMLElement` IDL attribute. Inherited rather than rediscovered.
+7. **The shell exposes no resize/aspect hook**, so the aspect breakpoint and the whole framing solve run per frame inside the lab.
+
+### Shared harness changes made in this lab
+
+Both were made **in this task** under explicit authorisation, and both affect every lab:
+
+- **`?reveal=full` seam in `lab-shell.js`.** The four dimmer direct-token strands dying ~90px out of `tokens.css` in the old `blueprint-desktop.png` were a **capture artifact, not geometry** — at `progress = 1` the stage-2 term saturates, endpoints are re-set from `pos` every frame and `computeLineDistances()` re-runs, so there was nothing incomplete in the scene. The real defect was that `verify-lab.sh` fired `wait 1200` at an ~8s draw-and-hold cycle and then the by-eye composition gate was applied to whichever frame happened to land — banking a frame that showed **four false dangling edges**. The seam is deliberately the weaker sibling of `?render=fallback`: it does not touch the renderer path, the scene stays live WebGL, labs with no reveal clock never read it, and `?render=fallback` is untouched.
+- **Vertical-overflow assertion, `verify-lab.sh` step 3b.** Deliberately not the literal mirror of the horizontal probe: every lab from 02 on lets its footer rail sit below the fold at 1440×900 (44px on `candle-field`, 45px on `crt-volume`, 83px on `blueprint` as shipped in round 1), so `scrollHeight - innerHeight <= 0` would have failed three shipped pages for a deliberate choice. What must not fall below the fold is the **readout rail**, so the probe takes the lowest `.oo-stat` bottom minus `innerHeight`. This lab's rail was at 906px — already 6px past the frame, which is why the round-1 stat deltas were clipped — and is now at 869px, against 867 on `candle-field` and 868 on `crt-volume`. **Honest caveat: the guard has roughly 45px of slack.** `.lab-viewport` is `flex: 1 1 auto` with `min-height: 62svh`, so the plate absorbs the first ~15px of readout growth by shrinking to its floor before the rail moves at all; combined with ~31px of headroom, a single extra wrapped line will not always trip it. It catches the class of regression that actually happened; it is not knife-edge.
+
+## Serious-track gate
+
+Fun-track. No promotion proposed. Promote only if Ayaz likes the live feel **and** the experiment earns a specific public role, and then as one scoped hero/plate, not a global Open Outcry primitive. This lab carries an additional condition the others do not: it draws a claim about the repository, so any public surface needs the audit re-run against the files at that time — the nine edges are true as of 2026-07-26 and nothing keeps them true. The annotation-density loss to the fallback and the ~13% residual void would also need a second opinion from someone who did not build the solver. Do not change `tokens.css` or `components.css` before that evidence exists.
