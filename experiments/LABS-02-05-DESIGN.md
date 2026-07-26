@@ -70,8 +70,37 @@ or the DOM chrome. Either side can be rewritten without breaking the other. Each
 lab file should stay comfortably readable on its own — if one grows past roughly
 300 lines, its geometry construction is doing too much and should be split.
 
-**Pointer input** is opt-in per lab (`ctx.pointer`), because only Depth Tape and
-Tape Ribbon want drift. No lab gets orbit controls.
+**Pointer input** is opt-in per lab (`ctx.pointer`) and available to **any** lab.
+No lab gets orbit controls.
+
+*Amended 2026-07-26.* This clause originally scoped drift to Depth Tape and Tape
+Ribbon, on the assumption that only they wanted it. The build falsified that:
+all four new labs opted in, and in two of them the drift became load-bearing
+rather than decorative — Blueprint sizes its node margins around it
+(`blueprint.js:235`) so the framing solve already accounts for the offset, and
+CRT Volume uses it to move the eye across the phosphor surface. Four out of four
+consumers diverging from a rule is evidence about the rule, not four mistakes.
+The amendment follows the code rather than asking two verified plates to change
+for conformance.
+
+Drift is permitted subject to the constraints the labs actually hold to:
+
+- **Bounded, and inside the framing solve's margins.** A lab that solves its own
+  framing must account for the offset so drift can never push its subject off an
+  edge. Observed magnitudes: ±0.42/±0.26 (CRT Volume), ±0.55/±0.28 (Blueprint),
+  ±0.8 x (Candle Field), ±0.7/±0.35 (Tape Ribbon).
+- **Smoothed linearly** — the shell lerps toward the cursor at `0.055`/frame. No
+  easing curve, consistent with §6.
+- **Suppressed entirely under `prefers-reduced-motion`**, which the shell handles.
+- **Re-aimed, not just translated.** The shell calls `camera.lookAt()` once at
+  init, so a lab that mutates `camera.position` in `update()` must re-issue
+  `lookAt()` there or its rotation goes stale.
+- **Still never orbit controls.** Drift is a parallax nudge, not camera control
+  handed to the viewer.
+
+A lab that takes drift discloses it in its receipt as a motion channel. The
+constraint that matters is boundedness and disclosure, not which labs are on the
+list.
 
 ### 2.2 Shared runtime
 
