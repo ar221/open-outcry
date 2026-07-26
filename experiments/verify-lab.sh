@@ -21,7 +21,21 @@ fail() { echo "FAIL [$LAB] $*" >&2; exit 1; }
 
 # 1. Syntax
 node --check "${DIR}/${LAB}.js" || fail "node --check"
-[ -f "${DIR}/lab-shell.js" ] && { node --check "${DIR}/lab-shell.js" || fail "node --check lab-shell"; }
+# Lab 01 predates the shared shell and legitimately does not load it, so a
+# missing lab-shell.js is a skip, not a failure. It must still be a LOUD skip.
+#
+# The previous form was `[ -f "${DIR}/lab-shell.js" ] && { node --check ... }`.
+# Reviewed as a silent `set -e` death; measured, it is not one — `[ -f ]` sits
+# in a `&&` list and is not the command following the final `&&`, so POSIX/bash
+# exempt its failure from `set -e` (verified on bash 5.3.15: the script ran to
+# its PASS line). The real defect is quieter and still real: an absent shared
+# shell meant the check simply did not happen, with nothing said either way, in
+# the one script whose whole job is to not be silent. Now it says so.
+if [ -f "${DIR}/lab-shell.js" ]; then
+  node --check "${DIR}/lab-shell.js" || fail "node --check lab-shell"
+else
+  echo "SKIP [$LAB] lab-shell.js absent — shared-shell syntax check not run"
+fi
 
 # 2. Serve the repo root so ../tokens.css resolves
 python -m http.server "$PORT" --directory "${DIR}/.." >/dev/null 2>&1 &

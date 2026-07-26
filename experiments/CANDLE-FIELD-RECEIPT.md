@@ -8,7 +8,7 @@
 ## What shipped
 
 - Three.js field of 90 real SPY daily sessions extruded as solid bodies, framed near-side-on (17° off the price plane, FOV 40) so history runs left and the newest bar runs right.
-- One amber dashed close rail annotating `CLOSE 738.93` / `2026-07-24`, drawn with `depthTest:false` + `renderOrder: 2` so it is not buried inside the column it names.
+- One amber close rail annotating `CLOSE 738.93` / `2026-07-24`, drawn with `depthTest:false` + `renderOrder: 2` so it is not buried inside the column it names. The live rail is a **solid** `LineBasicMaterial`; only the static SVG fallback dashes it (`stroke-dasharray`), because the flat still has no depth cue to distinguish an annotation from data. An earlier draft of this receipt called the live rail dashed — it never was.
 - One linear pan, bounded to a scan over `z ∈ [53.0, 64.6]` with instantaneous reversal at the ends; pointer drift ±0.8 units; no easing, no orbit, no particles, no post-processing.
 - Aspect-driven camera orbit about a computed target with `lookAt` re-issued every frame, so desktop and phone re-centre structurally rather than by a dolly table.
 - Static SVG fallback: a complete axis-labelled 90-session candle chart with price grid, date axis, the same close rail, and a `50 UP / 40 DOWN` header strip.

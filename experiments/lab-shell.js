@@ -50,8 +50,11 @@ export function createLab(config) {
   const pointer = new THREE.Vector2(0, 0);
   const targetPointer = new THREE.Vector2(0, 0);
 
-  let renderer, scene, camera, resizeObserver;
+  let renderer, scene, camera, resizeObserver, visibilityObserver;
   let animationFrame = 0;
+  // Set by teardown() when the page is being discarded rather than cached. A
+  // restored page whose renderer was disposed cannot honestly claim it is live.
+  let disposed = false;
   let visible = true;
   let pausedByUser = false;
   let lastTime = 0;
@@ -130,8 +133,23 @@ export function createLab(config) {
     if (!pausedByUser) lastTime = performance.now();
   }
 
+  function onVisibilityChange() {
+    visible = !document.hidden;
+    if (visible) lastTime = performance.now();
+  }
+
+  function onReducedMotionChange() {
+    window.location.reload();
+  }
+
   function initialize() {
     if (forced === 'fallback') return setFallback('forced still');
+    // A lab that could not assemble its own inputs (a missing or unreadable
+    // data snapshot) hands the reason in and gets the shell's one fallback
+    // route, rather than dying at module scope and leaving `data-lab-static`
+    // hidden behind a blank plate. Checked after `?render=fallback` so the
+    // forced-still seam keeps reporting its own reason.
+    if (config.fallbackReason) return setFallback(config.fallbackReason);
     if (reducedMotion.matches) return setFallback('reduced-motion still');
     if (!supportsWebGL()) return setFallback('webgl unavailable');
 
@@ -169,27 +187,66 @@ export function createLab(config) {
         window.addEventListener('pointermove', onPointerMove, { passive: true });
       }
 
-      const visibilityObserver = new IntersectionObserver(([entry]) => {
+      visibilityObserver = new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
         if (visible) lastTime = performance.now();
       }, { threshold: 0.02 });
       visibilityObserver.observe(el.viewport);
 
-      document.addEventListener('visibilitychange', () => {
-        visible = !document.hidden;
-        if (visible) lastTime = performance.now();
-      });
+      document.addEventListener('visibilitychange', onVisibilityChange);
     } catch (error) {
       console.error('Lab WebGL initialization failed.', error);
       setFallback('renderer fault');
     }
   }
 
-  reducedMotion.addEventListener('change', () => window.location.reload());
-  window.addEventListener('pagehide', () => {
+  // Full teardown: every observer disconnected and every listener removed, not
+  // just the loop and the renderer. The earlier version dropped the frame and
+  // disposed the context but left the IntersectionObserver, `visibilitychange`,
+  // `pointermove`, reduced-motion and control-click listeners attached, all of
+  // them still holding this closure — and that shape is now on five pages.
+  function teardown() {
     stopLoop();
     resizeObserver?.disconnect();
+    visibilityObserver?.disconnect();
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+    reducedMotion.removeEventListener('change', onReducedMotionChange);
+    window.removeEventListener('pointermove', onPointerMove);
+    el.control.removeEventListener('click', toggleMotion);
     renderer?.dispose();
+    disposed = true;
+  }
+
+  reducedMotion.addEventListener('change', onReducedMotionChange);
+
+  // `pagehide` fires for BOTH a discard and a bfcache entry, and the two want
+  // opposite handling. Back-navigation from experiments/index.html is the
+  // intended browsing flow, so a bfcache hit is the common case: disposing the
+  // GL context there left a restored plate with a dead canvas still reporting
+  // `renderer / webgl live`, which is the one thing a status rail must never do.
+  // On a cached exit we only idle the loop and keep the context; on a real
+  // discard we tear the whole thing down.
+  window.addEventListener('pagehide', (event) => {
+    if (event.persisted) {
+      stopLoop();
+      return;
+    }
+    teardown();
+  });
+
+  // Restore path. Resume only if there is genuinely something live to resume;
+  // otherwise route to the fallback and say so, rather than leaving a stale
+  // "webgl live" over a canvas that cannot paint another frame.
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return;
+    if (el.stage.dataset.renderer !== 'webgl') return;
+    const gl = renderer?.getContext?.();
+    if (disposed || !renderer || !gl || gl.isContextLost()) {
+      return setFallback('context lost on restore');
+    }
+    resize();
+    lastTime = performance.now();
+    if (!pausedByUser) startLoop();
   });
 
   initialize();

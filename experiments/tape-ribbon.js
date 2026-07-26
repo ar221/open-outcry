@@ -16,8 +16,21 @@ import { createLab } from './lab-shell.js';
 
 const SNAPSHOT = 'data/market-2026-07-26.json';
 
-const response = await fetch(SNAPSHOT);
-const data = await response.json();
+// Guarded — see the same guard in candle-field.js. Everything below is derived
+// from the snapshot at module scope, so an unguarded rejection here leaves a
+// blank plate with `[data-lab-static]` still hidden and `?render=fallback`
+// unreachable. Route through the shell's fallback first, then rethrow to abort
+// the module body.
+let data;
+try {
+  const response = await fetch(SNAPSHOT);
+  if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${SNAPSHOT}`);
+  data = await response.json();
+} catch (error) {
+  console.error(`Tape Ribbon: snapshot ${SNAPSHOT} unavailable.`, error);
+  createLab({ fallbackReason: 'snapshot unavailable' });
+  throw error;
+}
 
 // ── The tape sheet ───────────────────────────────────────────────────────
 // 4096 wide, and a power of two on purpose: this texture is RepeatWrapping'd,

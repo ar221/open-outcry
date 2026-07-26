@@ -6,8 +6,23 @@ import { createLab, makeLine, makeTextSprite } from './lab-shell.js';
 
 const SNAPSHOT = 'data/market-2026-07-26.json';
 
-const response = await fetch(SNAPSHOT);
-const data = await response.json();
+// Guarded, because everything below this point is derived from the snapshot at
+// module scope. Unguarded, a missing or renamed file rejects the module, so
+// createLab() never runs, [data-lab-static] stays `hidden`, and the plate is
+// blank — with `?render=fallback` unreachable in exactly the state that needs
+// it. Instead: route through the shell's one fallback path first, then rethrow
+// to abort the rest of this module. The console error is the diagnostic; the
+// plate the reader gets is the complete static composition.
+let data;
+try {
+  const response = await fetch(SNAPSHOT);
+  if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${SNAPSHOT}`);
+  data = await response.json();
+} catch (error) {
+  console.error(`Candle Field: snapshot ${SNAPSHOT} unavailable.`, error);
+  createLab({ fallbackReason: 'snapshot unavailable' });
+  throw error;
+}
 
 const BARS = data.bars.series;
 const SPACING = 0.72;

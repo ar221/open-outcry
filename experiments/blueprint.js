@@ -203,7 +203,7 @@ const NODES = [
   { id: 'book',       label: 'index.html',     tier: 'green', stage: 2, note: 'BRAND BOOK' },
   { id: 'inir',       label: 'examples/inir',  tier: 'green', stage: 2, note: 'EXAMPLE' },
   { id: 'brief',      label: 'examples/brief', tier: 'green', stage: 2, note: 'EXAMPLE' },
-  { id: 'labs',       label: 'experiments/*',  tier: 'peach', stage: 2, note: '4 LABS' },
+  { id: 'labs',       label: 'experiments/*',  tier: 'peach', stage: 2, note: '5 LABS + SHEET' },
 ];
 
 // stage 0: the contract chain's own link.
