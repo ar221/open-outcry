@@ -128,6 +128,22 @@
      bezel. */
   .lab-static { background-color: var(--oo-broadcast-stage); }
   .lab-static > svg { display: block; width: 100%; height: 100%; }
+  /* ── Two stills, because one viewBox cannot serve both widths ──
+     The still is the reduced-motion AND the no-WebGL path, so for a reader with
+     `prefers-reduced-motion: reduce` it is the ONLY view of this plate — and
+     phone is the commonest viewport. The 1400x340 sweep scaled into a 350px box
+     puts every glyph at ~4px: the plan's standing precedent (Lab 03, enforced at
+     Lab 04) allows CROPPING when what remains reads, and forbids shrinking type
+     under readability. A diagonal swept band is simply the wrong form factor at
+     390px, so the narrow still drops the sweep and states the tape as what a
+     tape actually is when it is not moving: a legible column of quotes. Same
+     seven figures, same mono face, same green/red, character for character.
+     Wide still untouched. */
+  .lab-static > svg.tr-still--narrow { display: none; }
+  @media (max-width: 900px) {
+    .lab-static > svg.tr-still--wide { display: none; }
+    .lab-static > svg.tr-still--narrow { display: block; }
+  }
   /* lab-shell.js swaps canvas/still with the `hidden` attribute. The UA rule
      for [hidden] is weaker than any author `display`, so every element the
      shell toggles has to restate it. Same trap as .oo-btn below. */
@@ -214,7 +230,7 @@
          the live scene fetches (data/market-2026-07-26.json), so the figures
          below are the figures on the mesh, character for character. Nothing
          here is hand-typed from memory. -->
-    <svg viewBox="0 0 1400 340" preserveAspectRatio="xMidYMid meet" role="img"
+    <svg class="tr-still--wide" viewBox="0 0 1400 340" preserveAspectRatio="xMidYMid meet" role="img"
          aria-label="Static tape ribbon: a swept band carrying the 2026-07-26 quote tape — SPY 738.93 +0.10%, QQQ 684.23 -1.12%, IWM 291.17 -0.31%, DIA 518.76 +0.48%, GLD 371.90 +0.10%, TLT 83.25 +0.10%, VIXY 21.44 -1.56%. Four up, three down.">
       <defs>
         <radialGradient id="tr-bloom" cx="24%" cy="26%" r="52%">
@@ -252,6 +268,70 @@
       <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1.2">
         <text x="20" y="26" fill="#7a6a5f">OPEN OUTCRY / TAPE RIBBON / STILL</text>
         <text x="1380" y="26" text-anchor="end" fill="#686564">7 QUOTES &middot; 2026-07-26 &middot; NO NETWORK</text>
+      </g>
+    </svg>
+
+    <!-- NARROW STILL (<=900px). Same snapshot, same seven runs, same strings —
+         the symbol/price/percent text below is copied verbatim from the wide
+         still's <textPath> runs above, which were themselves emitted from
+         data/market-2026-07-26.json. Only the LAYOUT differs: a stationary tape
+         is a column, and a column is the only form that reads at 350px. The
+         amber rules and the #0d0d0b row fills are the same tape hardware
+         paintTape() draws on the live sheet, flattened. Mono only; no serif. -->
+    <svg class="tr-still--narrow" viewBox="0 0 350 253" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Static tape, narrow: the 2026-07-26 quote tape as a column — SPY 738.93 +0.10%, QQQ 684.23 -1.12%, IWM 291.17 -0.31%, DIA 518.76 +0.48%, GLD 371.90 +0.10%, TLT 83.25 +0.10%, VIXY 21.44 -1.56%. Four up, three down.">
+      <defs>
+        <radialGradient id="tr-bloom-n" cx="22%" cy="14%" r="72%">
+          <stop offset="0%" stop-color="#e8927c" stop-opacity="0.17"/>
+          <stop offset="100%" stop-color="#e8927c" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <rect width="350" height="253" fill="#181210"/>
+      <rect width="350" height="253" fill="url(#tr-bloom-n)"/>
+
+      <g font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="1">
+        <!-- Brighter than the wide still's equivalent label on purpose: at 390
+             the viewport's top scrim (.lab-viewport::after, .92 alpha at 0%)
+             lands exactly here, and #7a6a5f under it went to near-black. -->
+        <text x="12" y="13" fill="#b4a291">OPEN OUTCRY / TAPE RIBBON / STILL</text>
+      </g>
+      <rect x="12" y="19" width="326" height="2" fill="#9b6822"/>
+
+      <g font-family="JetBrains Mono, monospace" font-size="16" font-weight="700"
+         letter-spacing="1.2" dominant-baseline="central">
+        <rect x="12" y="26" width="326" height="27" fill="#0d0d0b" stroke="#241c18" stroke-width="1"/>
+        <text x="24" y="39.5" fill="#eee8df">SPY</text>
+        <text x="326" y="39.5" text-anchor="end" fill="#48dc7d">738.93&#160;+0.10%</text>
+
+        <rect x="12" y="55" width="326" height="27" fill="#0d0d0b" stroke="#241c18" stroke-width="1"/>
+        <text x="24" y="68.5" fill="#eee8df">QQQ</text>
+        <text x="326" y="68.5" text-anchor="end" fill="#e0455a">684.23&#160;-1.12%</text>
+
+        <rect x="12" y="84" width="326" height="27" fill="#0d0d0b" stroke="#241c18" stroke-width="1"/>
+        <text x="24" y="97.5" fill="#eee8df">IWM</text>
+        <text x="326" y="97.5" text-anchor="end" fill="#e0455a">291.17&#160;-0.31%</text>
+
+        <rect x="12" y="113" width="326" height="27" fill="#0d0d0b" stroke="#241c18" stroke-width="1"/>
+        <text x="24" y="126.5" fill="#eee8df">DIA</text>
+        <text x="326" y="126.5" text-anchor="end" fill="#48dc7d">518.76&#160;+0.48%</text>
+
+        <rect x="12" y="142" width="326" height="27" fill="#0d0d0b" stroke="#241c18" stroke-width="1"/>
+        <text x="24" y="155.5" fill="#eee8df">GLD</text>
+        <text x="326" y="155.5" text-anchor="end" fill="#48dc7d">371.90&#160;+0.10%</text>
+
+        <rect x="12" y="171" width="326" height="27" fill="#0d0d0b" stroke="#241c18" stroke-width="1"/>
+        <text x="24" y="184.5" fill="#eee8df">TLT</text>
+        <text x="326" y="184.5" text-anchor="end" fill="#48dc7d">83.25&#160;+0.10%</text>
+
+        <rect x="12" y="200" width="326" height="27" fill="#0d0d0b" stroke="#241c18" stroke-width="1"/>
+        <text x="24" y="213.5" fill="#eee8df">VIXY</text>
+        <text x="326" y="213.5" text-anchor="end" fill="#e0455a">21.44&#160;-1.56%</text>
+      </g>
+
+      <rect x="12" y="232" width="326" height="2" fill="#9b6822"/>
+      <g font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="1">
+        <text x="338" y="247" text-anchor="end" fill="#686564">7 QUOTES &middot; 2026-07-26 &middot; NO NETWORK</text>
       </g>
     </svg>
     </div>
