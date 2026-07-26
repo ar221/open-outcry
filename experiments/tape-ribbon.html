@@ -10,34 +10,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../tokens.css">
 <link rel="stylesheet" href="../components.css">
+<link rel="stylesheet" href="lab-chrome.css">
 <style>
-  * { box-sizing: border-box; margin: 0; }
-  :root { color-scheme: dark; }
-  html, body { min-height: 100%; background: var(--oo-void); }
-  body {
-    color: var(--oo-fg-warm);
-    font-family: var(--oo-font-mono);
-    font-size: var(--oo-type-body);
-    line-height: 1.6;
-  }
-  button { font: inherit; }
+  /* Lab 05 — BROADCAST. Shared chrome lives in lab-chrome.css, which carries
+     only the four-way-common lab glue. Everything below is this plate's own:
+     the warm register, the bloom, the grain host, the compositional head, and
+     its two-layer vignette. None of it belongs in the shared file. */
+  body { color: var(--oo-fg-warm); }
 
   /* ── Stage — BROADCAST ──
-     Same anatomy as Labs 02-04 (not .oo-stage: that primitive caps at 1080px
-     and the labs are 1440px instruments), but the register cues come from Lab
-     01, the only other Broadcast plate: broadcast stage temperature, film
-     grain, one warm radial bloom. Explicitly NO .oo-scanlines — scanlines are
-     a Console cue and this plate does not get to wear both registers. */
+     Anatomy comes from lab-chrome.css. The register cues come from Lab 01, the
+     only other Broadcast plate: broadcast stage temperature, film grain, one
+     warm radial bloom. Explicitly NO .oo-scanlines — scanlines are a Console
+     cue and this plate does not get to wear both registers. */
   .lab-stage {
-    max-width: 1440px;
-    min-height: 100svh;
-    margin: 0 auto;
-    padding: 0 var(--oo-gutter);
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
     background-color: var(--oo-broadcast-stage);
     border-inline: var(--oo-stroke) solid var(--oo-line-warm);
   }
@@ -57,9 +43,6 @@
   .lab-stage > *:not(.oo-overlay) { position: relative; z-index: 1; }
 
   .lab-path { color: var(--oo-muted-warm); }
-  .lab-status strong { color: var(--oo-green); font-weight: 400; }
-  .lab-stage[data-renderer="fallback"] .lab-status strong { color: var(--oo-amber); }
-  .lab-stage[data-renderer="pending"] .lab-status strong { color: var(--oo-muted); }
 
   /* ── Head: the voice, and it holds the first read ──
      Register law, concretely: the Fraunces headline is the largest, warmest,
@@ -94,40 +77,23 @@
      rather than as a framed console instrument. A framed box would promote the
      quotation to a second voice, which is the one thing §1 forbids here. */
   .lab-viewport {
-    position: relative;
-    flex: 1 1 auto;
     min-height: 34svh;
-    overflow: hidden;
     background-color: var(--oo-broadcast-stage);
   }
   /* Two jobs, one pseudo: the top-weighted scrim seats the band back under the
      headline, and the late-stopping ellipse keeps the tape's own figures out of
      the darkened corners. Stops are late for the same reason as Labs 03-04 —
-     the reading matter runs close to the left and right edges. */
+     the reading matter runs close to the left and right edges. Two layers and
+     its own centre, so it is the least shareable vignette of the four. */
   .lab-viewport::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
     background-image:
       linear-gradient(180deg, rgba(24,18,16,.92) 0%, rgba(24,18,16,.34) 22%, transparent 46%),
       radial-gradient(ellipse 98% 96% at 50% 56%, transparent 0 58%, rgba(2,3,2,.42) 100%);
-  }
-  .lab-canvas,
-  .lab-static {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    height: 100%;
   }
   /* Letterboxed, not cropped: a sliced ribbon loses quotes off both ends, and
      the fallback is a promotion gate. Matte is the stage, so the bars read as
      bezel. */
   .lab-static { background-color: var(--oo-broadcast-stage); }
-  .lab-static > svg { display: block; width: 100%; height: 100%; }
   /* ── Two stills, because one viewBox cannot serve both widths ──
      The still is the reduced-motion AND the no-WebGL path, so for a reader with
      `prefers-reduced-motion: reduce` it is the ONLY view of this plate — and
@@ -144,33 +110,19 @@
     .lab-static > svg.tr-still--wide { display: none; }
     .lab-static > svg.tr-still--narrow { display: block; }
   }
-  /* lab-shell.js swaps canvas/still with the `hidden` attribute. The UA rule
-     for [hidden] is weaker than any author `display`, so every element the
-     shell toggles has to restate it. Same trap as .oo-btn below. */
-  .lab-canvas[hidden],
-  .lab-static[hidden] { display: none; }
 
   /* ── Readout: four real figures off the snapshot ──
      Chrome, therefore mono, therefore no serif — same rail as Labs 02-04.
      Deltas are budgeted to one line each: verify-lab.sh asserts the bottom of
      the stat rail sits inside a 1440x900 frame, and a wrapped delta is exactly
-     what pushes it out. */
+     what pushes it out. Per-plate budget, so padding stays page-local. */
   .lab-readout { padding: 16px 0 16px; }
-  .lab-readout .oo-stat { padding: 13px 16px; }
-  .lab-readout .oo-stat-value { margin-top: 5px; font-size: 19px; letter-spacing: .01em; }
-  .lab-readout .oo-stat-delta { margin-top: 4px; font-size: 10px; line-height: 1.45; }
-  .lab-readout .oo-kicker { font-size: 10px; }
 
   /* ── Footer rail ──
      v1.3 register-law corollary: controls are chrome and chrome is always mono,
      regardless of the plate's dominant register. .oo-btn supplies the mono
      face; nothing here inherits Fraunces. */
-  .lab-rail--foot { gap: 14px; flex-wrap: wrap; }
   .lab-meta { color: var(--oo-muted-warm); }
-  .lab-control { min-height: 36px; padding: 8px 14px; font-size: 11px; }
-  /* .oo-btn declares display:inline-flex, which outranks the UA [hidden] rule
-     the shell uses to retire the control on the fallback path. */
-  .oo-btn[hidden] { display: none; }
 
   @media (max-width: 900px) {
     .lab-head { grid-template-columns: minmax(0, 1fr); padding-top: 24px; }
@@ -178,7 +130,6 @@
     .lab-note { max-width: none; }
   }
   @media (max-width: 720px) {
-    .oo-rail { font-size: 10px; letter-spacing: .02em; }
     .lab-head { gap: 12px; padding: 20px 0 16px; }
     /* components.css narrows .oo-display-broadcast to clamp(20px,7.5vw,40px);
        this holds the headline just above that so it still wins the plate at
@@ -187,11 +138,6 @@
     .lab-note { font-size: 12px; }
     .lab-viewport { min-height: 30svh; }
     .lab-readout { padding: 14px 0 16px; }
-    .lab-readout .oo-stat-value { font-size: 17px; }
-    .lab-meta { line-height: 1.5; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .lab-control { display: none; }
   }
 </style>
 <noscript><style>

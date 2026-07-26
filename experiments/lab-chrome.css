@@ -1,0 +1,137 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   lab-chrome.css — page-local chrome shared by Labs 02-05
+   ═══════════════════════════════════════════════════════════════════════════
+
+   WHAT THIS IS
+   Deduplicated page-local glue for the four lab pages that ship the current
+   lab-shell conventions: candle-field (02), crt-volume (03), blueprint (04),
+   and tape-ribbon (05). Nothing more. Every rule in here was, before this
+   file existed, restated verbatim and identically in all four <style> blocks.
+
+   WHAT THIS IS NOT
+   This is NOT part of the frozen Open Outcry contract. Do not confuse it with
+   ../tokens.css (v1.3) or ../components.css (v1.4), which are the contract and
+   are versioned, reviewed, and consumed by everything. This file is scaffolding
+   for one directory of experiments. It introduces no tokens, no primitives, and
+   no new naming authority, and it must not become a second de-facto design
+   system. If a rule here starts wanting to apply outside experiments/, that is
+   a signal to propose it into components.css properly — not to widen this file.
+
+   LAB 01 DELIBERATELY DOES NOT CONSUME IT
+   depth-tape.html is untouched by design. Its bundle SHA is a recorded
+   verification artifact and its markup predates these conventions, so it keeps
+   its own self-contained <style> block. Do not wire it up to this file.
+
+   WHAT IS *NOT* HERE, AND WHY
+   Only the genuinely four-way-common surface was extracted. Rules that differ
+   between plates stay page-local, on purpose:
+     - The vignette GRADIENT on .lab-viewport::after. All four labs were
+       hand-tuned to different values (Lab 02 a tight 40% ellipse window; Labs
+       03/04 wide late-stopping falloff at different opacities; Lab 05 a
+       two-layer scrim + ellipse). Only the positioning scaffold is shared.
+     - Register colour: body color, .lab-path, .lab-meta, .lab-static and
+       .lab-stage backgrounds and borders. Labs 02-04 are Console, Lab 05 is
+       Broadcast (warm stage, film grain, one radial bloom, NO scanlines).
+     - .lab-head / .lab-title / .lab-note / .lab-readout base geometry, which
+       each plate budgeted separately against its own composition gate.
+       CASCADE NOTE: these are also touched inside the media queries below's
+       page-local counterparts. A property must never be split between this
+       file's @media and a page-local base rule of equal specificity — the
+       page-local base would win at narrow widths and silently invert the
+       breakpoint. Where the base value differs per lab, BOTH the base and its
+       responsive override stay page-local.
+
+   Loaded AFTER tokens.css/components.css and BEFORE each lab's own <style>,
+   so page-local rules of equal specificity win, as intended.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Reset ── */
+* { box-sizing: border-box; margin: 0; }
+:root { color-scheme: dark; }
+html, body { min-height: 100%; background: var(--oo-void); }
+/* `color` is register-dependent (--oo-fg vs --oo-fg-warm) and stays page-local. */
+body {
+  font-family: var(--oo-font-mono);
+  font-size: var(--oo-type-body);
+  line-height: 1.6;
+}
+button { font: inherit; }
+
+/* ── Stage anatomy ──
+   Not .oo-stage: that primitive is capped at 1080px and the labs are
+   1440px instruments. Same anatomy, wider ceiling.
+   background-color and border-inline are register cues — page-local. */
+.lab-stage {
+  max-width: 1440px;
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: 0 var(--oo-gutter);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Renderer status lamp ── */
+.lab-status strong { color: var(--oo-green); font-weight: 400; }
+.lab-stage[data-renderer="fallback"] .lab-status strong { color: var(--oo-amber); }
+.lab-stage[data-renderer="pending"] .lab-status strong { color: var(--oo-muted); }
+
+/* ── Viewport shell ──
+   min-height, background-color and border differ per plate — page-local. */
+.lab-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+/* Vignette SCAFFOLD only. The gradient itself is hand-tuned per lab and is
+   declared page-local; see the header note. */
+.lab-viewport::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.lab-canvas,
+.lab-static {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.lab-static > svg { display: block; width: 100%; height: 100%; }
+/* lab-shell.js swaps canvas/still with the `hidden` attribute. The UA rule
+   for [hidden] is weaker than any author `display`, so every element the
+   shell toggles has to restate it. Same trap as .oo-btn below. */
+.lab-canvas[hidden],
+.lab-static[hidden] { display: none; }
+
+/* ── Readout ──
+   .lab-readout's own padding is budgeted per plate against the 1440x900
+   frame assertion, so it stays page-local along with its @media override. */
+.lab-readout .oo-stat { padding: 13px 16px; }
+.lab-readout .oo-stat-value { margin-top: 5px; font-size: 19px; letter-spacing: .01em; }
+.lab-readout .oo-stat-delta { margin-top: 4px; font-size: 10px; line-height: 1.45; }
+.lab-readout .oo-kicker { font-size: 10px; }
+
+/* ── Footer rail ── */
+.lab-rail--foot { gap: 14px; flex-wrap: wrap; }
+.lab-control { min-height: 36px; padding: 8px 14px; font-size: 11px; }
+/* components.css:209 — .oo-btn declares display:inline-flex, which outranks
+   the UA [hidden] rule the shell uses to retire the control on the fallback
+   path. Restated here once instead of once per lab. The frozen contract is
+   not touched to fix this. */
+.oo-btn[hidden] { display: none; }
+
+@media (max-width: 720px) {
+  .oo-rail { font-size: 10px; letter-spacing: .02em; }
+  .lab-meta { line-height: 1.5; }
+  .lab-readout .oo-stat-value { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-control { display: none; }
+}

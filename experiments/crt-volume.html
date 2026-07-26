@@ -10,39 +10,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../tokens.css">
 <link rel="stylesheet" href="../components.css">
+<link rel="stylesheet" href="lab-chrome.css">
 <style>
-  * { box-sizing: border-box; margin: 0; }
-  :root { color-scheme: dark; }
-  html, body { min-height: 100%; background: var(--oo-void); }
-  body {
-    color: var(--oo-fg);
-    font-family: var(--oo-font-mono);
-    font-size: var(--oo-type-body);
-    line-height: 1.6;
-  }
-  button { font: inherit; }
+  /* Lab 03 — Console. Shared chrome lives in lab-chrome.css; what remains here
+     is this plate's own register colour, geometry budget, and vignette tune. */
+  body { color: var(--oo-fg); }
 
-  /* ── Stage ──
-     Not .oo-stage: that primitive is capped at 1080px and the labs are
-     1440px instruments. Same anatomy, wider ceiling. */
+  /* never `background:` — erases .oo-scanlines */
   .lab-stage {
-    max-width: 1440px;
-    min-height: 100svh;
-    margin: 0 auto;
-    padding: 0 var(--oo-gutter);
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--oo-console-stage);   /* never `background:` — erases .oo-scanlines */
+    background-color: var(--oo-console-stage);
     border-inline: var(--oo-stroke) solid var(--oo-line);
   }
 
   .lab-path { color: var(--oo-amber-dim); }
-  .lab-status strong { color: var(--oo-green); font-weight: 400; }
-  .lab-stage[data-renderer="fallback"] .lab-status strong { color: var(--oo-amber); }
-  .lab-stage[data-renderer="pending"] .lab-status strong { color: var(--oo-muted); }
 
   /* ── Head: title + one line of intent ── */
   .lab-head {
@@ -58,76 +38,38 @@
 
   /* ── Viewport: the dominant object ── */
   .lab-viewport {
-    position: relative;
-    flex: 1 1 auto;
     min-height: 62svh;
-    overflow: hidden;
     background-color: var(--oo-void);
     border: var(--oo-stroke) solid var(--oo-line);
   }
   .lab-viewport::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
     /* Tube falloff, not a spotlight. Lab 02's window could be tight because a
        candle field is mostly void; here the subject is text that runs to the
        frame edges at every aspect, so a 40%-stop vignette would dim the very
        glyphs the lab exists to make readable. Wide ellipse, late stop, half
-       the opacity. */
+       the opacity. Hand-tuned, therefore page-local. */
     background: radial-gradient(ellipse 98% 94% at 50% 50%, transparent 0 52%, rgba(2,3,2,.5) 100%);
-  }
-  .lab-canvas,
-  .lab-static {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    height: 100%;
   }
   /* The still is letterboxed rather than cropped: a sliced fallback is a
      degraded terminal, and the fallback is a promotion gate. Matte matches the
      stage so the bars read as bezel, not as a broken frame. */
   .lab-static { background-color: var(--oo-console-stage); }
-  .lab-static > svg { display: block; width: 100%; height: 100%; }
-  /* lab-shell.js swaps canvas/still with the `hidden` attribute. The UA rule
-     for [hidden] is weaker than any author `display`, so every element the
-     shell toggles has to restate it. Same trap as .oo-btn below. */
-  .lab-canvas[hidden],
-  .lab-static[hidden] { display: none; }
 
   /* ── Readout: four real figures from the capture ── */
   .lab-readout { padding: 18px 0 20px; }
-  .lab-readout .oo-stat { padding: 13px 16px; }
-  .lab-readout .oo-stat-value { margin-top: 5px; font-size: 19px; letter-spacing: .01em; }
-  .lab-readout .oo-stat-delta { margin-top: 4px; font-size: 10px; line-height: 1.45; }
-  .lab-readout .oo-kicker { font-size: 10px; }
 
   /* ── Footer rail ── */
-  .lab-rail--foot { gap: 14px; flex-wrap: wrap; }
   .lab-meta { color: var(--oo-muted); }
-  .lab-control { min-height: 36px; padding: 8px 14px; font-size: 11px; }
-  /* .oo-btn declares display:inline-flex, which outranks the UA [hidden] rule
-     the shell uses to retire the control on the fallback path. */
-  .oo-btn[hidden] { display: none; }
 
   @media (max-width: 900px) {
     .lab-head { padding-top: 24px; }
     .lab-title { max-width: none; }
   }
   @media (max-width: 720px) {
-    .oo-rail { font-size: 10px; letter-spacing: .02em; }
     .lab-head { gap: 12px; padding: 20px 0 16px; }
     .lab-note { max-width: none; font-size: 12px; }
     .lab-viewport { min-height: 54svh; }
     .lab-readout { padding: 14px 0 16px; }
-    .lab-readout .oo-stat-value { font-size: 17px; }
-    .lab-meta { line-height: 1.5; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .lab-control { display: none; }
   }
 </style>
 <noscript><style>

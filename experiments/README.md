@@ -254,19 +254,29 @@ Recorded so nobody re-derives them.
 - **The vertical assertion runs at 1440×900 only.** There is no 390×844 sibling.
 - **`.oo-stage` is capped at 1080 px** and the labs are 1440 px instruments, so every lab
   page — and now the contact sheet — re-declares the stage anatomy locally with a wider
-  ceiling: six copies inside `experiments/` alone (`.depth-stage`, `.lab-stage` ×4,
-  `.sheet-stage`), of exactly the boilerplate `components.css` v1.4 promoted `.oo-stage` to
-  retire. A `--oo-stage-max` token or an `.oo-stage--wide` modifier would fix it.
+  ceiling, of exactly the boilerplate `components.css` v1.4 promoted `.oo-stage` to retire.
+  A `--oo-stage-max` token or an `.oo-stage--wide` modifier would fix it. Since the
+  `lab-chrome.css` extraction the *anatomy* is declared three times inside `experiments/`
+  (`.depth-stage`, `.lab-stage` once in `lab-chrome.css`, `.sheet-stage`) rather than six;
+  only the register cues — stage colour and border — remain per-lab, which is correct.
+  Deduplicating page-local glue does not retire this: the contract-side fix is still owed.
 - **`.oo-btn` defeats the `hidden` attribute.** It declares `display: inline-flex`, which
   outranks the UA `[hidden] { display: none }` rule that `lab-shell.js` uses to retire the
-  pause control, so `.oo-btn[hidden] { display: none }` is restated page-locally in all four
-  shell labs. Same for `.lab-canvas[hidden]` / `.lab-static[hidden]`. A contract-side
-  `[hidden]` guard would retire it for every consumer.
-- **No canvas/still swap primitive exists.** `.lab-viewport`, `.lab-canvas`, `.lab-static`
-  and the viewport vignette are page-local in all four shell labs, byte-for-byte apart from
-  the vignette stop. Strongest promotion candidate.
+  pause control. `.oo-btn[hidden] { display: none }` — and the same restatement for
+  `.lab-canvas[hidden]` / `.lab-static[hidden]` — now lives once in `lab-chrome.css` instead
+  of four times page-locally, which stops the recurrence inside `experiments/` but is still
+  a workaround. A contract-side `[hidden]` guard would retire it for every consumer.
+- **No canvas/still swap primitive exists.** `.lab-viewport`, `.lab-canvas` and
+  `.lab-static` are now shared via `lab-chrome.css` rather than restated in all four shell
+  labs, but that is deduplication of page-local glue, not a contract primitive — Lab 01 does
+  not consume it and nothing outside `experiments/` can. Still the strongest promotion
+  candidate. The viewport vignette stayed page-local; see the next entry for why.
 - **The viewport vignette is a per-lab magic gradient**, hand-tuned in opposite directions
-  across labs from the same starting rule. Wants a `--oo-vignette-*` knob.
+  across labs from the same starting rule. Wants a `--oo-vignette-*` knob. Deliberately NOT
+  moved into `lab-chrome.css`: all four values genuinely differ (Lab 02 a tight
+  `40%`-stop window, Labs 03/04 wide late stops at `.5`/`.46`, Lab 05 a two-layer scrim plus
+  ellipse off-centre at `56%`), so only the positioning scaffold is shared and each stop
+  stays with its plate.
 - **`.oo-stat-value` clamps to 28–40 px**, which competes with the display title when a stat
   strip sits *under* a hero; every lab re-derives a dense variant. `.oo-tape` is likewise
   `white-space: nowrap; overflow: hidden` because it is built for a scrolling
