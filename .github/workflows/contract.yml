@@ -1,0 +1,44 @@
+name: contract
+
+# The first CI in this repo. It asserts ONE thing, deliberately.
+#
+# `experiments/verify-contract.mjs` checks that every contract class declaring a
+# `display` other than `none` also appears in the top-level `[hidden] { display:
+# none }` guard rule in components.css. That guard is a hand-maintained list; a
+# new display-declaring class left out of it silently reintroduces the v1.5 bug
+# (an author `display` beats the user-agent `[hidden]` rule on cascade ORIGIN, so
+# the element stays on screen while the DOM and assistive tech call it hidden).
+# Until now the only mitigation was a `▲ TRAP` note asking the next author to
+# remember.
+#
+# WHAT THIS CI DOES NOT COVER — do not assume a green check means more than it
+# does:
+#   · It does NOT run experiments/verify-lab.sh. That harness needs a real Chrome
+#     with WebGL and a GPU, samples animated three.js frames, and applies by-eye
+#     composition gates; on a headless runner it would be flaky, and a flaky
+#     first check is a check that gets disabled. Lab verification stays local and
+#     manual.
+#   · It does NOT render anything, check tokens, visual output, accessibility,
+#     HTML validity, links, or the consumer pages in examples/.
+#   · It is a static parity assertion on the stylesheet text. Nothing more.
+#
+# Same script, same invocation, locally: ./experiments/verify-contract.mjs
+
+on:
+  push:
+  pull_request:
+
+# Checkout-only job. The repo default may be read-write; nothing here needs to
+# write, so drop the token to the minimum.
+permissions:
+  contents: read
+
+jobs:
+  hidden-guard-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # No actions/setup-node: the check imports only node:fs and the runner's
+      # preinstalled node is sufficient. No package.json, no install step — this
+      # repo has zero dependencies and CI must not be the thing that adds one.
+      - run: node experiments/verify-contract.mjs
