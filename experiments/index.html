@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070807">
+<title>WEBGL LABS — Open Outcry contact sheet</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; background: var(--oo-void); }
+  body {
+    color: var(--oo-fg);
+    font-family: var(--oo-font-mono);
+    font-size: var(--oo-type-body);
+    line-height: 1.6;
+  }
+
+  /* ── Stage ──
+     Not .oo-stage: that primitive is capped at 1080px and the labs are 1440px
+     instruments. Same anatomy, wider ceiling. Sixth copy of this boilerplate —
+     see README "Known limitations". */
+  .sheet-stage {
+    max-width: 1440px;
+    min-height: 100svh;
+    margin: 0 auto;
+    padding: 0 var(--oo-gutter);
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--oo-console-stage);   /* never `background:` — erases .oo-scanlines */
+    border-inline: var(--oo-stroke) solid var(--oo-line);
+  }
+
+  .sheet-path { color: var(--oo-amber-dim); }
+  .sheet-live { display: inline-flex; align-items: center; gap: 8px; }
+
+  /* ── Head ── */
+  .sheet-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px 32px;
+    padding: 30px 0 20px;
+  }
+  .sheet-title { max-width: 12ch; }
+  .sheet-note { max-width: 52ch; font-size: 13px; }
+
+  /* ── Contact rows ──
+     .oo-grid-4 is the contract grid; the thumbnail takes one track and the
+     body spans the other three. The span is the only page-local addition. */
+  .sheet-rows { display: flex; flex-direction: column; gap: 14px; padding-bottom: 22px; }
+  .sheet-row {
+    align-items: center;
+    padding: 14px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .sheet-row:focus-visible { outline: var(--oo-stroke) solid var(--oo-amber); outline-offset: 2px; }
+  .sheet-body { grid-column: span 2; min-width: 0; }
+  /* Right track: register + the open affordance. Without it the row's third
+     and fourth tracks are dead space at 1440 — a contact sheet should carry
+     ink to both edges. */
+  .sheet-aside {
+    grid-column: span 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 9px;
+  }
+  .sheet-open { color: var(--oo-amber-dim); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+  .oo-hover:hover .sheet-open { color: var(--oo-amber); }
+  /* The row is an <a>, so every part of it is a <span>; the layout needs them
+     to be blocks before margins and max-widths apply. */
+  .sheet-body > span { display: block; }
+
+  /* Thumbnail = the lab's own fallback SVG, reused markup, not a screenshot.
+     Each still keeps its authored preserveAspectRatio, so labs that letterbox
+     letterbox here too and Lab 01 (authored `none`) fills its frame. */
+  .sheet-thumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--oo-void);
+    border: var(--oo-stroke) solid var(--oo-line);
+  }
+  .sheet-thumb > svg { display: block; width: 100%; height: 100%; }
+
+  .sheet-id { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  /* .oo-display-console clamps to 36–112px, which is a hero size; a row title
+     needs a dense variant the contract does not carry. Same gap Labs 02–05
+     logged for .oo-stat-value. */
+  .sheet-num,
+  .sheet-name {
+    font-family: var(--oo-font-pixel);
+    color: var(--oo-amber);
+    text-transform: uppercase;
+    letter-spacing: -.01em;
+    line-height: 1.05;
+  }
+  .sheet-num { font-size: 17px; color: var(--oo-amber-dim); }
+  .sheet-name { font-size: 27px; }
+  .sheet-reg {
+    font-family: var(--oo-font-mono);
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: var(--oo-stroke) solid var(--oo-line);
+    border-radius: var(--oo-radius);
+  }
+  .sheet-reg--console { color: var(--oo-amber-dim); }
+  .sheet-reg--broadcast { color: var(--oo-peach); }
+  .sheet-intent { margin-top: 7px; font-size: 13px; }
+  .sheet-meta { margin-top: 9px; color: var(--oo-muted); font-size: 11px; letter-spacing: .02em; }
+  .sheet-meta b { color: var(--oo-amber-dim); font-weight: 400; }
+
+  /* ── Foot ── */
+  .sheet-foot { margin-top: auto; }
+  /* .oo-tape is `white-space: nowrap; overflow: hidden` because it is built for
+     a scrolling .oo-tickwrap strip. A static counts line has to opt back into
+     wrapping or it is silently truncated at 390px. */
+  .sheet-counts { padding: 9px 0; letter-spacing: .1em; text-transform: uppercase; white-space: normal; }
+  .sheet-rail--foot { gap: 14px; flex-wrap: wrap; }
+
+  @media (max-width: 900px) {
+    .sheet-head { padding-top: 24px; }
+    .sheet-title { max-width: none; }
+    .sheet-row { grid-template-columns: minmax(0, 1fr); }
+    .sheet-body { grid-column: auto; }
+    .sheet-aside {
+      grid-column: auto;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+  }
+  @media (max-width: 720px) {
+    .oo-rail { font-size: 10px; letter-spacing: .02em; }
+    .oo-tape { font-size: 10px; }
+    .sheet-head { gap: 12px; padding: 20px 0 16px; }
+    .sheet-note { max-width: none; font-size: 12px; }
+    .sheet-name { font-size: 23px; }
+    .sheet-intent { font-size: 12px; }
+    .sheet-counts { letter-spacing: .04em; }
+  }
+</style>
+</head>
+<body>
+<main class="sheet-stage oo-scanlines reg-console">
+
+  <header class="oo-rail sheet-rail">
+    <span class="sheet-path">&gt; experiments/webgl</span>
+    <span class="sheet-live"><span class="oo-dot"></span> 5 LABS ON FILE</span>
+  </header>
+
+  <div class="sheet-head">
+    <h1 class="oo-display-console sheet-title">WEBGL LABS.</h1>
+    <p class="oo-prose sheet-note">Contact sheet for the five fun-track WebGL plates. Every thumbnail is that lab&rsquo;s own static fallback, reused markup rather than a screenshot &mdash; so this page carries no canvas, no shader and no Three.js. It loads instantly and survives a dead GPU.</p>
+  </div>
+
+  <div class="sheet-rows">
+
+    <a class="oo-pane oo-hover oo-grid-4 sheet-row" href="depth-tape.html">
+      <span class="sheet-thumb" aria-hidden="true">
+      <svg viewBox="0 0 1200 800" preserveAspectRatio="none" role="presentation">
+        <rect width="1200" height="800" fill="#070807"/>
+        <g fill="none" stroke="#9b6822" stroke-width="1" opacity=".5">
+          <path d="M-100 820 L520 380 M260 820 L590 380 M620 820 L660 380 M980 820 L730 380 M1340 820 L800 380"/>
+          <path d="M0 730 H1200 M90 650 H1110 M180 580 H1020 M270 520 H930 M350 470 H850 M420 430 H780 M480 400 H720"/>
+        </g>
+        <g fill="#f2a51f" opacity=".72">
+          <rect x="400" y="672" width="160" height="8"/><rect x="720" y="608" width="130" height="7"/>
+          <rect x="534" y="548" width="118" height="6"/><rect x="666" y="493" width="96" height="5"/>
+          <rect x="580" y="444" width="78" height="4"/>
+        </g>
+        <g font-family="monospace" font-size="12" fill="#b57b24" opacity=".72">
+          <text x="882" y="722">BROADCAST / HUMAN VOICE</text>
+          <text x="774" y="587">CONSOLE / MACHINE VOICE</text>
+          <text x="688" y="482">TAPE / LIVE SIGNAL</text>
+        </g>
+      </svg>
+      </span>
+      <span class="sheet-body">
+        <span class="sheet-id">
+          <span class="sheet-num">01</span>
+          <span class="sheet-name">Depth Tape</span>
+        </span>
+        <span class="oo-prose sheet-intent">Perspective market lanes receding into the desk.</span>
+        <span class="sheet-meta"><b>depth-tape.html</b> &middot; own bundle <code>depth-tape.bundle.js</code> &middot; predates lab-shell.js and the fallback seam</span>
+      </span>
+      <span class="sheet-aside">
+        <span class="sheet-reg sheet-reg--broadcast">Broadcast</span>
+        <span class="sheet-open">Open &rarr;</span>
+      </span>
+    </a>
+
+    <a class="oo-pane oo-hover oo-grid-4 sheet-row" href="candle-field.html">
+      <span class="sheet-thumb" aria-hidden="true">
+    <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Static candle field: 90 daily SPY bars from 2026-03-17 to 2026-07-24, closing at 738.93">
+      <rect width="1200" height="640" fill="#070807"/>
+      <g stroke="#1c1a14" stroke-width="1" fill="none"><path d="M62 508.1 H1092 M62 435.5 H1092 M62 362.9 H1092 M62 290.3 H1092 M62 217.7 H1092 M62 145.1 H1092 M62 72.5 H1092"/></g>
+      <g font-family="JetBrains Mono, monospace" font-size="10" fill="#686564" letter-spacing="0.5"><text x="1102" y="511.6">640.00</text><text x="1102" y="439.0">660.00</text><text x="1102" y="366.4">680.00</text><text x="1102" y="293.8">700.00</text><text x="1102" y="221.2">720.00</text><text x="1102" y="148.6">740.00</text><text x="1102" y="76.0">760.00</text></g>
+      <g class="cf-up" stroke="#1f9d55" stroke-width="1" fill="none" opacity=".62"><path d="M90.6 424.6 V453.0 M124.9 446.2 V472.2 M182.2 466.2 V515.4 M193.6 440.8 V460.9 M205.1 442.0 V489.5 M216.5 436.5 V451.7 M227.9 436.9 V467.9 M250.8 358.7 V385.5 M273.7 340.0 V375.3 M285.2 309.9 V335.1 M296.6 289.3 V311.3 M308.1 280.2 V295.6 M319.5 245.3 V269.4 M353.8 248.7 V260.4 M376.7 237.7 V257.6 M388.2 233.5 V245.6 M411.1 246.0 V259.9 M422.5 218.4 V252.3 M456.8 199.4 V212.3 M468.3 164.7 V189.3 M491.2 152.1 V164.8 M502.6 142.2 V158.0 M514.1 149.3 V174.7 M525.5 130.9 V161.5 M536.9 110.5 V132.2 M582.7 138.3 V167.3 M594.2 127.4 V155.9 M617.1 101.1 V114.7 M639.9 90.1 V111.6 M651.4 79.5 V91.8 M662.8 71.5 V91.8 M674.3 71.0 V84.3 M697.2 78.6 V103.5 M754.4 145.1 V201.7 M765.8 129.0 V163.1 M777.3 84.5 V102.4 M868.8 157.7 V230.1 M880.3 139.4 V173.8 M891.7 116.0 V141.9 M903.2 110.8 V136.4 M926.1 100.0 V118.2 M948.9 122.8 V146.9 M960.4 101.6 V124.8 M971.8 89.1 V115.7 M994.7 96.7 V113.6 M1006.2 88.5 V108.1 M1029.1 118.6 V142.2 M1051.9 112.3 V129.9 M1063.4 108.7 V122.0 M1086.3 131.6 V154.9"/></g>
+      <g class="cf-up" fill="#1f9d55" opacity=".86"><rect x="87.1" y="436.2" width="7.1" height="10.3"/><rect x="121.4" y="460.2" width="7.1" height="6.8"/><rect x="178.6" y="470.5" width="7.1" height="41.4"/><rect x="190.1" y="452.7" width="7.1" height="4.9"/><rect x="201.5" y="450.6" width="7.1" height="34.1"/><rect x="213.0" y="439.3" width="7.1" height="11.2"/><rect x="224.4" y="438.3" width="7.1" height="9.3"/><rect x="247.3" y="363.2" width="7.1" height="18.4"/><rect x="270.2" y="340.7" width="7.1" height="31.6"/><rect x="281.6" y="310.4" width="7.1" height="24.6"/><rect x="293.1" y="290.5" width="7.1" height="17.0"/><rect x="304.5" y="284.2" width="7.1" height="2.2"/><rect x="316.0" y="253.5" width="7.1" height="14.5"/><rect x="350.3" y="249.6" width="7.1" height="7.5"/><rect x="373.2" y="239.7" width="7.1" height="11.6"/><rect x="384.6" y="235.2" width="7.1" height="7.3"/><rect x="407.5" y="248.2" width="7.1" height="2.1"/><rect x="419.0" y="222.5" width="7.1" height="14.7"/><rect x="453.3" y="204.0" width="7.1" height="7.3"/><rect x="464.7" y="167.5" width="7.1" height="20.6"/><rect x="487.6" y="153.7" width="7.1" height="9.8"/><rect x="499.1" y="147.6" width="7.1" height="10.4"/><rect x="510.5" y="151.7" width="7.1" height="4.7"/><rect x="522.0" y="136.7" width="7.1" height="13.9"/><rect x="533.4" y="115.4" width="7.1" height="16.4"/><rect x="579.2" y="140.5" width="7.1" height="20.2"/><rect x="590.6" y="135.2" width="7.1" height="14.8"/><rect x="613.5" y="106.6" width="7.1" height="2.1"/><rect x="636.4" y="92.1" width="7.1" height="15.8"/><rect x="647.8" y="85.3" width="7.1" height="2.1"/><rect x="659.3" y="77.8" width="7.1" height="11.5"/><rect x="670.7" y="74.0" width="7.1" height="9.3"/><rect x="693.6" y="83.1" width="7.1" height="18.1"/><rect x="750.8" y="153.2" width="7.1" height="32.7"/><rect x="762.3" y="138.7" width="7.1" height="3.8"/><rect x="773.7" y="91.3" width="7.1" height="10.8"/><rect x="865.3" y="185.0" width="7.1" height="1.4"/><rect x="876.7" y="141.5" width="7.1" height="16.2"/><rect x="888.2" y="120.5" width="7.1" height="19.9"/><rect x="899.6" y="124.2" width="7.1" height="2.7"/><rect x="922.5" y="104.1" width="7.1" height="9.3"/><rect x="945.4" y="125.5" width="7.1" height="8.1"/><rect x="956.8" y="102.6" width="7.1" height="15.8"/><rect x="968.3" y="90.8" width="7.1" height="10.5"/><rect x="991.2" y="102.1" width="7.1" height="3.4"/><rect x="1002.6" y="91.3" width="7.1" height="2.1"/><rect x="1025.5" y="133.1" width="7.1" height="4.4"/><rect x="1048.4" y="115.0" width="7.1" height="7.3"/><rect x="1059.8" y="118.2" width="7.1" height="2.9"/><rect x="1082.7" y="149.0" width="7.1" height="1.5"/></g>
+      <g class="cf-down" stroke="#e0455a" stroke-width="1" fill="none" opacity=".62"><path d="M67.7 383.0 V400.3 M79.2 400.2 V431.1 M102.1 447.5 V490.9 M113.5 425.9 V457.5 M136.4 432.2 V456.4 M147.8 454.2 V490.6 M159.3 498.4 V533.1 M170.7 506.7 V547.0 M239.4 373.5 V393.9 M262.3 355.5 V368.5 M330.9 254.3 V268.0 M342.4 249.3 V280.7 M365.3 245.4 V282.0 M399.6 243.5 V256.7 M433.9 200.0 V216.0 M445.4 210.0 V235.9 M479.7 159.1 V182.3 M548.4 132.5 V152.5 M559.8 139.9 V169.1 M571.3 153.6 V175.8 M605.6 112.6 V128.8 M628.5 103.8 V115.2 M685.7 76.8 V95.8 M708.6 98.6 V161.3 M720.1 125.7 V151.7 M731.5 120.0 V208.3 M742.9 151.0 V198.3 M788.7 89.0 V109.2 M800.2 101.0 V147.9 M811.6 115.2 V131.1 M823.1 108.1 V133.7 M834.5 146.4 V173.0 M845.9 145.3 V178.3 M857.4 147.4 V182.8 M914.6 104.0 V145.0 M937.5 105.3 V126.2 M983.3 94.6 V116.0 M1017.6 92.2 V116.5 M1040.5 113.4 V139.6 M1074.8 135.8 V162.5"/></g>
+      <g class="cf-down" fill="#e0455a" opacity=".86"><rect x="64.2" y="390.5" width="7.1" height="5.8"/><rect x="75.6" y="405.1" width="7.1" height="25.2"/><rect x="98.5" y="448.1" width="7.1" height="28.8"/><rect x="110.0" y="442.5" width="7.1" height="9.7"/><rect x="132.8" y="440.3" width="7.1" height="6.7"/><rect x="144.3" y="464.3" width="7.1" height="25.3"/><rect x="155.7" y="499.0" width="7.1" height="30.5"/><rect x="167.2" y="507.7" width="7.1" height="29.5"/><rect x="235.8" y="376.0" width="7.1" height="1.4"/><rect x="258.7" y="358.1" width="7.1" height="6.7"/><rect x="327.4" y="258.4" width="7.1" height="1.4"/><rect x="338.8" y="253.0" width="7.1" height="22.5"/><rect x="361.7" y="255.8" width="7.1" height="3.8"/><rect x="396.1" y="247.4" width="7.1" height="1.4"/><rect x="430.4" y="213.1" width="7.1" height="2.2"/><rect x="441.8" y="217.4" width="7.1" height="7.5"/><rect x="476.2" y="163.0" width="7.1" height="12.6"/><rect x="544.8" y="138.6" width="7.1" height="9.5"/><rect x="556.3" y="145.7" width="7.1" height="4.3"/><rect x="567.7" y="164.0" width="7.1" height="3.8"/><rect x="602.1" y="122.4" width="7.1" height="2.2"/><rect x="625.0" y="105.6" width="7.1" height="1.5"/><rect x="682.2" y="79.2" width="7.1" height="14.2"/><rect x="705.1" y="100.4" width="7.1" height="53.6"/><rect x="716.5" y="132.9" width="7.1" height="15.0"/><rect x="728.0" y="131.9" width="7.1" height="23.9"/><rect x="739.4" y="169.1" width="7.1" height="28.9"/><rect x="785.2" y="92.3" width="7.1" height="15.3"/><rect x="796.6" y="104.1" width="7.1" height="37.5"/><rect x="808.1" y="116.9" width="7.1" height="3.7"/><rect x="819.5" y="117.1" width="7.1" height="12.0"/><rect x="831.0" y="167.6" width="7.1" height="1.4"/><rect x="842.4" y="162.6" width="7.1" height="7.0"/><rect x="853.8" y="149.0" width="7.1" height="16.8"/><rect x="911.1" y="118.2" width="7.1" height="9.5"/><rect x="934.0" y="108.0" width="7.1" height="9.1"/><rect x="979.7" y="99.8" width="7.1" height="12.0"/><rect x="1014.1" y="98.8" width="7.1" height="7.4"/><rect x="1037.0" y="119.5" width="7.1" height="18.0"/><rect x="1071.3" y="147.4" width="7.1" height="4.3"/></g>
+      <g stroke="#f2a51f" stroke-width="1" opacity=".55"><path d="M62 149.0 H1092" stroke-dasharray="6 5"/></g>
+      <g font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="1.4"><text x="70" y="139.0" fill="#f2a51f">CLOSE 738.93</text><text x="70" y="169.0" fill="#686564" font-size="10">2026-07-24</text></g>
+      <g stroke="#241c18" stroke-width="1"><path d="M62 580 H1092"/></g>
+      <g font-family="JetBrains Mono, monospace" font-size="10" fill="#686564" letter-spacing="0.6"><text x="62.0" y="600" text-anchor="start">2026-03-17</text><text x="399.6" y="600" text-anchor="middle">2026-04-28</text><text x="742.9" y="600" text-anchor="middle">2026-06-10</text><text x="1092.0" y="600" text-anchor="end">2026-07-24</text></g>
+      <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1.2"><text x="62" y="32" fill="#b57b24">SPY / 90 DAILY SESSIONS / STATIC STILL</text><text x="1092" y="32" text-anchor="end" fill="#686564"><tspan fill="#1f9d55">50 UP</tspan> / <tspan fill="#e0455a">40 DOWN</tspan></text></g>
+    </svg>
+      </span>
+      <span class="sheet-body">
+        <span class="sheet-id">
+          <span class="sheet-num">02</span>
+          <span class="sheet-name">Candle Field</span>
+        </span>
+        <span class="oo-prose sheet-intent">90 real sessions as extruded bodies along time.</span>
+        <span class="sheet-meta"><b>candle-field.html</b> &middot; shared runtime + lab-shell.js &middot; SPY snapshot 2026-07-26</span>
+      </span>
+      <span class="sheet-aside">
+        <span class="sheet-reg sheet-reg--console">Console</span>
+        <span class="sheet-open">Open &rarr;</span>
+      </span>
+    </a>
+
+    <a class="oo-pane oo-hover oo-grid-4 sheet-row" href="crt-volume.html">
+      <span class="sheet-thumb" aria-hidden="true">
+    <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Static CRT still: the same terminal frame uncurved, showing git log --oneline -8 for branch labs-02-05 captured 2026-07-26, head c65292d">
+      <defs>
+        <!-- Scanlines at 3px intervals. Flat here by definition: the still has
+             no surface to curve with. -->
+        <pattern id="cv-scan" width="3" height="3" patternUnits="userSpaceOnUse">
+          <rect width="3" height="1" fill="#000000" opacity="0.18"/>
+        </pattern>
+      </defs>
+      <rect width="1200" height="640" fill="#070807"/>
+      <rect x="40.5" y="40.5" width="1119" height="559" fill="none" stroke="#9b6822" stroke-width="1" opacity="0.55"/>
+      <rect x="58.5" y="58.5" width="1083" height="523" fill="#070807" stroke="#1c1a14" stroke-width="1"/>
+      <g font-family="JetBrains Mono, monospace" font-size="11" fill="#686564" letter-spacing="1.2">
+        <text x="86" y="96">LOCAL SHELL / STATIC STILL / NO NETWORK</text>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="20" letter-spacing="0">
+        <text x="86" y="140" fill="#f2a51f">&gt; git log --oneline -8</text>
+        <text x="86" y="186" fill="#eee8df">c65292d experiments: re-frame Candle Field so the live plate holds the first read</text>
+        <text x="86" y="232" fill="#eee8df">19c8322 experiments: add Candle Field &#8212; WebGL Lab 02 (Console)</text>
+        <text x="86" y="278" fill="#eee8df">87c39c1 experiments: document stale-lookAt trap in lab-shell.js</text>
+        <text x="86" y="324" fill="#eee8df">50d6f06 experiments: extract lab-shell.js harness from Lab 01</text>
+        <text x="86" y="370" fill="#eee8df">8122e1b experiments: bake dated Alpha Vantage snapshot for Labs 02 and 05</text>
+        <text x="86" y="416" fill="#eee8df">6d12f68 experiments: add shared Three.js IIFE runtime for Labs 02-05</text>
+        <text x="86" y="462" fill="#eee8df">8084321 experiments: add verify-lab.sh &#8212; repeatable lab verification</text>
+        <text x="86" y="508" fill="#eee8df">12fe872 experiments: implementation plan for WebGL Labs 02-05</text>
+      </g>
+      <rect x="86" y="534" width="13" height="26" fill="#f2a51f"/>
+      <rect x="58.5" y="58.5" width="1083" height="523" fill="url(#cv-scan)"/>
+    </svg>
+      </span>
+      <span class="sheet-body">
+        <span class="sheet-id">
+          <span class="sheet-num">03</span>
+          <span class="sheet-name">CRT Volume</span>
+        </span>
+        <span class="oo-prose sheet-intent">The console voice as a curved phosphor slab.</span>
+        <span class="sheet-meta"><b>crt-volume.html</b> &middot; shared runtime + lab-shell.js &middot; dated <code>git log</code> snapshot, stale by design</span>
+      </span>
+      <span class="sheet-aside">
+        <span class="sheet-reg sheet-reg--console">Console</span>
+        <span class="sheet-open">Open &rarr;</span>
+      </span>
+    </a>
+
+    <a class="oo-pane oo-hover oo-grid-4 sheet-row" href="blueprint.html">
+      <span class="sheet-thumb" aria-hidden="true">
+    <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Static dependency schematic of the Open Outcry repo: tokens.css declares 59 custom properties, 37 --oo-* plus 22 --r-* register aliases, and feeds components.css through 18 var(--oo-*) plus 9 var(--r-*) references; components.css feeds index.html, examples/inir, examples/brief and experiments/*; all four consumers also link tokens.css directly. Six nodes, nine edges, no @import anywhere.">
+      <!-- Hand-authored. Same six nodes and same nine edges as the live plate,
+           fully drawn, orthogonally routed. Monoline SVG is the source language
+           of design-language §5, so the fallback here is not a degraded print
+           of the WebGL scene — it is the drawing in its native medium. -->
+      <rect width="1200" height="640" fill="#070807"/>
+
+      <!-- Drawing grid -->
+      <g stroke="#14130f" stroke-width="1">
+        <path d="M80 41 V599 M120 41 V599 M160 41 V599 M200 41 V599 M240 41 V599 M280 41 V599 M320 41 V599 M360 41 V599 M400 41 V599 M440 41 V599 M480 41 V599 M520 41 V599 M560 41 V599 M600 41 V599 M640 41 V599 M680 41 V599 M720 41 V599 M760 41 V599 M800 41 V599 M840 41 V599 M880 41 V599 M920 41 V599 M960 41 V599 M1000 41 V599 M1040 41 V599 M1080 41 V599 M1120 41 V599"/>
+        <path d="M41 80 H1159 M41 120 H1159 M41 160 H1159 M41 200 H1159 M41 240 H1159 M41 280 H1159 M41 320 H1159 M41 360 H1159 M41 400 H1159 M41 440 H1159 M41 480 H1159 M41 520 H1159 M41 560 H1159"/>
+      </g>
+      <rect x="40.5" y="40.5" width="1119" height="559" fill="none" stroke="#9b6822" stroke-width="1" opacity="0.5"/>
+
+      <!-- Sheet header -->
+      <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1.2">
+        <text x="41" y="30" fill="#b57b24">OPEN OUTCRY / DEPENDENCY SCHEMATIC / SHEET 04</text>
+        <text x="1159" y="30" text-anchor="end" fill="#686564">6 NODES / 9 EDGES / NO @IMPORT</text>
+      </g>
+
+      <!-- ── Direct strand: every consumer <link>s tokens.css itself ── -->
+      <g fill="none" stroke="#9b6822" stroke-width="2" stroke-linejoin="miter" stroke-linecap="butt" stroke-dasharray="7 5">
+        <path d="M600 112 V78"/>
+        <path d="M430 460 H95 V78 H1105 V460 H750"/>
+      </g>
+
+      <!-- ── Primary strand: the contract chain ── -->
+      <g fill="none" stroke="#f2a51f" stroke-width="2" stroke-linejoin="miter" stroke-linecap="butt">
+        <path d="M600 128 V252"/>
+        <path d="M600 268 V360"/>
+        <path d="M180 452 V360 H1000 V452"/>
+        <path d="M440 360 V452"/>
+        <path d="M740 360 V452"/>
+      </g>
+
+      <!-- ── Nodes: square hardware ── -->
+      <g>
+        <rect x="594" y="114" width="12" height="12" fill="#f2a51f"/>
+        <rect x="594" y="254" width="12" height="12" fill="#f2a51f"/>
+        <rect x="174" y="454" width="12" height="12" fill="#48dc7d"/>
+        <rect x="434" y="454" width="12" height="12" fill="#48dc7d"/>
+        <rect x="734" y="454" width="12" height="12" fill="#48dc7d"/>
+        <rect x="994" y="454" width="12" height="12" fill="#e8927c"/>
+      </g>
+
+      <!-- ── Node labels ── -->
+      <g font-family="JetBrains Mono, monospace" font-size="16" letter-spacing="0.5" fill="#f2a51f">
+        <text x="582" y="126" text-anchor="end">tokens.css</text>
+        <text x="582" y="266" text-anchor="end">components.css</text>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="16" letter-spacing="0.5" text-anchor="middle">
+        <text x="180" y="492" fill="#48dc7d">index.html</text>
+        <text x="440" y="492" fill="#48dc7d">examples/inir</text>
+        <text x="740" y="492" fill="#48dc7d">examples/brief</text>
+        <text x="1000" y="492" fill="#e8927c">experiments/*</text>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1" fill="#686564" text-anchor="middle">
+        <text x="180" y="510">BRAND BOOK</text>
+        <text x="440" y="510">EXAMPLE</text>
+        <text x="740" y="510">EXAMPLE</text>
+        <text x="1000" y="510">4 LABS</text>
+      </g>
+
+      <!-- ── Edge and node annotations ── -->
+      <g font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="0.8" fill="#686564">
+        <text x="618" y="126">v1.3 &middot; 59 PROPS &middot; 37 --oo-* + 22 --r-*</text>
+        <text x="618" y="266">v1.4 &middot; 38 CLASSES &middot; DECLARES NONE</text>
+      </g>
+      <!-- The contract edge carries BOTH halves of the coupling. The register
+           aliases are the load-bearing half: .oo-* classes read --r-*, which
+           tokens.css re-points per register, so one class works in both. -->
+      <g font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="0.6" fill="#b57b24">
+        <text x="618" y="188">var(--oo-*) &times; 18</text>
+        <text x="618" y="206">+ var(--r-*) &times; 9</text>
+        <text x="618" y="352">&lt;link rel=stylesheet&gt; &times; 4</text>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="0.6" fill="#9b6822">
+        <text x="108" y="300">&lt;link&gt; direct &times; 4</text>
+      </g>
+
+      <!-- ── Legend ── -->
+      <g fill="none" stroke-width="2" stroke-linecap="butt">
+        <path d="M62 549 H110" stroke="#f2a51f"/>
+        <path d="M62 575 H110" stroke="#9b6822" stroke-dasharray="7 5"/>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="0.6">
+        <text x="122" y="553" fill="#eee8df">PRIMARY &mdash; tokens.css &rarr; components.css &rarr; consumer</text>
+        <text x="122" y="579" fill="#686564">DIRECT &mdash; each consumer also links tokens.css itself</text>
+      </g>
+
+      <!-- ── Title block ── -->
+      <g fill="none" stroke="#9b6822" stroke-width="1" opacity="0.55">
+        <rect x="884.5" y="534.5" width="270" height="54"/>
+        <path d="M884.5 561.5 H1154.5"/>
+      </g>
+      <g font-family="JetBrains Mono, monospace" letter-spacing="0.8">
+        <text x="898" y="554" font-size="11" fill="#b57b24">OPEN OUTCRY &middot; SHEET 04 &middot; REV v1.4</text>
+        <text x="898" y="580" font-size="10" fill="#686564">MONOLINE / STATIC STILL / NO NETWORK</text>
+      </g>
+    </svg>
+      </span>
+      <span class="sheet-body">
+        <span class="sheet-id">
+          <span class="sheet-num">04</span>
+          <span class="sheet-name">Blueprint</span>
+        </span>
+        <span class="oo-prose sheet-intent">The repo&rsquo;s own pipeline drawn in depth.</span>
+        <span class="sheet-meta"><b>blueprint.html</b> &middot; shared runtime + lab-shell.js &middot; 6 nodes / 9 edges &middot; reads <code>?reveal=full</code></span>
+      </span>
+      <span class="sheet-aside">
+        <span class="sheet-reg sheet-reg--console">Console</span>
+        <span class="sheet-open">Open &rarr;</span>
+      </span>
+    </a>
+
+    <a class="oo-pane oo-hover oo-grid-4 sheet-row" href="tape-ribbon.html">
+      <span class="sheet-thumb" aria-hidden="true">
+    <svg class="tr-still--wide" viewBox="0 0 1400 340" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Static tape ribbon: a swept band carrying the 2026-07-26 quote tape — SPY 738.93 +0.10%, QQQ 684.23 -1.12%, IWM 291.17 -0.31%, DIA 518.76 +0.48%, GLD 371.90 +0.10%, TLT 83.25 +0.10%, VIXY 21.44 -1.56%. Four up, three down.">
+      <defs>
+        <radialGradient id="tr-bloom" cx="24%" cy="26%" r="52%">
+          <stop offset="0%" stop-color="#e8927c" stop-opacity="0.20"/>
+          <stop offset="100%" stop-color="#e8927c" stop-opacity="0"/>
+        </radialGradient>
+        <!-- The band's own centreline. Stroke-free: it exists only to carry the
+             tape text, exactly as the UV axis does on the live mesh. -->
+        <path id="tr-spine" fill="none" stroke="none" d="M 22 288 L 47.1 290 L 71.2 291 L 94.5 291.1 L 116.9 290.4 L 138.5 289 L 159.5 286.8 L 180 284.1 L 199.9 280.8 L 219.4 277 L 238.6 272.8 L 257.5 268.3 L 276.2 263.4 L 294.9 258.4 L 313.5 253.2 L 332.2 247.9 L 351.1 242.5 L 370.2 237.3 L 389.6 232.1 L 409.4 227.2 L 429.7 222.4 L 450.5 218 L 472 214 L 495.3 209.6 L 517.2 204.7 L 537.9 199.3 L 557.5 193.6 L 576.3 187.5 L 594.3 181.1 L 611.6 174.5 L 628.6 167.8 L 645.2 161 L 661.7 154.2 L 678.3 147.5 L 694.9 140.9 L 711.9 134.5 L 729.4 128.3 L 747.4 122.5 L 766.3 117 L 786 112 L 806.9 107.5 L 828.9 103.6 L 852.4 100.3 L 877.3 97.8 L 904 96 L 927 95.2 L 949.7 95 L 972 95.3 L 994.1 96.1 L 1015.9 97.2 L 1037.5 98.6 L 1058.9 100.2 L 1080.2 102 L 1101.3 103.9 L 1122.3 105.9 L 1143.3 107.8 L 1164.2 109.5 L 1185.1 111.1 L 1206 112.5 L 1227 113.5 L 1248.1 114.1 L 1269.3 114.3 L 1290.6 114 L 1312.1 113 L 1333.8 111.4 L 1355.8 109.1 L 1378 106"/>
+      </defs>
+
+      <rect width="1400" height="340" fill="#181210"/>
+      <rect width="1400" height="340" fill="url(#tr-bloom)"/>
+
+      <!-- The band: the spine offset by a half-width tapering 22px (near) to
+           13px (far), which is the flat-medium reading of the live mesh's
+           perspective taper. -->
+      <path fill="#0d0d0b" stroke="#241c18" stroke-width="1" d="M 20.3 309.9 L 45.8 311.8 L 70.7 312.6 L 94.7 312.6 L 117.9 311.8 L 140.3 310.1 L 162 307.8 L 183.1 304.8 L 203.6 301.3 L 223.6 297.3 L 243.2 292.9 L 262.4 288.1 L 281.4 283.1 L 300.3 277.8 L 319 272.5 L 337.7 267.1 L 356.4 261.6 L 375.3 256.3 L 394.5 251.1 L 414 246.1 L 433.9 241.3 L 454.3 236.8 L 475.5 232.7 L 499.1 228.1 L 521.6 222.9 L 542.8 217.3 L 563 211.2 L 582.2 204.8 L 600.5 198.2 L 618.2 191.4 L 635.3 184.5 L 652 177.5 L 668.5 170.6 L 684.8 163.8 L 701.2 157.2 L 717.9 150.8 L 734.9 144.6 L 752.4 138.8 L 770.7 133.4 L 789.9 128.4 L 810.1 123.9 L 831.5 120 L 854.3 116.6 L 878.7 114 L 904.8 112.1 L 927.3 111.2 L 949.6 110.8 L 971.6 111 L 993.4 111.5 L 1015 112.5 L 1036.4 113.8 L 1057.7 115.3 L 1078.8 116.9 L 1099.9 118.7 L 1121 120.5 L 1142 122.2 L 1163 123.9 L 1184.1 125.3 L 1205.2 126.6 L 1226.5 127.5 L 1247.8 128 L 1269.3 128 L 1291 127.5 L 1312.9 126.4 L 1335 124.7 L 1357.4 122.2 L 1379.8 118.9 L 1376.2 93.1 L 1354.2 96.1 L 1332.6 98.2 L 1311.3 99.6 L 1290.2 100.4 L 1269.2 100.6 L 1248.3 100.3 L 1227.6 99.5 L 1206.8 98.4 L 1186.1 96.9 L 1165.3 95.2 L 1144.5 93.3 L 1123.6 91.3 L 1102.6 89.2 L 1081.5 87.1 L 1060.1 85.2 L 1038.6 83.4 L 1016.8 81.8 L 994.7 80.6 L 972.4 79.7 L 949.7 79.2 L 926.7 79.3 L 903.2 79.9 L 876 81.6 L 850.4 84 L 826.4 87.2 L 803.7 91.1 L 782.2 95.6 L 761.8 100.6 L 742.4 106.1 L 723.8 112 L 706 118.2 L 688.6 124.6 L 671.7 131.2 L 655 137.8 L 638.5 144.5 L 621.9 151.2 L 605.1 157.7 L 588 164 L 570.4 170.1 L 552.1 176 L 532.9 181.4 L 512.8 186.5 L 491.5 191.1 L 468.5 195.3 L 446.8 199.2 L 425.5 203.6 L 404.8 208.3 L 384.7 213.2 L 365.1 218.3 L 345.8 223.5 L 326.8 228.7 L 308.1 233.8 L 289.5 238.9 L 271 243.8 L 252.6 248.4 L 234 252.7 L 215.2 256.7 L 196.2 260.3 L 176.9 263.3 L 157.1 265.9 L 136.8 267.8 L 115.8 269 L 94.2 269.6 L 71.8 269.3 L 48.4 268.2 L 23.7 266.1 Z"/>
+
+      <!-- Tape ink: symbol in --oo-fg, figure in --oo-green / --oo-red, mono
+           only. Start offsets are measured along the spine, so no run overruns
+           the band's far end — the flat analogue of the wrap-seam bound in
+           tape-ribbon.js. -->
+      <g font-family="JetBrains Mono, monospace" font-size="15" font-weight="700"
+         letter-spacing="1" dominant-baseline="central">
+      <text><textPath href="#tr-spine" startOffset="12"><tspan fill="#eee8df">SPY&#160;</tspan><tspan fill="#48dc7d">738.93&#160;+0.10%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="207.7"><tspan fill="#eee8df">QQQ&#160;</tspan><tspan fill="#e0455a">684.23&#160;-1.12%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="403.4"><tspan fill="#eee8df">IWM&#160;</tspan><tspan fill="#e0455a">291.17&#160;-0.31%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="599.1"><tspan fill="#eee8df">DIA&#160;</tspan><tspan fill="#48dc7d">518.76&#160;+0.48%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="794.8"><tspan fill="#eee8df">GLD&#160;</tspan><tspan fill="#48dc7d">371.90&#160;+0.10%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="990.5"><tspan fill="#eee8df">TLT&#160;</tspan><tspan fill="#48dc7d">83.25&#160;+0.10%</tspan></textPath></text>
+      <text><textPath href="#tr-spine" startOffset="1176.2"><tspan fill="#eee8df">VIXY&#160;</tspan><tspan fill="#e0455a">21.44&#160;-1.56%</tspan></textPath></text>
+      </g>
+
+      <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1.2">
+        <text x="20" y="26" fill="#7a6a5f">OPEN OUTCRY / TAPE RIBBON / STILL</text>
+        <text x="1380" y="26" text-anchor="end" fill="#686564">7 QUOTES &middot; 2026-07-26 &middot; NO NETWORK</text>
+      </g>
+    </svg>
+      </span>
+      <span class="sheet-body">
+        <span class="sheet-id">
+          <span class="sheet-num">05</span>
+          <span class="sheet-name">Tape Ribbon</span>
+        </span>
+        <span class="oo-prose sheet-intent">The quote tape swept into a physical band.</span>
+        <span class="sheet-meta"><b>tape-ribbon.html</b> &middot; shared runtime + lab-shell.js &middot; wide still shown; a stacked 7-quote column takes over below 900px</span>
+      </span>
+      <span class="sheet-aside">
+        <span class="sheet-reg sheet-reg--broadcast">Broadcast</span>
+        <span class="sheet-open">Open &rarr;</span>
+      </span>
+    </a>
+
+  </div>
+
+  <div class="sheet-foot">
+    <div class="oo-tape sheet-counts">5 LABS &middot; 4 ON SHARED RUNTIME &middot; SNAPSHOT 2026-07-26 &middot; CONTRACT v1.4 UNCHANGED</div>
+    <footer class="oo-rail oo-rail--foot sheet-rail--foot">
+      <span>OPEN OUTCRY / EXPERIMENTS / CONTACT SHEET</span>
+      <span class="sheet-live"><span>NO WEBGL HERE</span><span class="voice">STILLS ONLY</span></span>
+    </footer>
+  </div>
+
+</main>
+</body>
+</html>
