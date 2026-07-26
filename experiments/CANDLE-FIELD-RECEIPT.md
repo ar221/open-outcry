@@ -56,9 +56,13 @@
 2. **`.oo-btn[hidden]` needs a page-local `[hidden] { display: none }` restatement.** `.oo-btn` declares `display: inline-flex` (`components.css:209`), an author declaration that outranks the UA `[hidden]` rule the shell uses to retire the pause control, so the contract's own button primitive defeats the platform's hiding mechanism. **This recurs in all four labs and reads as a `components.css` defect rather than a lab quirk.**
 
    > **Superseded 2026-07-26 by `experiments/lab-chrome.css`.** The restatement is no longer page-local per lab — it is declared once in the shared lab chrome. **The underlying defect is unchanged and still unfixed:** `components.css:209`'s `.oo-btn { display: inline-flex }` still outranks the UA `[hidden]` rule, and `lab-chrome.css` only stops it recurring per-lab inside `experiments/`. A contract-side `[hidden]` guard is still owed.
+
+   > **Closed 2026-07-26 by `components.css` v1.5.** The contract-side guard shipped: the contract now restates `[hidden] { display: none }` for all ten of its classes that declare `display`, `.oo-btn` among them, and the `.oo-btn[hidden]` line was retired from `lab-chrome.css`. Four independent labs hitting this is the friction that lifted the v1.4 freeze.
 3. **`.lab-canvas[hidden]` / `.lab-static[hidden]`** need the same restatement, for the same reason.
 
    > **Superseded 2026-07-26 by `experiments/lab-chrome.css`.** The restatement is no longer page-local per lab — it is declared once in the shared lab chrome. **The underlying defect is unchanged and still unfixed:** `components.css:209`'s `.oo-btn { display: inline-flex }` still outranks the UA `[hidden]` rule, and `lab-chrome.css` only stops it recurring per-lab inside `experiments/`. A contract-side `[hidden]` guard is still owed.
+
+   > **Partly closed 2026-07-26 by `components.css` v1.5.** The cascade-origin defect is fixed for the contract's own classes, but `.lab-canvas`/`.lab-static` are page-local classes declaring their own `display: block`, which the contract does not and must not style. Their restatement correctly stays in `lab-chrome.css` and is no longer a contract ask.
 4. **No canvas/still swap primitive.** `.lab-viewport`, `.lab-canvas`, `.lab-static` and the vignette are page-local, and are byte-for-byte the same in all four labs apart from the vignette stop.
 
    > **Superseded 2026-07-26 by `experiments/lab-chrome.css`.** `.lab-viewport`, `.lab-canvas` and `.lab-static` are now shared rather than restated per lab. **The promotion ask is unchanged:** that is deduplication of page-local glue, not a contract primitive — Lab 01 does not consume it and nothing outside `experiments/` can. The vignette stayed page-local because all four values genuinely differ.

@@ -24,7 +24,9 @@ python -m http.server 8000
 
 Snapshot date across the data-driven labs: **2026-07-26** (`data/market-2026-07-26.json`,
 Alpha Vantage, baked — never fetched live). Neither `tokens.css` (v1.3) nor
-`components.css` (v1.4) was modified by any lab; the contract is unchanged.
+`components.css` (v1.5) was modified by any lab. The labs did, however, produce the
+friction that lifted the freeze afterwards: four of them independently hit the
+`[hidden]` cascade trap on `.oo-btn`, and `components.css` v1.5 promotes the fix.
 
 Labs 02–05 share two files beyond the contract: the Three.js runtime plus `lab-shell.js`
 (above), and **`lab-chrome.css`** — their common page-local CSS scaffolding, extracted so
@@ -110,14 +112,15 @@ Load order in every one of the four labs is `../tokens.css` → `../components.c
 win and each plate keeps its overrides.
 
 **`lab-chrome.css` is not part of the frozen contract.** `tokens.css` v1.3 and
-`components.css` v1.4 are the contract; this file is scaffolding for one directory of
+`components.css` v1.5 are the contract; this file is scaffolding for one directory of
 experiments. It adds no tokens and no primitives, and it must not become a second de-facto
 design system — a rule here that wants to apply outside `experiments/` is a signal to
 propose it into `components.css` properly, not to widen this file.
 
 What it carries: the reset, the stage *anatomy* (1440px ceiling, flex column, isolation),
-the renderer status lamp, viewport/canvas/still positioning, the `[hidden]` restatements
-that `components.css:209` forces, stat-rail type, and the four-way-identical media rules.
+the renderer status lamp, viewport/canvas/still positioning, the `[hidden]` restatement
+for its own `.lab-canvas`/`.lab-static` (the `.oo-btn` one was retired at contract v1.5,
+which now handles it), stat-rail type, and the four-way-identical media rules.
 
 What it deliberately does **not** carry, because these genuinely differ per plate:
 
@@ -311,12 +314,14 @@ Recorded so nobody re-derives them.
   (`.depth-stage`, `.lab-stage` once in `lab-chrome.css`, `.sheet-stage`) rather than six;
   only the register cues — stage colour and border — remain per-lab, which is correct.
   Deduplicating page-local glue does not retire this: the contract-side fix is still owed.
-- **`.oo-btn` defeats the `hidden` attribute.** It declares `display: inline-flex`, which
-  outranks the UA `[hidden] { display: none }` rule that `lab-shell.js` uses to retire the
-  pause control. `.oo-btn[hidden] { display: none }` — and the same restatement for
-  `.lab-canvas[hidden]` / `.lab-static[hidden]` — now lives once in `lab-chrome.css` instead
-  of four times page-locally, which stops the recurrence inside `experiments/` but is still
-  a workaround. A contract-side `[hidden]` guard would retire it for every consumer.
+- **~~`.oo-btn` defeats the `hidden` attribute.~~ FIXED in `components.css` v1.5.** It declared
+  `display: inline-flex`, an author declaration that outranks the UA `[hidden] { display: none }`
+  rule `lab-shell.js` uses to retire the pause control — a cascade-*origin* contest, so
+  `:where()` could not have helped. Four labs hit it independently, which is the friction that
+  lifted the v1.4 freeze. The contract now restates `[hidden]` for all ten of its classes that
+  declare `display`, and the `.oo-btn[hidden]` workaround is retired from `lab-chrome.css`.
+  `.lab-canvas[hidden]` / `.lab-static[hidden]` keep their restatement here on purpose: those
+  are page-local classes, and the contract does not style classes it does not own.
 - **No canvas/still swap primitive exists.** `.lab-viewport`, `.lab-canvas` and
   `.lab-static` are now shared via `lab-chrome.css` rather than restated in all four shell
   labs, but that is deduplication of page-local glue, not a contract primitive — Lab 01 does

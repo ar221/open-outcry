@@ -10,7 +10,7 @@
 
    WHAT THIS IS NOT
    This is NOT part of the frozen Open Outcry contract. Do not confuse it with
-   ../tokens.css (v1.3) or ../components.css (v1.4), which are the contract and
+   ../tokens.css (v1.3) or ../components.css (v1.5), which are the contract and
    are versioned, reviewed, and consumed by everything. This file is scaffolding
    for one directory of experiments. It introduces no tokens, no primitives, and
    no new naming authority, and it must not become a second de-facto design
@@ -105,8 +105,11 @@ button { font: inherit; }
 }
 .lab-static > svg { display: block; width: 100%; height: 100%; }
 /* lab-shell.js swaps canvas/still with the `hidden` attribute. The UA rule
-   for [hidden] is weaker than any author `display`, so every element the
-   shell toggles has to restate it. Same trap as .oo-btn below. */
+   for [hidden] loses to any author `display`, so every element the shell
+   toggles has to restate it. These two STAY: .lab-canvas/.lab-static are
+   page-local classes whose `display: block` is declared right above, and the
+   contract does not — and must not — style classes it does not own. The
+   contract's own half of this trap was fixed upstream at components.css v1.5. */
 .lab-canvas[hidden],
 .lab-static[hidden] { display: none; }
 
@@ -121,11 +124,12 @@ button { font: inherit; }
 /* ── Footer rail ── */
 .lab-rail--foot { gap: 14px; flex-wrap: wrap; }
 .lab-control { min-height: 36px; padding: 8px 14px; font-size: 11px; }
-/* components.css:209 — .oo-btn declares display:inline-flex, which outranks
-   the UA [hidden] rule the shell uses to retire the control on the fallback
-   path. Restated here once instead of once per lab. The frozen contract is
-   not touched to fix this. */
-.oo-btn[hidden] { display: none; }
+/* `.oo-btn[hidden] { display: none; }` — RETIRED v1.5, promoted into the
+   contract. .oo-btn's display:inline-flex outranked the UA [hidden] rule the
+   shell uses to retire the control on the fallback path; four labs hit it
+   independently and this file was the deduped fourth copy. components.css v1.5
+   now restates [hidden] for all ten contract classes that declare `display`,
+   so nothing is needed here. */
 
 @media (max-width: 720px) {
   .oo-rail { font-size: 10px; letter-spacing: .02em; }

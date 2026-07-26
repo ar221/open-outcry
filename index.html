@@ -49,7 +49,7 @@
 <div class="oo-stage reg-console oo-scanlines" id="stage">
 
   <header class="oo-rail oo-rail--sticky">
-    <span>&gt; <span class="voice">open-outcry</span>/brand-book · v1.4</span>
+    <span>&gt; <span class="voice">open-outcry</span>/brand-book · v1.5</span>
     <span style="display:flex; gap:16px; align-items:center;">
       <button id="reg-toggle" type="button">[ REGISTER: CONSOLE ]</button>
       <span><span class="oo-dot"></span> LIVE</span>
@@ -165,14 +165,15 @@
           <p style="font-size:11px; color:var(--oo-ghost); margin-top:14px; line-height:1.8;">compose on .oo-pane (+ --armed) and .oo-hover — hover-arm + black-on-voice press come free. Controls are chrome; chrome is always mono, even on a broadcast plate (§01 corollary).</p>
         </div>
         <div class="oo-pane" style="padding:24px; font-size:12px; line-height:2.2;">
-          <div class="oo-kicker" style="margin-bottom:12px;">v1.3 / v1.4 CONTRACT NOTES</div>
+          <div class="oo-kicker" style="margin-bottom:12px;">v1.3 / v1.5 CONTRACT NOTES</div>
           <span class="voice">--oo-gutter</span> <span style="color:var(--r-fg-dim)">— stage padding and .oo-plate--bleed share one token (56px / 20px narrow)</span><br>
           <span class="voice">.oo-rail--sticky</span> <span style="color:var(--r-fg-dim)">— pins chrome; opaque background-color baked in (see TRAP, components.css)</span><br>
           <span class="voice">:where(.oo-stat-value)</span> <span style="color:var(--r-fg-dim)">— base ink at zero specificity; semantic ink wins: <span class="oo-stat-value up" style="display:inline; font-size:18px;">+78%</span> <span class="oo-stat-value down" style="display:inline; font-size:18px;">-1/9</span></span><br>
           <span class="voice">.oo-stage</span> <span style="color:var(--r-fg-dim)">— v1.4: the consumer shell, promoted after its fifth copy (this very page carries it now)</span><br>
           <span class="voice">.oo-grid-4</span> <span style="color:var(--r-fg-dim)">— v1.4: 4-up stat row; all grids now minmax(0,1fr) so long mono numbers can't tear the stage</span><br>
           <span class="voice">.oo-stat-delta</span> <span style="color:var(--r-fg-dim)">— v1.4: source/context third line under a stat value: <span class="oo-stat-delta" style="display:inline; margin:0;">source: jobs.json · 99 GiB free</span></span><br>
-          <span class="voice">zero-state ink</span> <span style="color:var(--r-fg-dim)">— v1.4 rule: a zero in a pending-stat stays base ink; semantic color is earned by non-zero state only</span>
+          <span class="voice">zero-state ink</span> <span style="color:var(--r-fg-dim)">— v1.4 rule: a zero in a pending-stat stays base ink; semantic color is earned by non-zero state only</span><br>
+          <span class="voice">[hidden]</span> <span style="color:var(--r-fg-dim)">— v1.5: every class here that declares <span class="voice">display</span> now restates <span class="voice">[hidden]</span>. An author <span class="voice">display</span> beats the UA rule on origin, not specificity, so <span class="voice">.oo-btn</span> and the grids used to ignore the attribute</span>
         </div>
       </div>
       <div class="oo-pane" style="margin-top:24px; padding:24px; text-align:center;">

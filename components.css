@@ -1,11 +1,19 @@
 /* ═══════════════════════════════════════════════════════════
-   OPEN OUTCRY — components v1.4
+   OPEN OUTCRY — components v1.5
    Import tokens.css first; these classes consume --r-* / --oo-* .
 
    ▲ TRAP — never use the `background:` shorthand on an element carrying
    .oo-scanlines (or any scanline background-image): the shorthand resets
    background-image and silently erases the scanlines at equal specificity.
    Always `background-color:`.
+
+   ▲ TRAP — any class here that declares `display` outranks the user-agent
+   `[hidden] { display: none }` rule, because that is a cascade ORIGIN
+   contest, not a specificity one — :where() cannot lower an author
+   declaration below the UA sheet. Ten classes declared `display` and so
+   ignored the `hidden` attribute; v1.5 restates it for all ten in one rule
+   near the foot of this file. Anything added here that declares `display`
+   must be added to that rule too.
 
    Inventory:
    · textures      — .oo-scanlines · .oo-grain · .oo-vignette
@@ -236,6 +244,35 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
 /* ── Overlay + content lift (grain / beam hosts) ── */
 .oo-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .oo-content { position: relative; z-index: 1; }
+
+/* ── The `hidden` attribute wins (v1.5) ──
+      `[hidden] { display: none }` ships in the USER-AGENT sheet, and every
+      author declaration beats the UA origin no matter how weak its selector.
+      So each class above that declares `display` was silently overriding
+      `hidden`: markup set the attribute, assistive tech and the DOM agreed the
+      element was hidden, and it stayed on screen.
+
+      Evidence that lifted the freeze: .oo-btn (display:inline-flex) met four
+      independent consumers — labs 02/03/04/05 — each of which toggles a
+      control with the `hidden` attribute, watched the button stay visible, and
+      each restated `[hidden]{display:none}` page-locally. The fourth copy was
+      deduped into experiments/lab-chrome.css; that restatement is RETIRED here.
+      Nine sibling classes carry the identical trap and are fixed in the same
+      pass rather than left as landmines.
+
+      Scope discipline: contract classes only. components.css does not own bare
+      elements and must not ship a global `[hidden]` reset — a consumer's own
+      display-setting classes remain the consumer's problem to restate. ── */
+.oo-rail[hidden],
+.oo-dot[hidden],
+.oo-cursor[hidden],
+.oo-tickwrap[hidden],
+.oo-grid-2[hidden],
+.oo-grid-3[hidden],
+.oo-grid-4[hidden],
+.oo-stat-value[hidden],
+.oo-stat-delta[hidden],
+.oo-btn[hidden] { display: none; }
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {

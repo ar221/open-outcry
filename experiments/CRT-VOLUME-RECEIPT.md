@@ -57,9 +57,13 @@
 2. **`.oo-btn[hidden]` needs a page-local `[hidden] { display: none }` restatement.** `.oo-btn`'s author `display: inline-flex` (`components.css:209`) outranks the UA `[hidden]` rule the shell uses to retire the pause control, so the contract's own primitive silently defeats the platform's hiding mechanism. **Two-for-two across labs at this point and four-for-four by Lab 05 — it reads as a `components.css` defect, not a lab quirk.**
 
    > **Superseded 2026-07-26 by `experiments/lab-chrome.css`.** The restatement is no longer page-local per lab — it is declared once in the shared lab chrome. **The underlying defect is unchanged and still unfixed:** `components.css:209`'s `.oo-btn { display: inline-flex }` still outranks the UA `[hidden]` rule, and `lab-chrome.css` only stops it recurring per-lab inside `experiments/`. A contract-side `[hidden]` guard is still owed.
+
+   > **Closed 2026-07-26 by `components.css` v1.5.** The contract-side guard shipped: the contract now restates `[hidden] { display: none }` for all ten of its classes that declare `display`, `.oo-btn` among them, and the `.oo-btn[hidden]` line was retired from `lab-chrome.css`. Four independent labs hitting this is the friction that lifted the v1.4 freeze.
 3. **`.lab-canvas[hidden]` / `.lab-static[hidden]`** need the same restatement.
 
    > **Superseded 2026-07-26 by `experiments/lab-chrome.css`.** The restatement is no longer page-local per lab — it is declared once in the shared lab chrome. **The underlying defect is unchanged and still unfixed:** `components.css:209`'s `.oo-btn { display: inline-flex }` still outranks the UA `[hidden]` rule, and `lab-chrome.css` only stops it recurring per-lab inside `experiments/`. A contract-side `[hidden]` guard is still owed.
+
+   > **Partly closed 2026-07-26 by `components.css` v1.5.** The cascade-origin defect is fixed for the contract's own classes, but `.lab-canvas`/`.lab-static` are page-local classes declaring their own `display: block`, which the contract does not and must not style. Their restatement correctly stays in `lab-chrome.css` and is no longer a contract ask.
 4. **`.oo-stage` caps at 1080px** and the labs are 1440px instruments, so `.lab-stage` re-declares the stage anatomy. Second lab in a row to pay it.
 5. **No canvas/still swap primitive** — `.lab-viewport`, `.lab-canvas`, `.lab-static` are page-local, inherited from Lab 02.
 
