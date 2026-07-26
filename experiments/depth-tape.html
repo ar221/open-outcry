@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#181210">
+<title>DEPTH TAPE — Open Outcry WebGL experiment</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; background: var(--oo-void); }
+  body {
+    color: var(--oo-fg-warm);
+    font-family: var(--oo-font-mono);
+    font-size: var(--oo-type-body);
+    line-height: 1.6;
+  }
+  button { font: inherit; }
+  .depth-stage {
+    max-width: 1440px;
+    min-height: 100svh;
+    margin: 0 auto;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-color: var(--oo-broadcast-stage);
+    border-inline: 1px solid var(--oo-line-warm);
+  }
+  .depth-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    background-image: radial-gradient(circle at 24% 42%, var(--oo-peach-glow), transparent 36%);
+    pointer-events: none;
+  }
+  .depth-stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(24,18,16,.96) 0%, rgba(24,18,16,.86) 31%, rgba(24,18,16,.18) 58%, rgba(2,3,2,.18) 100%);
+  }
+  .depth-rail {
+    position: relative;
+    z-index: 8;
+    padding-inline: var(--oo-gutter);
+    background-color: rgba(24,18,16,.94);
+    backdrop-filter: blur(8px);
+  }
+  .depth-rail--foot {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    border-top: 1px solid var(--oo-line-warm);
+    border-bottom: 0;
+  }
+  .depth-rail__cluster { display: flex; align-items: center; gap: 16px; }
+  .depth-control {
+    min-height: 42px;
+    padding: 8px 13px;
+    border: 1px solid var(--oo-amber-line);
+    border-radius: var(--oo-radius);
+    background-color: transparent;
+    color: var(--oo-amber);
+    cursor: crosshair;
+    font-family: var(--oo-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .depth-control:hover,
+  .depth-control:focus-visible {
+    color: var(--oo-void);
+    background-color: var(--oo-amber);
+    outline: 1px solid var(--oo-fg);
+    outline-offset: 2px;
+  }
+  .depth-hero {
+    min-height: calc(100svh - 86px);
+    padding: clamp(72px, 13vh, 148px) var(--oo-gutter) 110px;
+    position: relative;
+    z-index: 6;
+    display: grid;
+    grid-template-columns: minmax(0, .88fr) minmax(440px, 1.12fr);
+    align-items: center;
+  }
+  .depth-copy { position: relative; z-index: 7; max-width: 690px; }
+  .depth-kicker { color: var(--oo-muted-warm); }
+  .depth-title {
+    max-width: 9ch;
+    margin-top: 22px;
+    font-family: var(--oo-font-serif);
+    font-size: clamp(58px, 8.2vw, 126px);
+    font-weight: 560;
+    line-height: .91;
+    letter-spacing: -.035em;
+  }
+  .depth-title em { color: var(--oo-peach); font-weight: 500; }
+  .depth-prose {
+    max-width: 47ch;
+    margin-top: 28px;
+    color: var(--oo-fg-dim);
+    font-size: clamp(14px, 1.2vw, 17px);
+  }
+  .depth-receipt {
+    width: min(560px, 100%);
+    margin-top: 36px;
+    padding: 18px 20px;
+    background-color: rgba(7,8,7,.82);
+    border-color: var(--oo-pane-border);
+    color: var(--oo-fg-dim);
+    box-shadow: inset 0 0 28px rgba(242,165,31,.035);
+  }
+  .depth-receipt__row {
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    gap: 14px;
+    padding-block: 4px;
+    font-size: 11px;
+  }
+  .depth-receipt__key { color: var(--oo-amber-dim); }
+  .depth-viewport {
+    position: absolute;
+    inset: 43px 0 43px 20%;
+    z-index: 1;
+    overflow: hidden;
+    background-color: var(--oo-console-stage);
+  }
+  .depth-viewport::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background-image: linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px);
+    background-size: 100% 4px;
+    mix-blend-mode: screen;
+  }
+  .depth-viewport::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: radial-gradient(circle at 70% 44%, transparent 0 22%, rgba(2,3,2,.74) 85%);
+  }
+  #depth-canvas { width: 100%; height: 100%; display: block; position: relative; z-index: 1; }
+  .depth-static {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background-color: var(--oo-console-stage);
+  }
+  .depth-static svg { width: 100%; height: 100%; display: block; }
+  .depth-status {
+    position: absolute;
+    right: var(--oo-gutter);
+    top: 70px;
+    z-index: 7;
+    color: var(--oo-muted);
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .depth-status strong { color: var(--oo-green); font-weight: 400; }
+  .depth-stage[data-renderer="fallback"] .depth-status strong { color: var(--oo-amber); }
+  .depth-nojs {
+    position: absolute;
+    right: var(--oo-gutter);
+    bottom: 70px;
+    z-index: 7;
+    color: var(--oo-amber);
+    font-size: 11px;
+  }
+  @media (max-width: 900px) {
+    .depth-stage::after {
+      background: linear-gradient(180deg, rgba(24,18,16,.98) 0%, rgba(24,18,16,.9) 52%, rgba(24,18,16,.08) 79%, rgba(2,3,2,.28) 100%);
+    }
+    .depth-hero {
+      min-height: 100svh;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      padding-top: 100px;
+    }
+    .depth-copy { max-width: 620px; }
+    .depth-title { font-size: clamp(48px, 14vw, 86px); }
+    .depth-viewport { inset: 43% 0 43px 0; }
+    .depth-receipt { margin-top: 24px; }
+    .depth-status { top: auto; bottom: 66px; }
+  }
+  @media (max-width: 620px) {
+    .depth-rail { padding-inline: 14px; }
+    .depth-rail__path { max-width: 45vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .depth-hero { padding: 84px 20px 260px; }
+    .depth-title { max-width: 8ch; font-size: clamp(46px, 16vw, 68px); }
+    .depth-prose { max-width: 36ch; }
+    .depth-receipt__row { grid-template-columns: 92px 1fr; }
+    .depth-viewport { inset: 56% 0 43px 0; }
+    .depth-status { right: 20px; }
+    .depth-stage::after {
+      background: linear-gradient(180deg, rgba(24,18,16,.99) 0%, rgba(24,18,16,.94) 56%, rgba(24,18,16,.12) 84%, rgba(2,3,2,.4) 100%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .depth-control { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="depth-stage reg-broadcast" id="depth-stage" data-renderer="fallback">
+  <header class="oo-rail depth-rail">
+    <span class="depth-rail__path">&lt; experiment = <span class="voice">"depth-tape"</span> &gt;</span>
+    <span class="depth-rail__cluster">
+      <button class="depth-control" id="motion-control" type="button" aria-pressed="false">[ PAUSE FEED ]</button>
+      <span><span class="oo-dot"></span> FUN TRACK</span>
+    </span>
+  </header>
+
+  <div class="depth-viewport" id="depth-viewport" aria-hidden="true">
+    <div class="depth-static" id="depth-static">
+      <svg viewBox="0 0 1200 800" preserveAspectRatio="none" role="presentation">
+        <rect width="1200" height="800" fill="#070807"/>
+        <g fill="none" stroke="#9b6822" stroke-width="1" opacity=".5">
+          <path d="M-100 820 L520 380 M260 820 L590 380 M620 820 L660 380 M980 820 L730 380 M1340 820 L800 380"/>
+          <path d="M0 730 H1200 M90 650 H1110 M180 580 H1020 M270 520 H930 M350 470 H850 M420 430 H780 M480 400 H720"/>
+        </g>
+        <g fill="#f2a51f" opacity=".72">
+          <rect x="400" y="672" width="160" height="8"/><rect x="720" y="608" width="130" height="7"/>
+          <rect x="534" y="548" width="118" height="6"/><rect x="666" y="493" width="96" height="5"/>
+          <rect x="580" y="444" width="78" height="4"/>
+        </g>
+        <g font-family="monospace" font-size="12" fill="#b57b24" opacity=".72">
+          <text x="882" y="722">BROADCAST / HUMAN VOICE</text>
+          <text x="774" y="587">CONSOLE / MACHINE VOICE</text>
+          <text x="688" y="482">TAPE / LIVE SIGNAL</text>
+        </g>
+      </svg>
+    </div>
+    <canvas id="depth-canvas"></canvas>
+  </div>
+
+  <section class="depth-hero">
+    <div class="depth-copy">
+      <div class="oo-kicker depth-kicker">&lt; register = "broadcast" &gt; - - - the machine runs beneath the voice</div>
+      <h1 class="depth-title">Give the tape <em>depth.</em></h1>
+      <p class="depth-prose">Not a 3D ornament. A market instrument: signal lanes recede into the desk while the editorial voice holds the foreground.</p>
+      <div class="oo-pane oo-scanlines depth-receipt reg-console">
+        <div class="depth-receipt__row"><span class="depth-receipt__key">&gt; REGISTER</span><span>broadcast dominant / console quoted</span></div>
+        <div class="depth-receipt__row"><span class="depth-receipt__key">&gt; INPUT</span><span>pointer drift + linear tape feed</span></div>
+        <div class="depth-receipt__row"><span class="depth-receipt__key">&gt; FALLBACK</span><span>static SVG / reduced motion / WebGL fault</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="depth-status" id="render-status">renderer / <strong>static fallback</strong></div>
+  <noscript><p class="depth-nojs">JavaScript is off. Static instrument retained.</p></noscript>
+
+  <footer class="oo-rail depth-rail depth-rail--foot">
+    <span>OPEN OUTCRY / WEBGL LAB 01</span>
+    <span class="depth-rail__cluster"><span>NO BLOBS</span><span>NO ORBIT</span><span class="voice">ONE INSTRUMENT</span></span>
+  </footer>
+</main>
+<script src="depth-tape.bundle.js"></script>
+</body>
+</html>
