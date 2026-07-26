@@ -208,9 +208,33 @@ with CSS — two looping `setTimeout` typewriters, `:hover` state left under the
 pointer, and `.oo-scanlines`' 4px-period background rephasing whenever page height
 changes. I chased all three down and then used a strictly stronger test for the actual
 question: **hold the DOM constant and swap only the stylesheet** (`components.css` v1.5 ↔
-the committed v1.4), comparing *every* computed property and layout box of *every*
-element. Animations frozen, `pointer-events: none` so `:hover` can never match,
-typewriters pinned.
+the committed v1.4). Animations frozen, `pointer-events: none` so `:hover` can never
+match, typewriters pinned.
+
+**What the harness actually enumerated**, stated precisely, because an overstated
+verification claim is the exact failure these receipts exist to catch. For every element
+matched by `querySelectorAll('*')`, it compared the full `getComputedStyle(el)` property
+list — every property the engine enumerates on that element — plus its
+`getBoundingClientRect()` to 3 decimal places. That is *element* computed style, **not**
+every computed style on the page. Two limits follow:
+
+- **Pseudo-elements were not reached.** `getComputedStyle(el)` takes an optional second
+  argument for a pseudo-element; the harness passed none, so it read only each element's
+  own style. `.oo-grain::before` and `.oo-vignette::after` — the film-grain and vignette
+  layers, and the contract's only generated content — were therefore never compared. (To
+  be exact about the gap and not overstate it either: `.oo-scanlines` and `.oo-scanbeam`
+  paint on the element itself, so their `background-image` / `background-size` *were*
+  enumerated and did match. The reduced-motion `.oo-scanbeam { display: none }` is
+  likewise element-level.) **Why it does not affect the verdict:** the v1.5 diff is purely
+  additive `[hidden]` attribute selectors on ten existing class selectors, plus comments
+  and one header note. It declares no pseudo-element selector and alters no existing
+  declaration, so there is no mechanism by which `::before` or `::after` could differ. The
+  claim is rescoped rather than the harness re-run, because re-running it would prove
+  nothing new.
+- **The positive control exercised `display` only.** It demonstrates the harness detects
+  a `display` change and its layout consequences — it does *not* demonstrate sensitivity
+  to an arbitrary colour, spacing, or typography regression, which this diff had no way
+  to introduce but which a future contract change would.
 
 | Page | Elements | Differing properties | Differing layout boxes |
 |---|---|---|---|
