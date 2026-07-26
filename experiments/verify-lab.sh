@@ -7,6 +7,13 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SHOTS="/tmp/oo-verify"
 PORT=8731
 BASE="http://127.0.0.1:${PORT}/experiments/${LAB}.html"
+# Live captures pin any one-shot reveal to completion (lab-shell.js `?reveal=full`).
+# A fixed `wait` against a multi-second draw+hold cycle otherwise samples an
+# arbitrary mid-animation frame, and the by-eye composition gate then gets
+# applied to a frame that is not the finished plate. Labs with no reveal clock
+# ignore the param. The fallback capture below deliberately does NOT carry it —
+# `?render=fallback` is asserted exactly as before.
+LIVE="${BASE}?reveal=full"
 
 mkdir -p "$SHOTS"
 
@@ -36,7 +43,7 @@ probe() {
 }
 
 # 3. Desktop: live renderer + no horizontal overflow
-chrome-devtools-axi open "$BASE" >/dev/null
+chrome-devtools-axi open "$LIVE" >/dev/null
 chrome-devtools-axi resize 1440 900 >/dev/null
 chrome-devtools-axi wait 1200 >/dev/null
 RENDERER="$(probe "document.querySelector('[data-renderer]').dataset.renderer")"
@@ -47,7 +54,9 @@ CANVAS="$(probe "document.querySelector('canvas').width")"
 [ "${CANVAS//[^0-9]/}" -gt 0 ] || fail "canvas not sized"
 chrome-devtools-axi screenshot "${SHOTS}/${LAB}-desktop.png" >/dev/null
 
-# 4. Phone: no overflow, composition stacks
+# 4. Phone: no overflow, composition stacks.
+# No re-open — the page is still the `?reveal=full` document from step 3, so the
+# phone capture is a finished plate too. Resizing is what re-solves the layout.
 chrome-devtools-axi resize 390 844 >/dev/null
 chrome-devtools-axi wait 800 >/dev/null
 OVERFLOW="$(probe "document.documentElement.scrollWidth - window.innerWidth")"

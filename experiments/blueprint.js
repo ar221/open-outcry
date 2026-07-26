@@ -6,8 +6,21 @@
 // Every edge below was checked against the files on 2026-07-26:
 //
 //   grep -n '@import' tokens.css components.css **/*.html   -> no hits
-//   grep -c 'var(--oo-' components.css                      -> 30 refs, 18 unique
+//   grep -oE 'var\(--oo-[a-z0-9-]+' components.css | sort -u -> 18 unique, 30 refs
+//   grep -oE 'var\(--r-[a-z0-9-]+'  components.css | sort -u ->  9 unique, 28 refs
+//   grep -cE '^\s*--oo-[a-z0-9-]+\s*:' tokens.css           -> 37 declarations
+//   grep -cE '^\s*--r-[a-z0-9-]+\s*:'  tokens.css           -> 22 declarations
+//                                                              (11 names x 2 registers)
+//   grep -cE '^\s*--(oo|r)-[a-z0-9-]+\s*:' components.css   ->  0 (declares none)
 //   grep -n 'rel="stylesheet"' index.html examples/*.html experiments/*.html
+//
+// The coupling is 27 names, not 18. components.css reads 18 `var(--oo-*)` AND 9
+// `var(--r-*)` register aliases, and the alias layer is the load-bearing half —
+// the .oo-* classes consume --r-* so that one class works in both registers.
+// All 9 alias names are defined only in tokens.css (:root/.reg-console and
+// .reg-broadcast). An earlier pass of this plate said `var(--oo-*) x 18` alone,
+// which is true but under-reports the very thing the plate exists to draw, so
+// both the drawing and the readout now carry both halves.
 //
 // Two facts that the plan's edge list got wrong, corrected here:
 //
@@ -47,8 +60,19 @@ import { createLab, makeTextSprite } from './lab-shell.js';
 //   go RIGHT: the consumer column is where every edge terminates, so nothing
 //   is drawn right of it. Source labels go LEFT: upstream of the whole fan.
 //   components.css is the one node needing care, because it sits inside
-//   tokens.css's fan — it is authored ABOVE the top edge of that fan, so its
-//   label clears every stage-2 stroke by world units rather than by luck.
+//   tokens.css's fan.
+//
+//   ── y-ordering (review fix) ──
+//   An earlier pass parked components.css ABOVE tokens.css, so the primary
+//   chain rose before the fan descended. It cleared the fan, but it also made
+//   the two surfaces of the same graph disagree about which sheet is upstream:
+//   the fallback SVG descends tokens -> components -> consumers, and so does
+//   every pipeline diagram anyone draws. The invariant ("no label shares a
+//   half-plane with edge geometry") wants the label OUT of the fan, not UP —
+//   a fan has two exteriors. So tokens.css is now the topmost node, the whole
+//   graph descends monotonically, and components.css escapes DOWNWARD: its
+//   `lift` is negative, seating its ink below the lowest tokens -> consumer
+//   stroke instead of above the highest one. Same argument, other exterior.
 //
 //   NARROW — a convex arc. Six nodes descending leftward with the leftward
 //   step growing each tier, which puts every chord to the LEFT of every node
@@ -66,18 +90,23 @@ import { createLab, makeTextSprite } from './lab-shell.js';
 // it does not merely dolly. `labelScale` is authored rather than derived,
 // because the fit reads label ink extents as inputs and deriving the scale from
 // the fit's own output would close a loop with no fixed point worth having.
+// Optional per-node `lift` / `noteDrop` override the shared LIFT / NOTE_DROP
+// seats, in label-scale units, signed the same way (+ is up off the dot). Only
+// components.css needs them, and only on the wide plate.
 const LAYOUTS = {
   wide: {
-    aim: [-8.0, 0.2, -9],
+    aim: [-8.0, -0.5, -9],
     labelScale: 2.4,
     aspectFloor: 1.35,
     nodes: {
-      tokens:     { pos: [-30.0, -1.0, -3],  side: 'left' },
-      components: { pos: [-15.0, 4.2, -7],   side: 'left' },
-      book:       { pos: [12.0, 8.0, -12],   side: 'right' },
-      inir:       { pos: [12.0, 2.4, -13],   side: 'right' },
-      brief:      { pos: [12.0, -3.2, -13],  side: 'right' },
-      labs:       { pos: [12.0, -8.8, -12],  side: 'right' },
+      // Monotone descent: tokens (top) -> components -> the consumer column.
+      tokens:     { pos: [-30.0, 9.0, -3],   side: 'left' },
+      // Its ink hangs below the node, clear of the tokens fan overhead.
+      components: { pos: [-15.0, 3.4, -7],   side: 'left', lift: -1.30, noteDrop: 2.10 },
+      book:       { pos: [12.0, 1.6, -12],   side: 'right' },
+      inir:       { pos: [12.0, -2.4, -13],  side: 'right' },
+      brief:      { pos: [12.0, -6.4, -13],  side: 'right' },
+      labs:       { pos: [12.0, -10.4, -12], side: 'right' },
     },
   },
   narrow: {
@@ -97,15 +126,26 @@ const LAYOUTS = {
   },
 };
 
-// `note` is a second, smaller caption under the file name saying what the file
-// IS. Only the consumers carry one: their side is 'right' in both layouts and
-// that half-plane is provably free of edges, so a second line is as safe as the
-// first. The two source sheets get no note — their versions and counts are in
-// the page readout, and a caption beside components.css would have to re-enter
-// tokens.css's fan to fit.
+// `note` is a second, smaller caption under the file name. For the consumers it
+// says what the file IS; for components.css it carries the figure that makes the
+// coupling honest. Every note sits in the same half-plane as its own label, so
+// it is exactly as safe as the label: the consumers' is free of edges by
+// construction, and components.css escapes downward (see LAYOUTS).
+//
+// components.css reads 27 names — 18 `var(--oo-*)` AND 9 `var(--r-*)` — and
+// declares none of its own. Saying only the 18, as an earlier pass did, hides
+// the load-bearing half: the .oo-* classes consume the --r-* aliases, which
+// tokens.css re-points per register so one class serves both. tokens.css gets
+// no note: its 37 + 22 declaration split is in the page readout and on the
+// fallback plate, and its caption was the widest ink box in the frame, dollying
+// the camera out far enough to cost every label a pixel of cap height.
+//
+// Sprite sheets are 512px wide with a 23px mono face at 2px tracking and origin
+// x = 8, so a note has ~31 characters before the ink runs off the texture.
 const NODES = [
   { id: 'tokens',     label: 'tokens.css',     tier: 'amber', stage: 0 },
-  { id: 'components', label: 'components.css', tier: 'amber', stage: 1 },
+  { id: 'components', label: 'components.css', tier: 'amber', stage: 1,
+    note: 'READS 18 --oo-* + 9 --r-*' },
   { id: 'book',       label: 'index.html',     tier: 'green', stage: 2, note: 'BRAND BOOK' },
   { id: 'inir',       label: 'examples/inir',  tier: 'green', stage: 2, note: 'EXAMPLE' },
   { id: 'brief',      label: 'examples/brief', tier: 'green', stage: 2, note: 'EXAMPLE' },
@@ -158,6 +198,17 @@ const INK_GAP = 0.60;
 // fix was the node's position, not this number.
 const LIFT = { left: 0.90, right: 0.50 };
 // Sub-caption: smaller, muted, seated below the dot on the same side.
+//
+// Measured, not guessed: raising this to 0.92 to make the coupling caption
+// readable on the 390px plate did nothing. The fit is bound by label ink on both
+// axes, so a bigger note sheet only dollies the camera out and hands the pixels
+// straight back — the note grew, every file name shrank, the note's rendered
+// width was unchanged. Relative type size here is zero-sum; the only real levers
+// are fewer ink boxes or shorter strings. Left at 0.80, which favours the file
+// names. Consequence recorded honestly: on the narrow plate the coupling caption
+// is ~3.4 px per glyph — present, not comfortably readable. It reads on the
+// desktop plate and on the fallback, and the page readout carries it in HTML
+// type at every width.
 const NOTE_SCALE = 0.80;
 const NOTE_DROP = 0.36;
 const INK_HALF_H = 0.15;                    // cap height half, in scale units
@@ -171,6 +222,15 @@ const pickLayout = aspect => (aspect >= LAYOUTS.wide.aspectFloor ? LAYOUTS.wide 
 
 // Which layout the current frame is using; labelBox needs its `side` rule.
 let active = LAYOUTS.wide;
+
+// Seats for one node's two ink lines, in label-scale units, signed + = up off
+// the dot. A per-node override wins, so a node whose safe exterior is DOWNWARD
+// flips both its label and its note with one authored number instead of a
+// special case in the layout loop. `noteDrop` is measured from the dot, not
+// from the label, so a node with a negative lift authors a drop large enough to
+// clear its own label — checked in fitPoints, which frames every ink box.
+const seatLift = node => active.nodes[node.id].lift ?? LIFT[active.nodes[node.id].side];
+const seatNoteDrop = node => active.nodes[node.id].noteDrop ?? NOTE_DROP;
 
 // Ink geometry for one label at one scale. makeTextSprite draws left-aligned
 // from x = 8 on a 512-wide sheet whose centre is the sprite's origin, so the
@@ -267,10 +327,10 @@ function fitPoints() {
     const half = dotScale.get(node.id) / 2;
     points.push([x - half, y - half, z], [x + half, y + half, z]);
     const s = labelScale.get(node.id);
-    const box = labelBox(node, node.label, x, y + LIFT[active.nodes[node.id].side] * s, s);
+    const box = labelBox(node, node.label, x, y + seatLift(node) * s, s);
     points.push([box.left, box.bottom, z], [box.right, box.top, z]);
     if (node.note) {
-      const nb = labelBox(node, node.note, x, y - NOTE_DROP * s, s * NOTE_SCALE);
+      const nb = labelBox(node, node.note, x, y - seatNoteDrop(node) * s, s * NOTE_SCALE);
       points.push([nb.left, nb.bottom, z], [nb.right, nb.top, z]);
     }
   }
@@ -442,7 +502,7 @@ function buildSchematic(ctx) {
 }
 
 function updateSchematic(ctx, dt) {
-  const { THREE, camera, pointer } = ctx;
+  const { THREE, camera, pointer, revealFull } = ctx;
 
   // ── Aspect ──
   // t = 0 is the 2.4:1 desktop plate, t = 1 the phone. The crossover band is
@@ -453,9 +513,15 @@ function updateSchematic(ctx, dt) {
   const aim = [framing.aimX, framing.aimY, chosen.aim[2]];
 
   // ── Reveal ──
+  // `?reveal=full` (lab-shell.js) pins the clock at completion. The geometry at
+  // progress = 1 is what the plate IS — stage 2 yields dashSize = length below,
+  // so every chord terminates on its node — and a screenshot harness sampling a
+  // fixed wait against this 8s cycle otherwise catches an arbitrary frame of the
+  // draw and gates the composition on something that is not the plate. Pointer
+  // drift and the camera solve are untouched: this pins the reveal, not the lab.
   drawClock += dt;
   if (drawClock > DRAW_SECONDS + HOLD_SECONDS) drawClock = 0;
-  const progress = Math.min(1, drawClock / DRAW_SECONDS);   // linear draw
+  const progress = revealFull ? 1 : Math.min(1, drawClock / DRAW_SECONDS);   // linear draw
 
   for (const line of lineObjs) {
     const { from, to, stage } = line.userData.edge;
@@ -499,8 +565,7 @@ function updateSchematic(ctx, dt) {
     dot.material.opacity = inked ? 1 : 0.55;
 
     const s = labelScale.get(node.id);
-    const side = active.nodes[node.id].side;
-    const box = labelBox(node, node.label, x, y + LIFT[side] * s, s);
+    const box = labelBox(node, node.label, x, y + seatLift(node) * s, s);
     const label = labelObjs[i];
     label.position.set(box.spriteX, box.spriteY, z);
     label.scale.set(SPRITE_W * s, 0.6 * s, 1);
@@ -509,7 +574,7 @@ function updateSchematic(ctx, dt) {
     const note = noteObjs[i];
     if (note) {
       const ns = s * NOTE_SCALE;
-      const nb = labelBox(node, node.note, x, y - NOTE_DROP * s, ns);
+      const nb = labelBox(node, node.note, x, y - seatNoteDrop(node) * s, ns);
       note.position.set(nb.spriteX, nb.spriteY, z);
       note.scale.set(SPRITE_W * ns, 0.6 * ns, 1);
       note.material.opacity = inked ? 0.8 : 0.55;

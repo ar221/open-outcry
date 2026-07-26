@@ -28,7 +28,19 @@ export function createLab(config) {
     control: document.querySelector('[data-lab-control]'),
   };
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const forced = new URLSearchParams(window.location.search).get('render');
+  const params = new URLSearchParams(window.location.search);
+  const forced = params.get('render');
+  // `?reveal=full` — deterministic full-reveal seam, same query-param idiom as
+  // `?render=fallback` but a strictly weaker one: it does NOT touch the renderer
+  // path. The scene stays live WebGL and everything else keeps animating; the
+  // flag is simply handed to the lab as `ctx.revealFull`, and a lab that runs a
+  // one-shot draw-in reads it to pin its own reveal clock to completion.
+  //
+  // Why the shell owns it: a screenshot harness firing a fixed wait against an
+  // ~8s draw+hold cycle samples an arbitrary frame, so the by-eye composition
+  // gate gets applied to something that is not the finished plate. Labs that
+  // have no reveal clock ignore the flag and are unaffected.
+  const revealFull = params.get('reveal') === 'full';
 
   const palette = {};
   for (const [name, hex] of Object.entries(PALETTE_HEX)) {
@@ -101,7 +113,7 @@ export function createLab(config) {
     const delta = Math.min((time - lastTime) / 1000 || 0, 0.05);
     lastTime = time;
     if (config.pointer) pointer.lerp(targetPointer, 0.055);
-    config.update({ THREE, scene, camera, palette, pointer, data: config.data }, delta);
+    config.update({ THREE, scene, camera, palette, pointer, revealFull, data: config.data }, delta);
     renderer.render(scene, camera);
   }
 
@@ -145,7 +157,7 @@ export function createLab(config) {
       // itself — the shell does not re-aim per frame, so rotation goes stale.
       camera.lookAt(...config.camera.lookAt);
 
-      config.build({ THREE, scene, camera, palette, pointer, data: config.data });
+      config.build({ THREE, scene, camera, palette, pointer, revealFull, data: config.data });
       resize();
       setLive();
       startLoop();

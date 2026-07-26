@@ -145,7 +145,7 @@
 
   <div class="lab-head">
     <h1 class="oo-display-console lab-title">BLUEPRINT.</h1>
-    <p class="oo-prose lab-note">The repo drawing itself. Six files, nine audited edges. There is no <code>@import</code> anywhere here — components.css inherits through eighteen <code>var(--oo-*)</code> names, and every consumer <code>&lt;link&gt;</code>s both sheets. The direct token links are the dimmer strand.</p>
+    <p class="oo-prose lab-note">The repo drawing itself. Six files, nine audited edges. No <code>@import</code> anywhere — components.css inherits 18 <code>var(--oo-*)</code> names plus the 9 <code>var(--r-*)</code> register aliases its classes consume. Every consumer <code>&lt;link&gt;</code>s both sheets; the direct links are the dimmer strand.</p>
   </div>
 
   <div class="lab-viewport" data-lab-viewport>
@@ -156,7 +156,7 @@
          dead expando and the still stays display:none forever. -->
     <div class="lab-static" data-lab-static hidden>
     <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet" role="img"
-         aria-label="Static dependency schematic of the Open Outcry repo: tokens.css feeds components.css through 18 var(--oo-*) references; components.css feeds index.html, examples/inir, examples/brief and experiments/*; all four consumers also link tokens.css directly. Six nodes, nine edges, no @import anywhere.">
+         aria-label="Static dependency schematic of the Open Outcry repo: tokens.css declares 59 custom properties, 37 --oo-* plus 22 --r-* register aliases, and feeds components.css through 18 var(--oo-*) plus 9 var(--r-*) references; components.css feeds index.html, examples/inir, examples/brief and experiments/*; all four consumers also link tokens.css directly. Six nodes, nine edges, no @import anywhere.">
       <!-- Hand-authored. Same six nodes and same nine edges as the live plate,
            fully drawn, orthogonally routed. Monoline SVG is the source language
            of design-language §5, so the fallback here is not a degraded print
@@ -221,11 +221,15 @@
 
       <!-- ── Edge and node annotations ── -->
       <g font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="0.8" fill="#686564">
-        <text x="618" y="126">v1.3 &middot; 37 CUSTOM PROPS</text>
-        <text x="618" y="266">v1.4 &middot; 38 CLASSES</text>
+        <text x="618" y="126">v1.3 &middot; 59 PROPS &middot; 37 --oo-* + 22 --r-*</text>
+        <text x="618" y="266">v1.4 &middot; 38 CLASSES &middot; DECLARES NONE</text>
       </g>
+      <!-- The contract edge carries BOTH halves of the coupling. The register
+           aliases are the load-bearing half: .oo-* classes read --r-*, which
+           tokens.css re-points per register, so one class works in both. -->
       <g font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="0.6" fill="#b57b24">
-        <text x="618" y="196">var(--oo-*) &times; 18</text>
+        <text x="618" y="188">var(--oo-*) &times; 18</text>
+        <text x="618" y="206">+ var(--r-*) &times; 9</text>
         <text x="618" y="352">&lt;link rel=stylesheet&gt; &times; 4</text>
       </g>
       <g font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="0.6" fill="#9b6822">
@@ -263,8 +267,8 @@
     </div>
     <div class="oo-pane oo-stat">
       <span class="oo-kicker">&gt; TOKENS</span>
-      <span class="oo-stat-value">37</span>
-      <span class="oo-stat-delta">--oo-* custom properties &middot; 18 read by components</span>
+      <span class="oo-stat-value">59</span>
+      <span class="oo-stat-delta">37 --oo-* + 22 --r-* decls &middot; 27 read by components</span>
     </div>
     <div class="oo-pane oo-stat">
       <span class="oo-kicker">&gt; CLASSES</span>
