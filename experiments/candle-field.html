@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070807">
+<title>CANDLE FIELD — Open Outcry WebGL Lab 02</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; background: var(--oo-void); }
+  body {
+    color: var(--oo-fg);
+    font-family: var(--oo-font-mono);
+    font-size: var(--oo-type-body);
+    line-height: 1.6;
+  }
+  button { font: inherit; }
+
+  /* ── Stage ──
+     Not .oo-stage: that primitive is capped at 1080px and the labs are
+     1440px instruments. Same anatomy, wider ceiling. */
+  .lab-stage {
+    max-width: 1440px;
+    min-height: 100svh;
+    margin: 0 auto;
+    padding: 0 var(--oo-gutter);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--oo-console-stage);   /* never `background:` — erases .oo-scanlines */
+    border-inline: var(--oo-stroke) solid var(--oo-line);
+  }
+
+  .lab-path { color: var(--oo-amber-dim); }
+  .lab-status strong { color: var(--oo-green); font-weight: 400; }
+  .lab-stage[data-renderer="fallback"] .lab-status strong { color: var(--oo-amber); }
+  .lab-stage[data-renderer="pending"] .lab-status strong { color: var(--oo-muted); }
+
+  /* ── Head: title + one line of intent ── */
+  .lab-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px 32px;
+    padding: 30px 0 20px;
+  }
+  .lab-title { max-width: 14ch; }
+  .lab-note { max-width: 46ch; font-size: 13px; }
+
+  /* ── Viewport: the dominant object ── */
+  .lab-viewport {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 62svh;
+    overflow: hidden;
+    background-color: var(--oo-void);
+    border: var(--oo-stroke) solid var(--oo-line);
+  }
+  .lab-viewport::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(circle at 52% 46%, transparent 0 34%, rgba(2,3,2,.66) 92%);
+  }
+  .lab-canvas,
+  .lab-static {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* The still is letterboxed rather than cropped: a sliced fallback is a
+     degraded chart, and the fallback is a promotion gate. Matte matches the
+     stage so the bars read as bezel, not as a broken frame. */
+  .lab-static { background-color: var(--oo-console-stage); }
+  .lab-static > svg { display: block; width: 100%; height: 100%; }
+  /* lab-shell.js swaps canvas/still with the `hidden` attribute. The UA rule
+     for [hidden] is weaker than any author `display`, so every element the
+     shell toggles has to restate it. Same trap as .oo-btn below. */
+  .lab-canvas[hidden],
+  .lab-static[hidden] { display: none; }
+
+  /* ── Readout: four real figures from the snapshot ── */
+  .lab-readout { padding: 18px 0 20px; }
+  .lab-readout .oo-stat { padding: 13px 16px; }
+  .lab-readout .oo-stat-value { margin-top: 5px; font-size: 19px; letter-spacing: .01em; }
+  .lab-readout .oo-stat-delta { margin-top: 4px; font-size: 10px; line-height: 1.45; }
+  .lab-readout .oo-kicker { font-size: 10px; }
+
+  /* ── Footer rail ── */
+  .lab-rail--foot { gap: 14px; flex-wrap: wrap; }
+  .lab-meta { color: var(--oo-muted); }
+  .lab-control { min-height: 36px; padding: 8px 14px; font-size: 11px; }
+  /* .oo-btn declares display:inline-flex, which outranks the UA [hidden] rule
+     the shell uses to retire the control on the fallback path. */
+  .oo-btn[hidden] { display: none; }
+
+  @media (max-width: 900px) {
+    .lab-head { padding-top: 24px; }
+    .lab-title { max-width: none; }
+  }
+  @media (max-width: 720px) {
+    .oo-rail { font-size: 10px; letter-spacing: .02em; }
+    .lab-head { gap: 12px; padding: 20px 0 16px; }
+    .lab-note { max-width: none; font-size: 12px; }
+    .lab-viewport { min-height: 54svh; }
+    .lab-readout { padding: 14px 0 16px; }
+    .lab-readout .oo-stat-value { font-size: 17px; }
+    .lab-meta { line-height: 1.5; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lab-control { display: none; }
+  }
+</style>
+<noscript><style>
+  /* No script: the still is the plate. */
+  .lab-static[hidden] { display: block; }
+  .lab-canvas, .lab-control { display: none; }
+</style></noscript>
+</head>
+<body>
+<main class="lab-stage oo-scanlines reg-console" data-renderer="pending">
+
+  <header class="oo-rail lab-rail">
+    <span class="lab-path">&gt; experiments/candle-field</span>
+    <span class="lab-status" data-lab-status>renderer / <strong>starting</strong></span>
+  </header>
+
+  <div class="lab-head">
+    <h1 class="oo-display-console lab-title">CANDLE FIELD.</h1>
+    <p class="oo-prose lab-note">Ninety real daily SPY sessions extruded along a time axis. One amber rail at the last close — the only annotation the field is allowed.</p>
+  </div>
+
+  <div class="lab-viewport" data-lab-viewport>
+    <canvas class="lab-canvas" data-lab-canvas></canvas>
+    <!-- data-lab-static MUST sit on an HTML element, not on the <svg>.
+         `hidden` is an HTMLElement IDL attribute; SVGElement does not
+         implement it, so lab-shell.js's `el.static.hidden = false` writes a
+         dead expando and the still stays display:none forever. -->
+    <div class="lab-static" data-lab-static hidden>
+    <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Static candle field: 90 daily SPY bars from 2026-03-17 to 2026-07-24, closing at 738.93">
+      <rect width="1200" height="640" fill="#070807"/>
+      <g stroke="#1c1a14" stroke-width="1" fill="none"><path d="M62 508.1 H1092 M62 435.5 H1092 M62 362.9 H1092 M62 290.3 H1092 M62 217.7 H1092 M62 145.1 H1092 M62 72.5 H1092"/></g>
+      <g font-family="JetBrains Mono, monospace" font-size="10" fill="#686564" letter-spacing="0.5"><text x="1102" y="511.6">640.00</text><text x="1102" y="439.0">660.00</text><text x="1102" y="366.4">680.00</text><text x="1102" y="293.8">700.00</text><text x="1102" y="221.2">720.00</text><text x="1102" y="148.6">740.00</text><text x="1102" y="76.0">760.00</text></g>
+      <g class="cf-up" stroke="#1f9d55" stroke-width="1" fill="none" opacity=".62"><path d="M90.6 424.6 V453.0 M124.9 446.2 V472.2 M182.2 466.2 V515.4 M193.6 440.8 V460.9 M205.1 442.0 V489.5 M216.5 436.5 V451.7 M227.9 436.9 V467.9 M250.8 358.7 V385.5 M273.7 340.0 V375.3 M285.2 309.9 V335.1 M296.6 289.3 V311.3 M308.1 280.2 V295.6 M319.5 245.3 V269.4 M353.8 248.7 V260.4 M376.7 237.7 V257.6 M388.2 233.5 V245.6 M411.1 246.0 V259.9 M422.5 218.4 V252.3 M456.8 199.4 V212.3 M468.3 164.7 V189.3 M491.2 152.1 V164.8 M502.6 142.2 V158.0 M514.1 149.3 V174.7 M525.5 130.9 V161.5 M536.9 110.5 V132.2 M582.7 138.3 V167.3 M594.2 127.4 V155.9 M617.1 101.1 V114.7 M639.9 90.1 V111.6 M651.4 79.5 V91.8 M662.8 71.5 V91.8 M674.3 71.0 V84.3 M697.2 78.6 V103.5 M754.4 145.1 V201.7 M765.8 129.0 V163.1 M777.3 84.5 V102.4 M868.8 157.7 V230.1 M880.3 139.4 V173.8 M891.7 116.0 V141.9 M903.2 110.8 V136.4 M926.1 100.0 V118.2 M948.9 122.8 V146.9 M960.4 101.6 V124.8 M971.8 89.1 V115.7 M994.7 96.7 V113.6 M1006.2 88.5 V108.1 M1029.1 118.6 V142.2 M1051.9 112.3 V129.9 M1063.4 108.7 V122.0 M1086.3 131.6 V154.9"/></g>
+      <g class="cf-up" fill="#1f9d55" opacity=".86"><rect x="87.1" y="436.2" width="7.1" height="10.3"/><rect x="121.4" y="460.2" width="7.1" height="6.8"/><rect x="178.6" y="470.5" width="7.1" height="41.4"/><rect x="190.1" y="452.7" width="7.1" height="4.9"/><rect x="201.5" y="450.6" width="7.1" height="34.1"/><rect x="213.0" y="439.3" width="7.1" height="11.2"/><rect x="224.4" y="438.3" width="7.1" height="9.3"/><rect x="247.3" y="363.2" width="7.1" height="18.4"/><rect x="270.2" y="340.7" width="7.1" height="31.6"/><rect x="281.6" y="310.4" width="7.1" height="24.6"/><rect x="293.1" y="290.5" width="7.1" height="17.0"/><rect x="304.5" y="284.2" width="7.1" height="2.2"/><rect x="316.0" y="253.5" width="7.1" height="14.5"/><rect x="350.3" y="249.6" width="7.1" height="7.5"/><rect x="373.2" y="239.7" width="7.1" height="11.6"/><rect x="384.6" y="235.2" width="7.1" height="7.3"/><rect x="407.5" y="248.2" width="7.1" height="2.1"/><rect x="419.0" y="222.5" width="7.1" height="14.7"/><rect x="453.3" y="204.0" width="7.1" height="7.3"/><rect x="464.7" y="167.5" width="7.1" height="20.6"/><rect x="487.6" y="153.7" width="7.1" height="9.8"/><rect x="499.1" y="147.6" width="7.1" height="10.4"/><rect x="510.5" y="151.7" width="7.1" height="4.7"/><rect x="522.0" y="136.7" width="7.1" height="13.9"/><rect x="533.4" y="115.4" width="7.1" height="16.4"/><rect x="579.2" y="140.5" width="7.1" height="20.2"/><rect x="590.6" y="135.2" width="7.1" height="14.8"/><rect x="613.5" y="106.6" width="7.1" height="2.1"/><rect x="636.4" y="92.1" width="7.1" height="15.8"/><rect x="647.8" y="85.3" width="7.1" height="2.1"/><rect x="659.3" y="77.8" width="7.1" height="11.5"/><rect x="670.7" y="74.0" width="7.1" height="9.3"/><rect x="693.6" y="83.1" width="7.1" height="18.1"/><rect x="750.8" y="153.2" width="7.1" height="32.7"/><rect x="762.3" y="138.7" width="7.1" height="3.8"/><rect x="773.7" y="91.3" width="7.1" height="10.8"/><rect x="865.3" y="185.0" width="7.1" height="1.4"/><rect x="876.7" y="141.5" width="7.1" height="16.2"/><rect x="888.2" y="120.5" width="7.1" height="19.9"/><rect x="899.6" y="124.2" width="7.1" height="2.7"/><rect x="922.5" y="104.1" width="7.1" height="9.3"/><rect x="945.4" y="125.5" width="7.1" height="8.1"/><rect x="956.8" y="102.6" width="7.1" height="15.8"/><rect x="968.3" y="90.8" width="7.1" height="10.5"/><rect x="991.2" y="102.1" width="7.1" height="3.4"/><rect x="1002.6" y="91.3" width="7.1" height="2.1"/><rect x="1025.5" y="133.1" width="7.1" height="4.4"/><rect x="1048.4" y="115.0" width="7.1" height="7.3"/><rect x="1059.8" y="118.2" width="7.1" height="2.9"/><rect x="1082.7" y="149.0" width="7.1" height="1.5"/></g>
+      <g class="cf-down" stroke="#e0455a" stroke-width="1" fill="none" opacity=".62"><path d="M67.7 383.0 V400.3 M79.2 400.2 V431.1 M102.1 447.5 V490.9 M113.5 425.9 V457.5 M136.4 432.2 V456.4 M147.8 454.2 V490.6 M159.3 498.4 V533.1 M170.7 506.7 V547.0 M239.4 373.5 V393.9 M262.3 355.5 V368.5 M330.9 254.3 V268.0 M342.4 249.3 V280.7 M365.3 245.4 V282.0 M399.6 243.5 V256.7 M433.9 200.0 V216.0 M445.4 210.0 V235.9 M479.7 159.1 V182.3 M548.4 132.5 V152.5 M559.8 139.9 V169.1 M571.3 153.6 V175.8 M605.6 112.6 V128.8 M628.5 103.8 V115.2 M685.7 76.8 V95.8 M708.6 98.6 V161.3 M720.1 125.7 V151.7 M731.5 120.0 V208.3 M742.9 151.0 V198.3 M788.7 89.0 V109.2 M800.2 101.0 V147.9 M811.6 115.2 V131.1 M823.1 108.1 V133.7 M834.5 146.4 V173.0 M845.9 145.3 V178.3 M857.4 147.4 V182.8 M914.6 104.0 V145.0 M937.5 105.3 V126.2 M983.3 94.6 V116.0 M1017.6 92.2 V116.5 M1040.5 113.4 V139.6 M1074.8 135.8 V162.5"/></g>
+      <g class="cf-down" fill="#e0455a" opacity=".86"><rect x="64.2" y="390.5" width="7.1" height="5.8"/><rect x="75.6" y="405.1" width="7.1" height="25.2"/><rect x="98.5" y="448.1" width="7.1" height="28.8"/><rect x="110.0" y="442.5" width="7.1" height="9.7"/><rect x="132.8" y="440.3" width="7.1" height="6.7"/><rect x="144.3" y="464.3" width="7.1" height="25.3"/><rect x="155.7" y="499.0" width="7.1" height="30.5"/><rect x="167.2" y="507.7" width="7.1" height="29.5"/><rect x="235.8" y="376.0" width="7.1" height="1.4"/><rect x="258.7" y="358.1" width="7.1" height="6.7"/><rect x="327.4" y="258.4" width="7.1" height="1.4"/><rect x="338.8" y="253.0" width="7.1" height="22.5"/><rect x="361.7" y="255.8" width="7.1" height="3.8"/><rect x="396.1" y="247.4" width="7.1" height="1.4"/><rect x="430.4" y="213.1" width="7.1" height="2.2"/><rect x="441.8" y="217.4" width="7.1" height="7.5"/><rect x="476.2" y="163.0" width="7.1" height="12.6"/><rect x="544.8" y="138.6" width="7.1" height="9.5"/><rect x="556.3" y="145.7" width="7.1" height="4.3"/><rect x="567.7" y="164.0" width="7.1" height="3.8"/><rect x="602.1" y="122.4" width="7.1" height="2.2"/><rect x="625.0" y="105.6" width="7.1" height="1.5"/><rect x="682.2" y="79.2" width="7.1" height="14.2"/><rect x="705.1" y="100.4" width="7.1" height="53.6"/><rect x="716.5" y="132.9" width="7.1" height="15.0"/><rect x="728.0" y="131.9" width="7.1" height="23.9"/><rect x="739.4" y="169.1" width="7.1" height="28.9"/><rect x="785.2" y="92.3" width="7.1" height="15.3"/><rect x="796.6" y="104.1" width="7.1" height="37.5"/><rect x="808.1" y="116.9" width="7.1" height="3.7"/><rect x="819.5" y="117.1" width="7.1" height="12.0"/><rect x="831.0" y="167.6" width="7.1" height="1.4"/><rect x="842.4" y="162.6" width="7.1" height="7.0"/><rect x="853.8" y="149.0" width="7.1" height="16.8"/><rect x="911.1" y="118.2" width="7.1" height="9.5"/><rect x="934.0" y="108.0" width="7.1" height="9.1"/><rect x="979.7" y="99.8" width="7.1" height="12.0"/><rect x="1014.1" y="98.8" width="7.1" height="7.4"/><rect x="1037.0" y="119.5" width="7.1" height="18.0"/><rect x="1071.3" y="147.4" width="7.1" height="4.3"/></g>
+      <g stroke="#f2a51f" stroke-width="1" opacity=".55"><path d="M62 149.0 H1092" stroke-dasharray="6 5"/></g>
+      <g font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="1.4"><text x="70" y="139.0" fill="#f2a51f">CLOSE 738.93</text><text x="70" y="169.0" fill="#686564" font-size="10">2026-07-24</text></g>
+      <g stroke="#241c18" stroke-width="1"><path d="M62 580 H1092"/></g>
+      <g font-family="JetBrains Mono, monospace" font-size="10" fill="#686564" letter-spacing="0.6"><text x="62.0" y="600" text-anchor="start">2026-03-17</text><text x="399.6" y="600" text-anchor="middle">2026-04-28</text><text x="742.9" y="600" text-anchor="middle">2026-06-10</text><text x="1092.0" y="600" text-anchor="end">2026-07-24</text></g>
+      <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1.2"><text x="62" y="32" fill="#b57b24">SPY / 90 DAILY SESSIONS / STATIC STILL</text><text x="1092" y="32" text-anchor="end" fill="#686564"><tspan fill="#1f9d55">50 UP</tspan> / <tspan fill="#e0455a">40 DOWN</tspan></text></g>
+    </svg>
+    </div>
+  </div>
+
+  <div class="oo-grid-4 lab-readout">
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; LAST CLOSE</span>
+      <span class="oo-stat-value voice">738.93</span>
+      <span class="oo-stat-delta">2026-07-24 &middot; <span class="up">+0.75 (+0.10%)</span></span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; WINDOW</span>
+      <span class="oo-stat-value up">+10.16%</span>
+      <span class="oo-stat-delta">670.79 &rarr; 738.93 over 90 sessions</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; RANGE</span>
+      <span class="oo-stat-value">629.28 &ndash; 760.40</span>
+      <span class="oo-stat-delta">low 2026-03-30 &middot; high 2026-06-02</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; DIRECTION</span>
+      <span class="oo-stat-value"><span class="up">50</span> / <span class="down">40</span></span>
+      <span class="oo-stat-delta">green-deep bodies / red bodies</span>
+    </div>
+  </div>
+
+  <footer class="oo-rail oo-rail--foot lab-rail--foot">
+    <span class="lab-meta">SPY &middot; 90 SESSIONS &middot; SNAPSHOT 2026-07-26 &middot; ALPHA VANTAGE</span>
+    <button class="oo-btn oo-pane oo-hover lab-control" type="button" data-lab-control aria-pressed="false">[ PAUSE FEED ]</button>
+  </footer>
+
+</main>
+
+<script src="vendor/three.iife.js"></script>
+<script type="module" src="candle-field.js"></script>
+</body>
+</html>
