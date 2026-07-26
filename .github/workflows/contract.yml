@@ -28,6 +28,11 @@ on:
   push:
   pull_request:
 
+# Checkout-only job. The repo default may be read-write; nothing here needs to
+# write, so drop the token to the minimum.
+permissions:
+  contents: read
+
 jobs:
   hidden-guard-parity:
     runs-on: ubuntu-latest

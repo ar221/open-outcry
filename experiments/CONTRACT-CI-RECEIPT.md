@@ -12,9 +12,18 @@ and not added to it reintroduces the bug silently. Mitigated by the `▲ TRAP` h
 note, but a real guard would be a check in CI … not built here — this worktree has no
 test harness for the contract, only for the labs."*
 
-**No contract file was touched.** `tokens.css`, `components.css`, `index.html`,
-`examples/`, and everything pre-existing under `experiments/` are byte-identical. Two
-files were added and nothing else.
+**Contract behaviour is untouched.** `tokens.css`, `index.html`, `examples/`, and every
+pre-existing `experiments/` file are byte-identical. Two files were added. `components.css`
+carries exactly one **comment-only** edit — the `▲ TRAP` note now points at the check
+(approved on review) — which alters no declaration and no computed style, so
+`components.css` stays **v1.5** with no version bump.
+
+**Post-review revision.** The first cut of this check was reviewed adversarially and
+**four holes were found, three of them false PASSES** — for a guard, the worst failure
+mode available, because a false PASS silently permits the exact bug the check exists to
+catch. All four are closed and each is recorded with its adversarial input and its
+post-fix output in §2.9. The scanner now also **refuses loudly** on constructs it cannot
+analyse rather than guessing.
 
 ---
 
@@ -28,7 +37,8 @@ One assertion, both directions:
 |---|---|
 | `MISSING GUARD` | class declares a `display` other than `none` and is absent from the `[hidden]` rule — the v1.5 bug, reintroduced |
 | `STALE GUARD` | class is named in the `[hidden]` rule but declares no non-`none` `display` — the rule rotted (renamed / deleted class) |
-| `BAD GUARD` | a `[hidden]` guard found nested inside an at-rule, so it only holds under that condition and is not accepted as the contract-wide guard |
+| `BAD GUARD` | a rule that *looks* like a guard but does not hold contract-wide: nested in an at-rule, descendant-scoped, type-qualified, compound-scoped, or narrowed by a functional pseudo-class |
+| `UNSUPPORTED` | a construct the scanner cannot analyse — native CSS nesting, or `display: var(…)`. **Hard fail on purpose.** A check that refuses to answer is honest; one that answers wrongly is not |
 
 **The exemption is derived, not listed.** There is no allow-list in the file, because a
 maintained allow-list would recreate the original problem one level up — the same
@@ -54,18 +64,30 @@ the sheet and printing the ones in `.oo-scanbeam` context returns exactly one va
 - **`@media` / `@supports` children are real rules and ARE scanned.** A `display`
   declared only inside a media query still defeats `hidden` at those widths, so it still
   needs the top-level guard. `@keyframes` children are not rules and are skipped.
-- **A guard nested in an at-rule is not accepted.** It would only hold under that
-  condition. Reported as `BAD GUARD` rather than silently ignored.
+- **A guard is accepted only in the shape `.class[hidden]`** (plus argument-less
+  pseudo-classes). Nested in an at-rule, descendant-scoped (`.oo-pane .oo-x[hidden]`),
+  type-qualified (`a.oo-x[hidden]`), compound-scoped (`.oo-x.oo-y[hidden]`), or narrowed
+  by a functional pseudo-class — all `BAD GUARD`, never silently honoured. Each of those
+  holds only in a context, and the contract-wide guard must hold everywhere.
+- **The `[hidden]` test runs AFTER `:not()` stripping**, so `.oo-x:not([hidden])` — which
+  applies precisely when the element is *not* hidden — cannot pose as a guard.
+- **A `;` at bracket depth zero resets the prelude buffer**, so a top-level `@import` or
+  `@charset` cannot swallow the rule that follows it.
+- **Any rule containing a nested block, or an `&`, is refused outright.** Nesting support
+  was deliberately not built; the scanner says what it cannot verify instead.
 - **`:not(…)` arguments are dropped; `:is(…)` / `:where(…)` arguments are unwrapped.** A
   `:not()` argument is a negation and never the subject. An `:is()`/`:where()` argument
   *is* the subject — and zero specificity is irrelevant here, because this is a cascade
   *origin* contest, so `:where(.oo-x) { display: block }` defeats `hidden` exactly as
   hard as a bare class does. Getting this backwards would produce a false negative on
   precisely the idiom v1.3 used for `.oo-stat-value`.
-- **`display: var(…)` is skipped**, not guessed at. It cannot be resolved statically and
-  a fabricated verdict is worse than an honest gap (recorded in §4).
-- `tokens.css` is scanned too. It declares no `display` today; scanning it is free and
-  means a `display` landing there is not invisible.
+- **`display: var(…)` is refused, not skipped.** It cannot be resolved statically, so
+  neither verdict is available; skipping it would be a false PASS on a class that may well
+  owe a guard. It now hard-fails with `UNSUPPORTED`. Zero such declarations exist today,
+  so this cannot cry wolf on the current sheet.
+- `tokens.css` is scanned too — and it is **not** dead weight, as review confirmed: it
+  carries real class selectors (`.reg-broadcast` at `tokens.css:83` and siblings), so a
+  `display` landing on a register alias would be caught rather than invisible.
 
 Zero dependencies — `node:fs`, `node:url`, `node:path` only. No `package.json`, no
 install step. Executable (`#!/usr/bin/env node`), so it runs as
@@ -88,6 +110,11 @@ diverge in feel and buried the one file a contract author needs to know exists.
 — the check imports only `node:fs` and the runner's preinstalled `node` covers it;
 adding `setup-node` would imply a toolchain this repo does not have.
 
+`permissions: contents: read` (added on review). The repo default may be read-write, and a
+checkout-only job has no business holding a writable `GITHUB_TOKEN`. `on: [push,
+pull_request]` stays as-is — same-repo PRs run the check twice, which is fine for a first
+check and cheaper than the conditional needed to avoid it.
+
 The workflow file states in a comment that CI **does not** run `verify-lab.sh`, and why:
 that harness needs a real Chrome with WebGL and a GPU, samples animated three.js frames,
 and applies by-eye composition gates. On a headless runner it would be flaky, and a
@@ -97,7 +124,7 @@ flaky first check is a check that gets disabled. Lab verification stays local an
 
 ## 2. Verification
 
-### 2.1 Passes at `HEAD` (182f1fc), and says what it measured
+### 2.1 Passes against the contract as shipped, and says what it measured
 
 ```
 $ ./experiments/verify-contract.mjs
@@ -208,13 +235,123 @@ Not by exemption — it is simply not in the required set, because its only `dis
 the sheet is `none`. A check that cries wolf on day one gets disabled; this one does not
 name the class at all.
 
-### 2.9 Constraints honoured
+### 2.9 Adversarial review — four holes, three of them false PASSES, all closed
 
-`git diff` empty after every mutation revert; the two required mutations were made on the
-real file and reverted with `git checkout -- components.css`, the other five on a scratch
-copy under `/tmp`. Not modified: `tokens.css`, `components.css`, `index.html`,
-`examples/`, `experiments/verify-lab.sh`, every lab `.html`/`.js`/receipt,
-`experiments/lab-chrome.css`. No `git add -A` — paths staged explicitly. Nothing pushed.
+Review constructed inputs I had not tested. Every one below is quoted with the verdict
+**before** the fix and the verbatim output **after**. All six regressions in §2.2–2.8 were
+re-run against the fixed scanner and behave identically; `HEAD` still returns the same
+`PASS [contract] 10/10`, so none of these fixes was bought with a false alarm.
+
+**Finding 1 — descendant-scoped and type-qualified guards were accepted contract-wide,
+and poisoned the reverse check.** Every class in any `[hidden]`-bearing compound was
+registered as guarded, so a guard that only holds inside an ancestor satisfied the
+assertion — and the ancestor itself got reported as rotted.
+
+Input: `.oo-newx { display: grid; }` + `.oo-pane .oo-newx[hidden] { display: none; }`
+Before: **FAIL for the wrong reason** — `.oo-newx` silently accepted, and
+`STALE GUARD .oo-pane[hidden] …`, a spurious complaint about a class nobody guarded.
+After:
+
+```
+FAIL [contract] 2 [hidden]-guard parity error(s) in components.css + tokens.css
+  MISSING GUARD  .oo-newx declares `display: grid` at components.css:293 but is absent from the [hidden] rule — it will override the UA `[hidden] { display: none }`. Add `.oo-newx[hidden]` to that rule.
+  BAD GUARD      components.css:294 `.oo-pane .oo-newx[hidden]` is not a contract-wide guard — it is scoped (descendant, type-qualified, compound, or narrowed by a functional pseudo-class), so it only holds in that context. Use a bare `.class[hidden]` entry.
+```
+
+Input: `.oo-newz { display: grid; }` + `a.oo-newz[hidden] { display: none; }`
+Before: **PASS — false.** After:
+
+```
+  MISSING GUARD  .oo-newz declares `display: grid` at components.css:293 but is absent from the [hidden] rule — …
+  BAD GUARD      components.css:294 `a.oo-newz[hidden]` is not a contract-wide guard — it is scoped …
+```
+
+The fix accepts a guard compound only in the shape `.class[hidden]` (plus argument-less
+pseudo-classes) and takes its subject from that compound alone — the same discipline the
+at-rule case already had, now applied to selector scope as well.
+
+**Finding 2 — `:not([hidden])` counted as a guard.** The `[hidden]` test ran on the raw
+compound, *before* `:not()` stripping, so a semantically inverted rule satisfied the
+assertion.
+
+Input: `.oo-newy { display: grid; }` + `.oo-newy:not([hidden]) { display: none; }`
+Before: **PASS — false.** After:
+
+```
+FAIL [contract] 1 [hidden]-guard parity error(s) in components.css + tokens.css
+  MISSING GUARD  .oo-newy declares `display: grid` at components.css:293 but is absent from the [hidden] rule — it will override the UA `[hidden] { display: none }`. Add `.oo-newy[hidden]` to that rule.
+exit=1
+```
+
+The test now runs on the `:not()`-stripped selector. A rule that applies exactly when the
+element is *not* hidden can no longer pose as the rule that hides it.
+
+**Finding 3 — a top-level `@import` or `@charset` silently swallowed the next rule.**
+`rules()` never reset its prelude buffer on `;`, so the leftover `@import …` text prefixed
+the following selector, that selector read as an at-rule prelude and was pushed on the
+stack, and its rule was never yielded. Not triggered by today's sheet — but a
+zero-dependency repo is one `@import` away from it, and the failure mode is an invisible
+class and exit 0.
+
+Input: `@import url("x.css");` + `.oo-nw2 { display: grid; }`
+Before: **PASS — false**, `.oo-nw2` invisible. After:
+
+```
+  MISSING GUARD  .oo-nw2 declares `display: grid` at components.css:294 but is absent from the [hidden] rule — …
+```
+
+Fixed by resetting the buffer on a `;` at bracket depth zero — `balanced()` keeps a `;`
+inside a quoted string or attribute value from counting.
+
+**Finding 4 — native CSS nesting gave a false pass.** My receipt called this "reasoned,
+not measured"; it is now measured, and the reasoning was right — the inner block's
+`display` was read as part of the outer body and attributed to nothing.
+
+Input: `.oo-nwb { color: red; &.x { display: grid; } }`
+Before: **PASS — false.** After:
+
+```
+FAIL [contract] 1 [hidden]-guard parity error(s) in components.css + tokens.css
+  UNSUPPORTED    components.css:293 `.oo-nwb` uses nested rules — this scanner cannot verify nesting. Flatten the rule, or teach the check before shipping it.
+exit=1
+```
+
+Nesting support was **not** built, by direction. The scanner refuses instead — and the
+same treatment now covers `display: var(…)`, which was previously skipped in silence:
+
+```
+  UNSUPPORTED    components.css:293 .oo-nwv declares `display: var(--oo-x)` — a var() display cannot be resolved statically, so this check cannot tell whether a [hidden] guard is owed. Inline a literal `display`, or teach the check.
+```
+
+**Collateral surprise, found by the reviewer and worth recording:** a class whose only
+`display` is `none` but which *defensively* carries its own `[hidden]` entry hard-fails
+`STALE GUARD`. Demonstrated by appending `.oo-scanbeam[hidden] { display: none; }`:
+
+```
+  STALE GUARD    .oo-scanbeam[hidden] is listed at components.css:293 but .oo-scanbeam declares no `display` other than `none` — the guard rule has rotted (class renamed or removed?). Drop the entry or restore the class.
+```
+
+That entry is **harmless at runtime** — it duplicates what the UA sheet already does — but
+it breaks CI. This is the deliberate cost of `STALE GUARD` being a hard failure (upheld on
+review): the rule is a description of which classes contest `[hidden]`, and a belt-and-braces
+entry makes that description false. The remedy is to delete the redundant entry, and the
+failure message says which one and where. Anyone who reaches for a defensive guard should
+expect to be told no.
+
+Review also independently verified as already correct: `display :grid` spacing, duplicate
+`display` declarations in either order, multi-selector rules, `.oo-btn.oo-nw8` compounds,
+`@layer`, `initial`/`unset`/`revert` falling through conservatively, and comment blanking
+with line numbers preserved.
+
+### 2.10 Constraints honoured
+
+`git diff` empty after every mutation revert; the required mutations were made on the real
+`components.css` and reverted with `git checkout -- components.css`, all others on a
+scratch copy under `/tmp`. Not modified: `tokens.css`, `index.html`, `examples/`,
+`experiments/verify-lab.sh`, every lab `.html`/`.js`/receipt, `experiments/lab-chrome.css`.
+`components.css` carries the one approved comment-only `▲ TRAP` edit and nothing else —
+`git diff` on it is 2 insertions / 1 deletion, all inside the header comment, so it stays
+v1.5. No `git add -A` — paths staged explicitly. Nothing pushed.
 
 ---
 
@@ -234,20 +371,33 @@ copy under `/tmp`. Not modified: `tokens.css`, `components.css`, `index.html`,
   dependencies"; a CI that installed a CSS parser would have made that claim false to
   add a check that protects it.
 
+- **It refuses rather than guesses.** The four review findings were all cases where the
+  scanner answered a question it was not equipped to answer, and three answered *PASS*. The
+  structural lesson is not "parse more CSS" — it is that the set of constructs the scanner
+  understands must be closed, with everything outside it a hard failure. `UNSUPPORTED`
+  exists to make that boundary enforceable rather than aspirational.
+- **Guard acceptance is shape-checked, not substring-checked.** The original `/\[hidden/`
+  test was the root cause of findings 1 and 2 — three distinct false passes from one lazy
+  predicate.
+
 **Watch:**
 
 - **It is a scanner, not a CSS-spec-complete parser.** Sized to this sheet: flat rules,
-  `@media` / `@supports` / `@keyframes`, plain comments. Native CSS nesting, `@layer`,
-  `@container`, or `@import`-ed sheets are unexercised territory. The failure mode is
-  believed to be a missed rule (false pass) rather than a false alarm, but that is
-  reasoned, not measured — nothing in this repo uses those features yet.
-- **`display: var(--x)` is skipped.** Currently unused in the contract. If a token-driven
-  `display` ever ships, this check goes quiet on it without saying so — the one place the
-  script is deliberately silent rather than loud, and the one worth revisiting first.
-- **`STALE GUARD` is a hard failure.** Correct for a contract that guards only classes it
-  owns, and it is what caught the rename in §2.4. But it would also fire if someone
-  deliberately guarded a class defined outside these two files — which the v1.5 scope
-  discipline forbids, so the strictness is intentional rather than accidental.
+  `@media` / `@supports` / `@keyframes`, plain comments. `@container` and `@import`-ed
+  sheets remain unexercised. `@layer` was verified correct on review. Anything genuinely
+  outside the scanner's competence should now surface as `UNSUPPORTED` rather than as a
+  quiet PASS — but that guarantee is only as good as the constructs anyone has thought to
+  try, which is exactly how the first four holes were found.
+- **`STALE GUARD` is a hard failure** (upheld on review). It caught the rename in §2.4 and
+  is what makes the guard rule a truthful description of the sheet. Its cost is the
+  collateral case in §2.9: a harmless defensive entry breaks CI. Intentional, not
+  accidental — but it is a trap someone will hit, and the fix is to delete their entry.
+- **`UNSUPPORTED` is a blocking failure with no escape hatch.** If a legitimate future
+  contract change needs native nesting or a token-driven `display`, CI blocks it until the
+  scanner is taught. That is the intended trade — a guard should not be bypassable by
+  accident — but it does mean the check can stand between the author and a valid change, and
+  the message has to be good enough to explain why. It names the file, line, selector, and
+  the two ways out.
 - **One assertion is one assertion.** A green check on this workflow says the `[hidden]`
   parity holds. It says nothing else about the contract, and the workflow comment says so
   in the file so nobody reads the badge as broader coverage.
@@ -270,11 +420,18 @@ copy under `/tmp`. Not modified: `tokens.css`, `components.css`, `index.html`,
   `experiments/lab-chrome.css`, or any consumer page. That boundary is the contract's
   documented scope discipline, not an oversight — but it also means the check protects
   the contract only.
+- **Native CSS nesting is not verified** — measured, not assumed (§2.9, finding 4). A
+  nested rule is refused with `UNSUPPORTED`, so the gap cannot masquerade as a pass, but the
+  check genuinely cannot analyse `& …` blocks. Same for `display: var(…)`. Both are
+  refusals, not coverage.
+- **`@container` and `@import`-ed stylesheets are unexercised.** A top-level `@import` no
+  longer swallows the following rule (finding 3), but the *imported* sheet is never read —
+  a `display` declared in another file is invisible to this check. The contract is two
+  files today and imports nothing.
 - **The other v1.5 owed items are untouched:** the `README.md` note about the general
   consumer-side hazard, the `.oo-stage` 1080px cap, the `--oo-vignette-*` knob, the dense
   `.oo-stat` variant, and `depth-tape`'s pre-existing `?render=fallback` assertion.
-- **The `▲ TRAP` note at `components.css:10-16` still says "must be added to that rule
-  too" with no mention of the check.** That is now an incomplete instruction — the author
-  who violates it will be told by CI, and the note is where they would look for that
-  fact. Not edited here: `components.css` is out of scope for this branch by constraint.
-  **Flagged for Ayaz's decision**, not assumed.
+- **Closed since the first draft:** the `▲ TRAP` note at `components.css:10-17` now points
+  at the check (`— CI enforces this parity (experiments/verify-contract.mjs; run it before
+  you push)`). Approved on review as comment-only; it alters no declaration, changes no
+  computed style, and needed no version bump — `components.css` remains v1.5.

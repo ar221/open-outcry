@@ -13,7 +13,8 @@
    declaration below the UA sheet. Ten classes declared `display` and so
    ignored the `hidden` attribute; v1.5 restates it for all ten in one rule
    near the foot of this file. Anything added here that declares `display`
-   must be added to that rule too.
+   must be added to that rule too — CI enforces this parity
+   (experiments/verify-contract.mjs; run it before you push).
 
    Inventory:
    · textures      — .oo-scanlines · .oo-grain · .oo-vignette
