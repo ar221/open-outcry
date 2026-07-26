@@ -26,6 +26,13 @@ Snapshot date across the data-driven labs: **2026-07-26** (`data/market-2026-07-
 Alpha Vantage, baked — never fetched live). Neither `tokens.css` (v1.3) nor
 `components.css` (v1.4) was modified by any lab; the contract is unchanged.
 
+Labs 02–05 share two files beyond the contract: the Three.js runtime plus `lab-shell.js`
+(above), and **`lab-chrome.css`** — their common page-local CSS scaffolding, extracted so
+the stage anatomy, viewport positioning and `[hidden]` restatements are declared once
+instead of four times. It is *not* contract; see
+[Shared page chrome](#shared-page-chrome--lab-chromecss-labs-0205). Lab 01 and `index.html`
+deliberately do not consume it.
+
 ### Two runtimes, on purpose
 
 Labs 02–05 share one `vendor/three.iife.js`. Lab 01 keeps its own
@@ -90,6 +97,50 @@ resolution and cannot fail silently on a static host.
   this build — no second license file was added).
 - Bundle SHA-256: `a86eec659703fb7b53fd06b0edfb4532b0032adc24e09bc441f1998f33ec2de7`
 - Bundle size: 726,603 bytes.
+
+## Shared page chrome — `lab-chrome.css`, Labs 02–05
+
+The runtime above is not the only thing Labs 02–05 hold in common. They also share their
+page-local CSS scaffolding, which lives in `lab-chrome.css` — **62 normalized lines** that
+were previously restated verbatim in all four `<style>` blocks (each lab dropped exactly 54
+normalized lines to it, which is what a genuinely common surface looks like).
+
+Load order in every one of the four labs is `../tokens.css` → `../components.css` →
+`lab-chrome.css` → the page's own `<style>`, so page-local rules of equal specificity still
+win and each plate keeps its overrides.
+
+**`lab-chrome.css` is not part of the frozen contract.** `tokens.css` v1.3 and
+`components.css` v1.4 are the contract; this file is scaffolding for one directory of
+experiments. It adds no tokens and no primitives, and it must not become a second de-facto
+design system — a rule here that wants to apply outside `experiments/` is a signal to
+propose it into `components.css` properly, not to widen this file.
+
+What it carries: the reset, the stage *anatomy* (1440px ceiling, flex column, isolation),
+the renderer status lamp, viewport/canvas/still positioning, the `[hidden]` restatements
+that `components.css:209` forces, stat-rail type, and the four-way-identical media rules.
+
+What it deliberately does **not** carry, because these genuinely differ per plate:
+
+- **The viewport vignette.** All four gradients were hand-tuned to different values (Lab 02
+  a tight `40%`-stop window, Labs 03/04 wide late stops, Lab 05 a two-layer scrim plus an
+  off-centre ellipse). Only the positioning scaffold is shared; every stop stays with its
+  plate. Sharing it would have moved pixels on three of the four labs.
+- **Register cues** — `body` colour, `.lab-path`, `.lab-meta`, and the stage/still
+  backgrounds and borders. Labs 02–04 are Console; Lab 05 is Broadcast.
+- **Lab 05's composition layer** — the warm bloom, the grain host, the grid head, the capped
+  title clamp, and the two-still swap.
+- **Four-way-identical `@media` rules whose base rule differs per lab** (`.lab-head`,
+  `.lab-readout` padding). Splitting a property between this file's `@media` and a
+  page-local base of equal specificity would let the base win at narrow widths and invert
+  the breakpoint.
+
+**Lab 01 does not consume it,** deliberately: `depth-tape.html`'s bundle SHA is a recorded
+verification artifact and its markup predates these conventions. **`index.html` does not
+consume it either** — it has zero `.lab-*` classes (it uses a `.sheet-*` namespace), no
+canvas, no viewport, no `[hidden]` toggling and no buttons, so only a ~9-line generic reset
+it already declares verbatim would apply.
+
+Full receipt, including the visual-no-op verification: `CSS-REFACTOR-RECEIPT.md`.
 
 ### ⚠ `vendor/three.module.min.js` is NOT importable standalone
 

@@ -266,3 +266,51 @@ Untouched, confirmed by `git diff --stat`: `tokens.css`, `components.css`,
 `experiments/lab-shell.js`, `experiments/verify-lab.sh`, all `depth-tape.*`,
 `experiments/index.html`, and all four labs' `.js`. No `#5aa7ff`, no `#b77aff`, no
 border-radius introduced.
+
+---
+
+## 8. Addendum — review follow-up, 2026-07-26 (documentation only)
+
+Review returned Spec ✅ with no Critical and no Important findings. The visual-no-op claim
+was independently reproduced: declaration multisets re-derived with a separate parser
+(89/89/89/107 equal), pixel diffs matched exactly (10842 / 4467 / 13975 / 5549), untouched
+`depth-tape` confirmed the run-to-run noise floor, and the vignette-differs claim was
+verified against `main`. The reviewer additionally ran a cascade-order analysis that a
+multiset check cannot catch — **zero `(media, selector, property)` triples appear in both
+`lab-chrome.css` and any lab's page-local block**, and the four cross-selector cases resolve
+correctly by specificity or document order. Under-extraction (62 < 69) accepted with
+reasons.
+
+Three Minors closed in a follow-up commit. **No CSS, HTML or JS was touched** — the
+refactor is verified and was not re-opened. No re-verification run was required.
+
+1. **Nine falsified receipt passages stamped.** My change made passages in the four lab
+   receipts read as false: they assert the duplication still exists per-lab. I had amended
+   `README.md` but not the receipts, which was an inconsistent policy — and these receipts
+   are the evidence a future promotion decision rests on. Applied the **per-passage stamp**
+   uniformly (the reviewer's preferred option, since it keeps the friction history readable
+   while making current state unambiguous): a one-line
+   `> **Superseded 2026-07-26 by experiments/lab-chrome.css**` note under each affected
+   item — `CANDLE-FIELD-RECEIPT.md` ×3, `CRT-VOLUME-RECEIPT.md` ×3,
+   `BLUEPRINT-RECEIPT.md` ×2, `TAPE-RIBBON-RECEIPT.md` ×2. `DEPTH-TAPE-RECEIPT.md` is
+   untouched and correctly so: Lab 01 does not consume the sheet.
+
+   **Every stamp keeps the contract-side ask alive.** `components.css:209`'s
+   `.oo-btn { display: inline-flex }` defeating the UA `[hidden]` rule is still a real,
+   unfixed defect; `lab-chrome.css` only stops it recurring per-lab inside `experiments/`.
+   Likewise the canvas/still promotion candidate stands — sharing page-local glue is not a
+   contract primitive.
+
+2. **`lab-chrome.css` introduced as architecture, not a footnote.** It previously appeared
+   only under "Known limitations". Added a full **"Shared page chrome — `lab-chrome.css`,
+   Labs 02–05"** section immediately after the shared-Three.js-runtime section (load order,
+   what it carries, what it deliberately does not and why, the not-contract warning, and
+   both non-consumers), plus a pointer in the top-of-file Labs material so a reader meets
+   the file while reading the lab anatomy.
+
+3. **Report relocated.** `CLAUDE.md` enumerates the repo root as `tokens.css`,
+   `components.css`, `index.html`, `examples/` and category folders; a refactor log is not
+   in that set, and root `DESIGN.md` is an undocumented squatter rather than precedent.
+   Moved via `git mv` so history follows: root `CSS-REFACTOR-REPORT.md` →
+   `experiments/CSS-REFACTOR-RECEIPT.md`, where it sits with its five sibling receipts and
+   inside the directory it describes. The root no longer carries it.
