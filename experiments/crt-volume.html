@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070807">
+<title>CRT VOLUME — Open Outcry WebGL Lab 03</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; background: var(--oo-void); }
+  body {
+    color: var(--oo-fg);
+    font-family: var(--oo-font-mono);
+    font-size: var(--oo-type-body);
+    line-height: 1.6;
+  }
+  button { font: inherit; }
+
+  /* ── Stage ──
+     Not .oo-stage: that primitive is capped at 1080px and the labs are
+     1440px instruments. Same anatomy, wider ceiling. */
+  .lab-stage {
+    max-width: 1440px;
+    min-height: 100svh;
+    margin: 0 auto;
+    padding: 0 var(--oo-gutter);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--oo-console-stage);   /* never `background:` — erases .oo-scanlines */
+    border-inline: var(--oo-stroke) solid var(--oo-line);
+  }
+
+  .lab-path { color: var(--oo-amber-dim); }
+  .lab-status strong { color: var(--oo-green); font-weight: 400; }
+  .lab-stage[data-renderer="fallback"] .lab-status strong { color: var(--oo-amber); }
+  .lab-stage[data-renderer="pending"] .lab-status strong { color: var(--oo-muted); }
+
+  /* ── Head: title + one line of intent ── */
+  .lab-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px 32px;
+    padding: 30px 0 20px;
+  }
+  .lab-title { max-width: 14ch; }
+  .lab-note { max-width: 46ch; font-size: 13px; }
+
+  /* ── Viewport: the dominant object ── */
+  .lab-viewport {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 62svh;
+    overflow: hidden;
+    background-color: var(--oo-void);
+    border: var(--oo-stroke) solid var(--oo-line);
+  }
+  .lab-viewport::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    /* Tube falloff, not a spotlight. Lab 02's window could be tight because a
+       candle field is mostly void; here the subject is text that runs to the
+       frame edges at every aspect, so a 40%-stop vignette would dim the very
+       glyphs the lab exists to make readable. Wide ellipse, late stop, half
+       the opacity. */
+    background: radial-gradient(ellipse 98% 94% at 50% 50%, transparent 0 52%, rgba(2,3,2,.5) 100%);
+  }
+  .lab-canvas,
+  .lab-static {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* The still is letterboxed rather than cropped: a sliced fallback is a
+     degraded terminal, and the fallback is a promotion gate. Matte matches the
+     stage so the bars read as bezel, not as a broken frame. */
+  .lab-static { background-color: var(--oo-console-stage); }
+  .lab-static > svg { display: block; width: 100%; height: 100%; }
+  /* lab-shell.js swaps canvas/still with the `hidden` attribute. The UA rule
+     for [hidden] is weaker than any author `display`, so every element the
+     shell toggles has to restate it. Same trap as .oo-btn below. */
+  .lab-canvas[hidden],
+  .lab-static[hidden] { display: none; }
+
+  /* ── Readout: four real figures from the capture ── */
+  .lab-readout { padding: 18px 0 20px; }
+  .lab-readout .oo-stat { padding: 13px 16px; }
+  .lab-readout .oo-stat-value { margin-top: 5px; font-size: 19px; letter-spacing: .01em; }
+  .lab-readout .oo-stat-delta { margin-top: 4px; font-size: 10px; line-height: 1.45; }
+  .lab-readout .oo-kicker { font-size: 10px; }
+
+  /* ── Footer rail ── */
+  .lab-rail--foot { gap: 14px; flex-wrap: wrap; }
+  .lab-meta { color: var(--oo-muted); }
+  .lab-control { min-height: 36px; padding: 8px 14px; font-size: 11px; }
+  /* .oo-btn declares display:inline-flex, which outranks the UA [hidden] rule
+     the shell uses to retire the control on the fallback path. */
+  .oo-btn[hidden] { display: none; }
+
+  @media (max-width: 900px) {
+    .lab-head { padding-top: 24px; }
+    .lab-title { max-width: none; }
+  }
+  @media (max-width: 720px) {
+    .oo-rail { font-size: 10px; letter-spacing: .02em; }
+    .lab-head { gap: 12px; padding: 20px 0 16px; }
+    .lab-note { max-width: none; font-size: 12px; }
+    .lab-viewport { min-height: 54svh; }
+    .lab-readout { padding: 14px 0 16px; }
+    .lab-readout .oo-stat-value { font-size: 17px; }
+    .lab-meta { line-height: 1.5; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lab-control { display: none; }
+  }
+</style>
+<noscript><style>
+  /* No script: the still is the plate. */
+  .lab-static[hidden] { display: block; }
+  .lab-canvas, .lab-control { display: none; }
+</style></noscript>
+</head>
+<body>
+<main class="lab-stage oo-scanlines reg-console" data-renderer="pending">
+
+  <header class="oo-rail lab-rail">
+    <span class="lab-path">&gt; experiments/crt-volume</span>
+    <span class="lab-status" data-lab-status>renderer / <strong>starting</strong></span>
+  </header>
+
+  <div class="lab-head">
+    <h1 class="oo-display-console lab-title">CRT VOLUME.</h1>
+    <p class="oo-prose lab-note">The console voice given a surface. Eight real commits off this branch, printed onto a barrel-warped phosphor slab — scanlines curve with the glass because they are painted into it.</p>
+  </div>
+
+  <div class="lab-viewport" data-lab-viewport>
+    <canvas class="lab-canvas" data-lab-canvas></canvas>
+    <!-- data-lab-static MUST sit on an HTML element, not on the <svg>.
+         `hidden` is an HTMLElement IDL attribute; SVGElement does not
+         implement it, so lab-shell.js's `el.static.hidden = false` writes a
+         dead expando and the still stays display:none forever. -->
+    <div class="lab-static" data-lab-static hidden>
+    <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Static CRT still: the same terminal frame uncurved, showing git log --oneline -8 for branch labs-02-05 captured 2026-07-26, head c65292d">
+      <defs>
+        <!-- Scanlines at 3px intervals. Flat here by definition: the still has
+             no surface to curve with. -->
+        <pattern id="cv-scan" width="3" height="3" patternUnits="userSpaceOnUse">
+          <rect width="3" height="1" fill="#000000" opacity="0.18"/>
+        </pattern>
+      </defs>
+      <rect width="1200" height="640" fill="#070807"/>
+      <rect x="40.5" y="40.5" width="1119" height="559" fill="none" stroke="#9b6822" stroke-width="1" opacity="0.55"/>
+      <rect x="58.5" y="58.5" width="1083" height="523" fill="#070807" stroke="#1c1a14" stroke-width="1"/>
+      <g font-family="JetBrains Mono, monospace" font-size="11" fill="#686564" letter-spacing="1.2">
+        <text x="86" y="96">LOCAL SHELL / STATIC STILL / NO NETWORK</text>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="20" letter-spacing="0">
+        <text x="86" y="140" fill="#f2a51f">&gt; git log --oneline -8</text>
+        <text x="86" y="186" fill="#eee8df">c65292d experiments: re-frame Candle Field so the live plate holds the first read</text>
+        <text x="86" y="232" fill="#eee8df">19c8322 experiments: add Candle Field &#8212; WebGL Lab 02 (Console)</text>
+        <text x="86" y="278" fill="#eee8df">87c39c1 experiments: document stale-lookAt trap in lab-shell.js</text>
+        <text x="86" y="324" fill="#eee8df">50d6f06 experiments: extract lab-shell.js harness from Lab 01</text>
+        <text x="86" y="370" fill="#eee8df">8122e1b experiments: bake dated Alpha Vantage snapshot for Labs 02 and 05</text>
+        <text x="86" y="416" fill="#eee8df">6d12f68 experiments: add shared Three.js IIFE runtime for Labs 02-05</text>
+        <text x="86" y="462" fill="#eee8df">8084321 experiments: add verify-lab.sh &#8212; repeatable lab verification</text>
+        <text x="86" y="508" fill="#eee8df">12fe872 experiments: implementation plan for WebGL Labs 02-05</text>
+      </g>
+      <rect x="86" y="534" width="13" height="26" fill="#f2a51f"/>
+      <rect x="58.5" y="58.5" width="1083" height="523" fill="url(#cv-scan)"/>
+    </svg>
+    </div>
+  </div>
+
+  <div class="oo-grid-4 lab-readout">
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; HEAD</span>
+      <span class="oo-stat-value voice">c65292d</span>
+      <span class="oo-stat-delta">labs-02-05 &middot; captured 2026-07-26</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; COMMITS</span>
+      <span class="oo-stat-value">8 / 46</span>
+      <span class="oo-stat-delta">printed on the slab / on the branch</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; SHEET</span>
+      <span class="oo-stat-value">1280 &times; 480</span>
+      <span class="oo-stat-delta">canvas texels &middot; 24px mono &middot; 81 columns</span>
+    </div>
+    <div class="oo-pane oo-stat">
+      <span class="oo-kicker">&gt; DISPLACEMENT</span>
+      <span class="oo-stat-value">1.00</span>
+      <span class="oo-stat-delta">barrel bulge at slab centre, world units</span>
+    </div>
+  </div>
+
+  <footer class="oo-rail oo-rail--foot lab-rail--foot">
+    <span class="lab-meta">PHOSPHOR SLAB &middot; LOCAL GIT LOG &middot; NO NETWORK</span>
+    <button class="oo-btn oo-pane oo-hover lab-control" type="button" data-lab-control aria-pressed="false">[ PAUSE FEED ]</button>
+  </footer>
+
+</main>
+
+<script src="vendor/three.iife.js"></script>
+<script type="module" src="crt-volume.js"></script>
+</body>
+</html>
