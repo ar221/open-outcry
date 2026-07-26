@@ -55,24 +55,58 @@ import { createLab, makeTextSprite } from './lab-shell.js';
 // both arrangements make crossings structurally impossible instead. In each
 // one, every label sits in a half-plane that contains no edge geometry:
 //
-//   WIDE — a fan. Two source sheets at the left, the four consumers in a
-//   column at the right, every edge descending left to right. Consumer labels
-//   go RIGHT: the consumer column is where every edge terminates, so nothing
-//   is drawn right of it. Source labels go LEFT: upstream of the whole fan.
-//   components.css is the one node needing care, because it sits inside
-//   tokens.css's fan.
+//   WIDE — a lattice. Two source sheets along the TOP (tokens.css upper left,
+//   components.css upper middle-right, below it in y), the four consumers spread
+//   along the BOTTOM in the same left-to-right order the fallback SVG uses. All
+//   nine edges descend from the top pair into the bottom row, so they cross the
+//   middle of the frame from both directions instead of pencilling into one
+//   corner. Consumer labels go BELOW: nothing whatever is drawn under the bottom
+//   row, which is the cheapest safe half-plane on the plate and the one rule that
+//   covers all four of them — and it is also where the fallback puts them, so the
+//   two surfaces now agree on label placement as well as on flow direction.
+//   Source labels sit in the free upper half-planes: tokens.css to the LEFT
+//   (upstream of everything), components.css UP-RIGHT of its own fan.
 //
-//   ── y-ordering (review fix) ──
+//   ── y-ordering (round-1 review fix, preserved) ──
 //   An earlier pass parked components.css ABOVE tokens.css, so the primary
 //   chain rose before the fan descended. It cleared the fan, but it also made
 //   the two surfaces of the same graph disagree about which sheet is upstream:
 //   the fallback SVG descends tokens -> components -> consumers, and so does
 //   every pipeline diagram anyone draws. The invariant ("no label shares a
 //   half-plane with edge geometry") wants the label OUT of the fan, not UP —
-//   a fan has two exteriors. So tokens.css is now the topmost node, the whole
-//   graph descends monotonically, and components.css escapes DOWNWARD: its
-//   `lift` is negative, seating its ink below the lowest tokens -> consumer
-//   stroke instead of above the highest one. Same argument, other exterior.
+//   a fan has two exteriors. So tokens.css is the topmost node, the whole
+//   graph descends monotonically (tokens > components > every consumer), and
+//   components.css escapes DOWNWARD: its `lift` is negative, seating its ink
+//   below the lowest tokens -> consumer stroke instead of above the highest.
+//
+//   ── interior fill (round-2 review fix) ──
+//   The monotone descent bought truth and cost composition: two source sheets at
+//   the upper left plus a consumer COLUMN at x = 12 left two genuinely inkless
+//   triangles, below the tokens -> components stroke on the lower left and above
+//   index.html on the upper right. Containment (93%/86% of the frame) is not
+//   composition, and the fallback still was beating the live plate on both
+//   density and structure. Re-inverting the y-order would buy the fill back by
+//   making the plate lie about its own subject, so that was never on the table.
+//
+//   The review proposed staggering or curving the consumer tier and pushing
+//   components.css left and down. I built exactly that first — a convex
+//   leftward-descending arc, components.css at x = -24.5 — screenshotted it, and
+//   it made the plate WORSE, so it is recorded here rather than shipped. The
+//   reason is structural: with both source nodes at the upper left, every stroke
+//   in the drawing starts up-left of every consumer, so the lower left is left of
+//   both sources and can hold ink only if a NODE sits there. Moving components.css
+//   further left moved ink OUT of the middle without putting any into the corner,
+//   and pulling the arc leftward pulled the consumers away from the right edge
+//   instead. Curvature cannot fix a void that is a consequence of where the
+//   sources are.
+//
+//   So the sources spread along the top instead of stacking in one corner. The
+//   lower left is now occupied by index.html itself, the upper right by
+//   components.css and its annotation block, and the middle is crossed by nine
+//   strokes running both down-left and down-right rather than nine near-parallel
+//   ones. Nothing about the graph changed: same six nodes, same nine edges, same
+//   strict tier order (tokens above components above every consumer), same
+//   reveal, same solver.
 //
 //   NARROW — a convex arc. Six nodes descending leftward with the leftward
 //   step growing each tier, which puts every chord to the LEFT of every node
@@ -95,24 +129,44 @@ import { createLab, makeTextSprite } from './lab-shell.js';
 // components.css needs them, and only on the wide plate.
 const LAYOUTS = {
   wide: {
-    aim: [-8.0, -0.5, -9],
+    aim: [-3.0, -3.0, -9],
     labelScale: 2.4,
     aspectFloor: 1.35,
     nodes: {
-      // Monotone descent: tokens (top) -> components -> the consumer column.
-      tokens:     { pos: [-30.0, 9.0, -3],   side: 'left' },
-      // Its ink hangs below the node, clear of the tokens fan overhead.
-      components: { pos: [-15.0, 3.4, -7],   side: 'left', lift: -1.30, noteDrop: 2.10 },
-      book:       { pos: [12.0, 1.6, -12],   side: 'right' },
-      inir:       { pos: [12.0, -2.4, -13],  side: 'right' },
-      brief:      { pos: [12.0, -6.4, -13],  side: 'right' },
-      labs:       { pos: [12.0, -10.4, -12], side: 'right' },
+      // Top row. Strict tier order holds: 7.0 > 2.6 > -10.0.
+      tokens:     { pos: [-26.0, 7.0, -3],  side: 'left' },
+      // Its annotation block stacks UPWARD off the dot — up-right of the node is
+      // the only half-plane here that is free of its own outgoing fan, and the
+      // one incoming stroke terminates at x = 2 and never reaches the ink. The
+      // note therefore sits ABOVE the label (negative drop), not below it.
+      components: { pos: [13.0, 2.6, -6],   side: 'right', lift: 0.95, noteDrop: -1.70 },
+      // Bottom row, left-to-right in the fallback SVG's own order. x is spread
+      // 18 units apart — six times the widest label half-width, so the centred
+      // captions cannot collide. The z bow (outer nearer, inner further) gives
+      // the row a shallow smile in projection instead of a ruled line.
+      book:       { pos: [-30.0, -10.0, -11], side: 'below' },
+      inir:       { pos: [-12.0, -10.0, -14], side: 'below' },
+      brief:      { pos: [6.0, -10.0, -14],   side: 'below' },
+      labs:       { pos: [24.0, -10.0, -11],  side: 'below' },
     },
   },
   narrow: {
     aim: [-1.5, 0.0, -6],
     labelScale: 2.1,
     aspectFloor: 0,
+    // ── OPEN 2 (round-2 review fix): drop the coupling caption on narrow ──
+    // On the 390px plate `READS 18 --oo-* + 9 --r-*` rendered at ~3.4 px per
+    // glyph over 25 characters — an unresolvable grey smear, not a figure. Lab
+    // 03's precedent is that cropping is fine when what remains is legible;
+    // shrinking glyphs under readability is not, and the previous round shipped
+    // it illegibly on the argument that the note is zero-sum against the file
+    // names. The measurement was right and the conclusion was wrong: a caption
+    // nobody can read is decoration, and this one was spending a fit-binding ink
+    // box — the widest on the plate — to cost every file name ~9% of cap height.
+    // So it is suppressed here, which hands those pixels back to the six names.
+    // The figure still reads in the HTML readout at 390px, which is the honest
+    // channel at that width, and on the desktop plate and the fallback still.
+    dropNotes: ['components'],
     nodes: {
       // x = 3.5 - 0.05 * (8 - y)^2 — the convexity is the whole safety
       // argument, so the arc is generated rather than eyeballed.
@@ -190,13 +244,17 @@ const SPRITE_W = 4.8;                       // world units at scale 1
 const PX_TO_WORLD = SPRITE_W / SHEET_PX;    // per unit of label scale
 
 // Clear air between the node dot and the nearest ink, in label-scale units.
+// Horizontal for 'left'/'right'; a 'below' label is centred on its dot and takes
+// its clearance from LIFT.below instead.
 const INK_GAP = 0.60;
 // Vertical lift of the ink off the dot, per side. Source labels ride higher:
 // they sit upstream of the fan, and the extra air keeps them off the shallowest
 // edge leaving the node. An earlier arrangement with components.css inside the
 // fan had the tokens -> examples/inir edge missing its ink by four pixels; the
-// fix was the node's position, not this number.
-const LIFT = { left: 0.90, right: 0.50 };
+// fix was the node's position, not this number. 'below' is negative by
+// definition — it is the seat used when the free half-plane is the one under the
+// dot, which on the wide plate is true of all four consumers at once.
+const LIFT = { left: 0.90, right: 0.50, below: -0.85 };
 // Sub-caption: smaller, muted, seated below the dot on the same side.
 //
 // Measured, not guessed: raising this to 0.92 to make the coupling caption
@@ -205,12 +263,15 @@ const LIFT = { left: 0.90, right: 0.50 };
 // straight back — the note grew, every file name shrank, the note's rendered
 // width was unchanged. Relative type size here is zero-sum; the only real levers
 // are fewer ink boxes or shorter strings. Left at 0.80, which favours the file
-// names. Consequence recorded honestly: on the narrow plate the coupling caption
-// is ~3.4 px per glyph — present, not comfortably readable. It reads on the
-// desktop plate and on the fallback, and the page readout carries it in HTML
-// type at every width.
+// names — and on the narrow plate the third lever was taken instead: the
+// coupling caption is dropped outright (LAYOUTS.narrow.dropNotes), because
+// ~3.4 px per glyph over 25 characters is a smear, and a caption that cannot be
+// read is not worth the ink box it binds the fit with.
 const NOTE_SCALE = 0.80;
 const NOTE_DROP = 0.36;
+// A 'below' label already occupies the seat at LIFT.below, so its note has to
+// clear the label rather than the dot. Both drops are measured from the dot.
+const NOTE_DROP_BELOW = 1.58;
 const INK_HALF_H = 0.15;                    // cap height half, in scale units
 
 const DOT_SIZE = 0.17;                      // scale units; square hardware
@@ -230,7 +291,16 @@ let active = LAYOUTS.wide;
 // from the label, so a node with a negative lift authors a drop large enough to
 // clear its own label — checked in fitPoints, which frames every ink box.
 const seatLift = node => active.nodes[node.id].lift ?? LIFT[active.nodes[node.id].side];
-const seatNoteDrop = node => active.nodes[node.id].noteDrop ?? NOTE_DROP;
+const seatNoteDrop = node =>
+  active.nodes[node.id].noteDrop ??
+  (active.nodes[node.id].side === 'below' ? NOTE_DROP_BELOW : NOTE_DROP);
+
+// The note a node actually draws at the CURRENT layout, or null. A layout's
+// `dropNotes` retires a caption that cannot be read at that aspect; the sprite
+// is built either way and hidden, and — the part that matters — it drops out of
+// fitPoints, so the fit stops paying for an ink box nobody can read.
+const noteFor = node =>
+  (active.dropNotes?.includes(node.id) ? null : node.note ?? null);
 
 // Ink geometry for one label at one scale. makeTextSprite draws left-aligned
 // from x = 8 on a 512-wide sheet whose centre is the sprite's origin, so the
@@ -241,7 +311,8 @@ function labelBox(node, text, x, inkY, scale) {
   const widthPx = text.length * ADVANCE_PX;
   const halfW = (widthPx / 2) * PX_TO_WORLD * scale;
   const reach = INK_GAP * scale + halfW;
-  const inkX = side === 'left' ? x - reach : x + reach;
+  // 'below' centres the ink on the dot; the clear air is vertical, from the seat.
+  const inkX = side === 'below' ? x : side === 'left' ? x - reach : x + reach;
   const inkOffset = (8 + widthPx / 2 - SHEET_PX / 2) * PX_TO_WORLD * scale;
   return {
     spriteX: inkX - inkOffset,
@@ -329,8 +400,9 @@ function fitPoints() {
     const s = labelScale.get(node.id);
     const box = labelBox(node, node.label, x, y + seatLift(node) * s, s);
     points.push([box.left, box.bottom, z], [box.right, box.top, z]);
-    if (node.note) {
-      const nb = labelBox(node, node.note, x, y - seatNoteDrop(node) * s, s * NOTE_SCALE);
+    const noteText = noteFor(node);
+    if (noteText) {
+      const nb = labelBox(node, noteText, x, y - seatNoteDrop(node) * s, s * NOTE_SCALE);
       points.push([nb.left, nb.bottom, z], [nb.right, nb.top, z]);
     }
   }
@@ -572,9 +644,11 @@ function updateSchematic(ctx, dt) {
     label.material.opacity = inked ? 0.85 : 0.62;
 
     const note = noteObjs[i];
-    if (note) {
+    const noteText = note ? noteFor(node) : null;
+    if (note) note.visible = Boolean(noteText);
+    if (note && noteText) {
       const ns = s * NOTE_SCALE;
-      const nb = labelBox(node, node.note, x, y - seatNoteDrop(node) * s, ns);
+      const nb = labelBox(node, noteText, x, y - seatNoteDrop(node) * s, ns);
       note.position.set(nb.spriteX, nb.spriteY, z);
       note.scale.set(SPRITE_W * ns, 0.6 * ns, 1);
       note.material.opacity = inked ? 0.8 : 0.55;

@@ -97,8 +97,13 @@
   .lab-canvas[hidden],
   .lab-static[hidden] { display: none; }
 
-  /* ── Readout: four real figures, counted off the two sheets ── */
-  .lab-readout { padding: 18px 0 20px; }
+  /* ── Readout: four real figures, counted off the two sheets ──
+     Padding and the four delta strings are jointly budgeted so the whole rail
+     lands inside a 1440x900 frame — verify-lab.sh now asserts that (the
+     vertical sibling of its horizontal-overflow probe), because a longer string
+     silently pushing a stat delta below the fold is exactly the regression that
+     only a manual re-capture caught last round. Every delta is one line here. */
+  .lab-readout { padding: 16px 0 16px; }
   .lab-readout .oo-stat { padding: 13px 16px; }
   .lab-readout .oo-stat-value { margin-top: 5px; font-size: 19px; letter-spacing: .01em; }
   .lab-readout .oo-stat-delta { margin-top: 4px; font-size: 10px; line-height: 1.45; }
@@ -145,7 +150,7 @@
 
   <div class="lab-head">
     <h1 class="oo-display-console lab-title">BLUEPRINT.</h1>
-    <p class="oo-prose lab-note">The repo drawing itself. Six files, nine audited edges. No <code>@import</code> anywhere — components.css inherits 18 <code>var(--oo-*)</code> names plus the 9 <code>var(--r-*)</code> register aliases its classes consume. Every consumer <code>&lt;link&gt;</code>s both sheets; the direct links are the dimmer strand.</p>
+    <p class="oo-prose lab-note">The repo drawing itself. Six files, nine audited edges. No <code>@import</code> anywhere — components.css inherits 18 <code>var(--oo-*)</code> names plus the 9 <code>var(--r-*)</code> register aliases. Every consumer <code>&lt;link&gt;</code>s both sheets; the direct links are the dimmer strand.</p>
   </div>
 
   <div class="lab-viewport" data-lab-viewport>
@@ -268,12 +273,12 @@
     <div class="oo-pane oo-stat">
       <span class="oo-kicker">&gt; TOKENS</span>
       <span class="oo-stat-value">59</span>
-      <span class="oo-stat-delta">37 --oo-* + 22 --r-* decls &middot; 27 read by components</span>
+      <span class="oo-stat-delta">37 --oo-* + 22 --r-* decls &middot; 27 read</span>
     </div>
     <div class="oo-pane oo-stat">
       <span class="oo-kicker">&gt; CLASSES</span>
       <span class="oo-stat-value">38</span>
-      <span class="oo-stat-delta">.oo-* selectors &middot; zero custom properties declared</span>
+      <span class="oo-stat-delta">.oo-* selectors &middot; declares zero props</span>
     </div>
     <div class="oo-pane oo-stat">
       <span class="oo-kicker">&gt; EDGES</span>

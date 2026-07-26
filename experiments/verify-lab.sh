@@ -52,6 +52,31 @@ OVERFLOW="$(probe "document.documentElement.scrollWidth - window.innerWidth")"
 [ "${OVERFLOW//[^0-9-]/}" -le 0 ] 2>/dev/null || fail "horizontal overflow at 1440: ${OVERFLOW}px"
 CANVAS="$(probe "document.querySelector('canvas').width")"
 [ "${CANVAS//[^0-9]/}" -gt 0 ] || fail "canvas not sized"
+
+# 3b. Vertical sibling of the overflow probe above.
+#
+# Why this is not literally `scrollHeight - innerHeight <= 0`: every lab from 02
+# on lets its footer rail sit below the fold at 1440x900 (measured: 44px on
+# candle-field, 45px on crt-volume), so the literal mirror would fail three
+# already-shipped pages for a deliberate choice. What must NOT fall below the
+# fold is the readout rail — the four `.oo-stat` figures are the page's data, and
+# a lab whose numbers are only reachable by scrolling has lost them at the size
+# the plate is judged at.
+#
+# This exists because it was found the hard way: a draft's longer readout strings
+# wrapped an extra line, pushed the stat deltas past the bottom of the 1440x900
+# frame, and nothing in this script noticed — it asserted horizontal overflow
+# only. A manual re-capture caught it. Lab 05 is a fifth page inheriting the same
+# readout rail and the same string-length pressure, so the assertion lands here
+# before that page is built rather than after.
+#
+# Labs with no `.oo-stat` rail (Lab 01 predates it) report `none` and skip.
+VOVERFLOW="$(probe "(function(){var s=document.querySelectorAll('.oo-stat');if(!s.length)return 'none';var b=0;for(var i=0;i<s.length;i++)b=Math.max(b,s[i].getBoundingClientRect().bottom);return String(Math.round(b-window.innerHeight))})()")"
+if [ "$VOVERFLOW" != "none" ]; then
+  [ "${VOVERFLOW//[^0-9-]/}" -le 0 ] 2>/dev/null \
+    || fail "readout rail past the bottom of the frame at 1440x900: ${VOVERFLOW}px"
+fi
+
 chrome-devtools-axi screenshot "${SHOTS}/${LAB}-desktop.png" >/dev/null
 
 # 4. Phone: no overflow, composition stacks.
