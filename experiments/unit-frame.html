@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070807">
+<title>UNIT &amp; FRAME — Open Outcry CSS Lab 06</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Lab 06 — UNIT & FRAME. Console register. No WebGL, no JS, no dependencies.
+
+   WHAT THIS IS
+   Four CSS techniques lifted from portal.nousresearch.com (designlang 12.15.0,
+   extracted 2026-08-08) and re-expressed in Open Outcry Console. Nothing about
+   the source's LOOK is imported — it is electric blue #0000f2 with 9999px pills
+   and a serif display, which collides head-on with the spec's stated hard
+   dislikes (no rounded corners, no blue backgrounds). What transfers is
+   mechanism: how it computes size, how it draws a line, how it fits a headline,
+   and how it seats a semantic colour.
+
+   WHAT THIS IS NOT
+   NOT contract. tokens.css is v1.3 and components.css is v1.5, both frozen;
+   neither is touched by this file. Every candidate below is declared
+   page-locally under an --lab6-* / .lab6-* prefix precisely so it CANNOT be
+   consumed by accident. Promotion into the --oo- / .oo- namespace requires
+   friction evidence from production consumers, per the freeze rule.
+   Reasoning and outstanding evidence: UNIT-FRAME-RECEIPT.md.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+* { box-sizing: border-box; margin: 0; }
+:root { color-scheme: dark; }
+
+/* ── CANDIDATE D1 — selection ink ────────────────────────────────────────────
+   The source tokenises ::selection (--selection-bg/--selection-fg). Open Outcry
+   never has, so every artifact inherits the OS highlight — a blue-grey slab on
+   an amber console. Two declarations buy a hardware detail. ── */
+::selection { background: var(--oo-amber); color: var(--oo-void); }
+
+body {
+  background-color: var(--oo-void);
+  color: var(--oo-fg);
+  font-family: var(--oo-font-mono);
+  font-size: var(--oo-type-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.lab6-stage {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--oo-gutter);
+  background-color: var(--oo-console-stage);   /* never `background:` — kills scanlines */
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ═══ CANDIDATE A — the unit ═════════════════════════════════════════════════
+   Source: `.hermes-web { --u-anchor: .58px; --u: max(calc(100cqw / 2360),
+   var(--u-anchor)); --u-text: max(var(--u), .75px) }`, with a mobile flip to a
+   500px artboard capped at 1.2x the anchor.
+
+   Every dimension on that site is `calc(N * var(--u))` where N is the literal
+   pixel value measured on a 2360px-wide artboard. One scalar drives spacing,
+   type, icon grid and chrome together, so the whole interface scales as one
+   object instead of as a pile of independent clamps.
+
+   Three details are the actual engineering, and all three are load-bearing:
+     1. `cqw`, not `vw`. The unit resolves against its CONTAINER, so a pane
+        dropped into a narrow column shrinks its own contents. `vw` cannot do
+        this — it only ever knows about the window.
+     2. `--u-anchor` is a FLOOR, not a minimum font size. max() means the layout
+        stops shrinking at a chosen container width and then simply overflows
+        or wraps, instead of degrading to unreadable at every scale.
+     3. `--u-text` is a SECOND, higher floor. Text stops shrinking before
+        chrome does — the two have different legibility budgets and the source
+        refuses to conflate them.
+
+   Open Outcry's equivalent today: `--oo-display-console: clamp(36px, 7vw,
+   112px)` plus hand-tuned 88px/48px/28px/24px/16px paddings, and a spacing
+   scale that has been on the deferred list since v1.3 ("the 14/20/24/28/32px
+   margin-top rhythm"). 7vw is measured against the window even when the plate
+   is 1080px capped, so on a 2560px monitor the display hits its 112px ceiling
+   and stops relating to the plate at all. ── */
+.lab6-unit {
+  container-type: inline-size;
+}
+.lab6-unit > * {
+  --lab6-u-anchor: 0.58px;                                  /* chrome floor: layout stops shrinking ~835px container */
+  --lab6-u: max(calc(100cqw / 1440), var(--lab6-u-anchor)); /* 1440px artboard: N * u == N px at a 1440 container */
+  --lab6-u-text: max(var(--lab6-u), 0.62px);                /* text floor sits ABOVE the chrome floor, so once
+                                                               padding stops shrinking, type keeps its size */
+}
+@media (max-width: 720px) {
+  .lab6-unit > * {
+    --lab6-u: min(calc(100cqw / 460), calc(1.2 * var(--lab6-u-anchor)));
+  }
+}
+
+/* Everything in the demo tile is expressed in artboard pixels. Resize the
+   window: one number moves and all of them move with it.
+
+   THE PART THAT IS EASY TO GET WRONG. The unit alone is not enough for TEXT.
+   The source pairs `--u-text` with a per-role ABSOLUTE floor —
+   `--hw-text-body: max(calc(21 * var(--u)), .92rem)` — and it is not
+   decoration: the first pass of this lab omitted it and body copy computed to
+   11.1px on a 1068px container, which is unreadable. Two floors are needed and
+   they do different jobs: `--u-text` keeps type from tracking chrome all the
+   way down, and the rem floor is the absolute legibility backstop that does
+   not care about the artboard at all. This is the strongest argument against
+   promoting the unit casually — it is not one token, it is a discipline. */
+.lab6-tile {
+  padding: calc(28 * var(--lab6-u)) calc(32 * var(--lab6-u));
+  display: grid;
+  gap: calc(20 * var(--lab6-u));
+}
+.lab6-tile .lab6-tile-title {
+  font-family: var(--oo-font-pixel);
+  font-size: max(calc(44 * var(--lab6-u-text)), 1.6rem);
+  line-height: 1;
+  color: var(--oo-amber);
+  text-shadow: 0 0 24px var(--oo-amber-glow);
+  letter-spacing: 0.01em;
+}
+.lab6-tile .lab6-tile-body {
+  font-size: max(calc(20 * var(--lab6-u-text)), 0.875rem);
+  color: var(--oo-fg-dim);
+  max-width: 54ch;
+}
+.lab6-swatchrow { display: flex; gap: calc(10 * var(--lab6-u)); align-items: flex-end; }
+.lab6-swatch {
+  width: calc(var(--n) * var(--lab6-u));
+  height: calc(28 * var(--lab6-u));
+  background-color: var(--oo-amber-dim);
+}
+.lab6-swatch:nth-child(even) { background-color: var(--oo-amber-line); }
+
+/* ═══ CANDIDATE B — the frame ════════════════════════════════════════════════
+   Source: `--hermes-outline-inset: 2px 0 0 0 C, -2px 0 0 0 C, 0 2px 0 0 C,
+   0 -2px 0 0 C` plus a `-divider` sibling at 20% alpha, consumed as
+   `.shadow-hermes-outline`.
+
+   Four zero-blur zero-spread box-shadows, one per side. It draws a crisp square
+   hairline that is NOT a border, and that difference is the whole point:
+
+     · Zero layout cost. A border participates in the box; this does not. Panes
+       can be swapped between framed and unframed without re-budgeting padding
+       or fighting box-sizing on nested grids.
+     · Abutting tiles do not double. Two neighbours with `border: 1px` share a
+       2px seam; here each tile's sliver overlaps the other's, so the seam stays
+       exactly one stroke wide. This is why the source can lay out a dense field
+       of tiles at gap:0 and keep a uniform graph-paper rule.
+     · It survives the repo's oldest documented trap. `background:` shorthand
+       erases `.oo-scanlines` (components.css header, and it is a real bug that
+       shipped). `background:` cannot erase a box-shadow. A frame drawn this way
+       is out of that cascade fight entirely.
+     · It composes. Frame plus glow plus press-state are three entries in one
+       box-shadow list; a border is one property with one value.
+
+   The cost, stated honestly: box-shadow is not hit-tested and does not clip, so
+   a framed tile at the stage edge paints its sliver into the gutter. Cheap to
+   contain (the stage has padding), but it is a real difference from a border.
+   ── */
+.lab6-frame {
+  --lab6-line: var(--r-line);
+  --lab6-w: var(--oo-stroke);
+  box-shadow:
+     var(--lab6-w) 0 0 0 var(--lab6-line),
+    calc(-1 * var(--lab6-w)) 0 0 0 var(--lab6-line),
+    0  var(--lab6-w) 0 0 var(--lab6-line),
+    0 calc(-1 * var(--lab6-w)) 0 0 var(--lab6-line);
+}
+.lab6-frame--armed { --lab6-line: var(--oo-pane-border); }
+.lab6-frame--divider { --lab6-line: color-mix(in srgb, var(--oo-amber) 20%, transparent); }
+
+/* The seam demo: two 2x2 fields at gap:0, same stroke width, side by side. */
+.lab6-seam { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
+.lab6-seam > div {
+  padding: 22px 20px;
+  font-size: 12px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--oo-fg-dim);
+  background-color: var(--oo-console-pane);
+}
+.lab6-seam--border > div { border: 2px solid var(--oo-amber-line); }
+.lab6-seam--frame  > div { --lab6-w: 2px; --lab6-line: var(--oo-amber-line); }
+.lab6-seam--frame  > div {
+  box-shadow:
+     var(--lab6-w) 0 0 0 var(--lab6-line),
+    calc(-1 * var(--lab6-w)) 0 0 0 var(--lab6-line),
+    0  var(--lab6-w) 0 0 var(--lab6-line),
+    0 calc(-1 * var(--lab6-w)) 0 0 var(--lab6-line);
+}
+
+/* ═══ CANDIDATE C — fit-to-measure display type ══════════════════════════════
+   Source ships Roman Komarov's `text-fit` (kizu.dev/fit-to-width/, 2024) under
+   the class `.fit-text`, keyed on
+   `--fit-ratio: tan(atan2(available, available - captured))`.
+
+   Three parts, and all three are required — the first attempt at this lab
+   shipped only the third and every masthead silently pinned to its ceiling:
+
+   1. `@property` registration. An unregistered custom property is a token
+      stream resolved at the USE site, so `100cqi` would resolve against the
+      wrong container. Registering it as `<length>` makes the value COMPUTE on
+      the element that declares it — that is the whole "captured length" idea,
+      and it is what lets a grandchild read a grandparent container's width.
+   2. A duplicated, `aria-hidden`, `visibility: hidden` copy of the string.
+      An element with `container-type` cannot measure its own contents —
+      containment forbids it. So the technique measures the REMAINING space
+      instead: the copy occupies the text's natural width, a `flex-grow: 1`
+      container takes what is left, and `available - remaining` is the text
+      width by subtraction. Contained from its children, sized by its sibling.
+   3. `tan(atan2(a, a - c))` == `a / c`. CSS has no length division; per
+      css-values-4 it should, but nothing implements it. This is the workaround
+      (Jane Ori). Zero JS, zero resize observer, reflows with the container.
+
+   For Open Outcry this is not a nicety. The Console display move is specified
+   as "ALL CAPS Pixelify, short phrases, trailing period" — mastheads meant to
+   hold the plate edge to edge. A clamp() cannot do that, because the correct
+   size depends on how many characters the phrase has. Today the author eyeballs
+   a font-size per plate and it is wrong at every other viewport. Every masthead
+   on this page is the same rule; only the string differs.
+
+   Cost, stated honestly: the string sits in the DOM twice. Cheap for a
+   masthead, wrong for body copy — this is a display-type primitive, not a
+   text one.
+   ── */
+@property --lab6-cap {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: true;
+}
+
+.lab6-fit {
+  display: flex;
+  container-type: inline-size;
+  /* sentinel: where @property is unsupported --lab6-cap stays `initial`, the
+     var() falls back to 9999px, the max term goes negative, and clamp()
+     collapses to the 1em floor instead of rendering at infinity */
+  --lab6-cap: initial;
+  --lab6-sentinel: var(--lab6-cap, 9999px);
+  /* below the floor the ratio can no longer shrink the string — a phone-width
+     plate with a long masthead WILL overrun. Clip it here rather than let a
+     display line tear the stage; the floor is a deliberate legibility choice,
+     and the consequence of choosing it is a truncated headline, not a
+     horizontal scrollbar on every other plate. */
+  overflow: clip;
+}
+.lab6-fit > [aria-hidden] { visibility: hidden; }
+.lab6-fit > :not([aria-hidden]) {
+  flex-grow: 1;
+  container-type: inline-size;
+  --lab6-cap: 100cqi;                    /* captured: the whole available width */
+  --lab6-avail: var(--lab6-cap);
+}
+.lab6-fit > :not([aria-hidden]) > * {
+  --lab6-sentinel: inherit;
+  --lab6-cap: 100cqi;                    /* captured: the space the copy left over */
+  --lab6-ratio: tan(atan2(var(--lab6-avail), var(--lab6-avail) - var(--lab6-cap)));
+  display: block;
+  inline-size: var(--lab6-avail);
+  font-size: clamp(
+    1em,
+    1em * var(--lab6-ratio),
+    var(--lab6-fit-max, infinity * 1px) - var(--lab6-sentinel)
+  );
+}
+/* the fitted size only approximates; nowrap keeps any overshoot on one line */
+@container (inline-size > 0) {
+  .lab6-fit > :not([aria-hidden]) > * { white-space: nowrap; }
+}
+
+/* The masthead sets the FLOOR: `1em` in the clamp above is this font-size.
+   It deliberately does NOT set --lab6-fit-max — that stays inheritable so a
+   plate can raise or lower its own display ceiling without a variant class. */
+.lab6-masthead {
+  font-family: var(--oo-font-pixel);
+  color: var(--oo-amber);
+  text-shadow: 0 0 28px var(--oo-amber-glow);
+  font-size: 28px;
+  line-height: 1.02;
+}
+
+/* ═══ CANDIDATE D2 — seated semantics ════════════════════════════════════════
+   Source computes every status colour as `color-mix(in srgb, <hue> 88%,
+   var(--background))` — the semantic never floats free of the surface it sits
+   on, it is tinted INTO it.
+
+   Open Outcry's --oo-green #48dc7d is tuned as INK on #070807 and it is correct
+   there. As a FILL — a chart band, a highlighted ledger row, a heat cell — the
+   same value is a neon slab that violates the void law ("black space is
+   electrical depth"). Consumers currently hand-roll an rgba() per site. One
+   mix expression per semantic gives a fill ramp that stays seated, and it is
+   derived from the existing token rather than being a new colour decision. ── */
+.lab6-seat {
+  --lab6-green-seat: color-mix(in srgb, var(--oo-green) 18%, var(--oo-console-stage));
+  --lab6-red-seat:   color-mix(in srgb, var(--oo-red)   18%, var(--oo-console-stage));
+  --lab6-amber-seat: color-mix(in srgb, var(--oo-amber) 14%, var(--oo-console-stage));
+}
+.lab6-ledger { display: grid; gap: 1px; font-size: 13px; }
+.lab6-ledger div {
+  display: flex; justify-content: space-between; gap: 16px;
+  padding: 11px 16px;
+  background-color: var(--oo-console-pane);
+}
+.lab6-ledger .seat-up   { background-color: var(--lab6-green-seat); }
+.lab6-ledger .seat-down { background-color: var(--lab6-red-seat); }
+.lab6-ledger .seat-warn { background-color: var(--lab6-amber-seat); }
+.lab6-ledger .raw-up    { background-color: var(--oo-green); color: var(--oo-void); }
+.lab6-ledger .raw-down  { background-color: var(--oo-red);   color: var(--oo-void); }
+.lab6-ledger span:last-child { font-variant-numeric: tabular-nums; }
+
+/* ── Page furniture ── */
+.lab6-head { padding: 64px 0 40px; }
+.lab6-sub {
+  color: var(--oo-fg-dim); max-width: 62ch; margin-top: 26px; font-size: 15px;
+}
+.lab6-block { padding: 52px 0; border-top: 1px solid var(--oo-line); }
+.lab6-h {
+  font-family: var(--oo-font-pixel); font-size: 26px; color: var(--oo-amber);
+  letter-spacing: 0.02em; margin-bottom: 6px;
+}
+.lab6-note { color: var(--oo-fg-dim); max-width: 68ch; font-size: 14px; margin-bottom: 26px; }
+.lab6-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.lab6-cap {
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--oo-muted); margin-bottom: 10px;
+}
+.lab6-cap b { color: var(--oo-amber-dim); font-weight: 400; }
+.lab6-code {
+  font-size: 12px; line-height: 1.9; color: var(--oo-fg-dim);
+  background-color: var(--oo-console-pane); padding: 16px 18px;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.lab6-code i { color: var(--oo-amber); font-style: normal; }
+.lab6-readout {
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--oo-muted); margin-top: 14px;
+}
+@media (max-width: 720px) {
+  .lab6-pair, .lab6-seam { grid-template-columns: minmax(0, 1fr); }
+  .lab6-head { padding: 40px 0 28px; }
+}
+</style>
+</head>
+<body>
+
+<header class="oo-rail">
+  <span>&gt; open-outcry/experiments/<span class="voice">unit-frame</span></span>
+  <span><span class="oo-dot"></span> CSS LAB 06 · NO CONTRACT CHANGES</span>
+</header>
+
+<main class="lab6-stage oo-scanlines">
+  <div class="oo-content">
+
+    <section class="lab6-head">
+      <div class="oo-kicker">// candidate techniques · source: portal.nousresearch.com</div>
+      <h1 class="lab6-fit lab6-masthead" style="margin-top:18px; --lab6-fit-max:132px">
+        <span><span>UNIT &amp; FRAME.</span></span>
+        <span aria-hidden="true">UNIT &amp; FRAME.</span>
+      </h1>
+      <p class="lab6-sub">
+        Four mechanisms extracted from the Nous Portal on 2026-08-08 with
+        <span class="voice">designlang 12.15.0</span> — 579 custom properties on its root — and
+        re-expressed in Console. None of its surface comes with them: that site is
+        <span class="voice">#0000f2</span> with 9999px pills, which is the spec's stated hard dislike
+        list almost verbatim. Only the machinery crosses over. Every candidate here is
+        page-local under <span class="voice">--lab6-*</span>; <span class="voice">tokens.css</span> v1.3
+        and <span class="voice">components.css</span> v1.5 are untouched.
+      </p>
+    </section>
+
+    <!-- ═══ A ═══ -->
+    <section class="lab6-block lab6-unit">
+      <div>
+        <div class="lab6-h">A · ONE UNIT DRIVES EVERY DIMENSION</div>
+        <p class="lab6-note">
+          <code>--lab6-u: max(calc(100cqw / 1440), 0.58px)</code>. Author in artboard pixels —
+          <code>calc(28 * var(--lab6-u))</code> is literally 28px at a 1440px container and scales
+          proportionally everywhere else. Container-relative, so it works inside a pane, not only
+          against the window. Resize this page: the title, the body, the padding and the bars below
+          all move on one number. The current contract moves none of them together.
+        </p>
+
+        <div class="oo-pane lab6-tile">
+          <div class="lab6-tile-title">SCALES AS ONE OBJECT.</div>
+          <div class="lab6-tile-body">
+            Padding 28×32, title 44, body 20, gap 20, bars 40/64/88/120 — every value here is the
+            number a designer would write on a 1440 artboard, multiplied by the unit. No clamp, no
+            breakpoint, no constant tuned by eye. The two type sizes additionally carry an absolute
+            <code>rem</code> backstop, because the unit alone will happily compute 11px body copy.
+          </div>
+          <div class="lab6-swatchrow">
+            <div class="lab6-swatch" style="--n:40"></div>
+            <div class="lab6-swatch" style="--n:64"></div>
+            <div class="lab6-swatch" style="--n:88"></div>
+            <div class="lab6-swatch" style="--n:120"></div>
+          </div>
+        </div>
+
+        <div class="lab6-pair" style="margin-top:24px">
+          <div>
+            <div class="lab6-cap">contract now — <b>independent clamps</b></div>
+            <div class="lab6-code">--oo-display-console: <i>clamp(36px, 7vw, 112px)</i>;
+.oo-plate    { padding: <i>88px</i> 0 }
+.oo-specimen { padding: <i>48px</i> }
+.oo-stat     { padding: <i>24px 28px</i> }
+.oo-grid-*   { gap: <i>16px</i> }
+
+/* 7vw reads the WINDOW. On a 2560px monitor
+   the display pins to its 112px ceiling while
+   the plate stays 1080px — the headline stops
+   relating to the plate it sits on. Spacing
+   is five unrelated constants; the scale has
+   been deferred since v1.3. */</div>
+          </div>
+          <div>
+            <div class="lab6-cap">candidate — <b>one scalar, three floors</b></div>
+            <div class="lab6-code">--lab6-u-anchor: <i>0.58px</i>;
+--lab6-u:      <i>max(calc(100cqw / 1440), var(--lab6-u-anchor))</i>;
+--lab6-u-text: <i>max(var(--lab6-u), 0.62px)</i>;
+
+@media (max-width: 720px) {
+  --lab6-u: <i>min(calc(100cqw / 460),
+                 calc(1.2 * var(--lab6-u-anchor)))</i>;
+}
+
+/* per-role absolute backstop, and it is NOT
+   optional — the first pass omitted it and
+   body copy computed to 11.1px: */
+font-size: <i>max(calc(20 * var(--lab6-u-text)), .875rem)</i>;
+
+/* Chrome floors, then text floors higher, then
+   the rem floor catches both. Narrow flips to a
+   460 artboard, capped, so a phone gets a phone
+   layout instead of a shrunken desk. */</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ B ═══ -->
+    <section class="lab6-block">
+      <div class="lab6-h">B · THE FRAME IS A SHADOW, NOT A BORDER</div>
+      <p class="lab6-note">
+        Four zero-blur box-shadows, one per side. Costs no layout, cannot be erased by the
+        <code>background:</code> shorthand that already ate this repo's scanlines once, and —
+        the reason the source uses it — abutting tiles keep a single-stroke seam instead of
+        doubling. Both fields below are <span class="voice">gap: 0</span> with a 2px stroke.
+      </p>
+
+      <div class="lab6-pair">
+        <div>
+          <div class="lab6-cap">border: 2px solid — <b>4px seam</b></div>
+          <div class="lab6-seam lab6-seam--border">
+            <div>tile 01</div><div>tile 02</div><div>tile 03</div><div>tile 04</div>
+          </div>
+        </div>
+        <div>
+          <div class="lab6-cap">shadow frame — <b>2px seam, same stroke</b></div>
+          <div class="lab6-seam lab6-seam--frame">
+            <div>tile 01</div><div>tile 02</div><div>tile 03</div><div>tile 04</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lab6-pair" style="margin-top:26px">
+        <div>
+          <div class="lab6-cap">the declaration</div>
+          <div class="lab6-code">box-shadow:
+   <i>var(--w)</i> 0 0 0 <i>var(--line)</i>,
+  <i>calc(-1 * var(--w))</i> 0 0 0 <i>var(--line)</i>,
+  0  <i>var(--w)</i> 0 0 <i>var(--line)</i>,
+  0 <i>calc(-1 * var(--w))</i> 0 0 <i>var(--line)</i>;</div>
+        </div>
+        <div>
+          <div class="lab6-cap">three states, one property</div>
+          <div class="oo-pane" style="padding:18px; display:grid; gap:12px">
+            <div class="lab6-frame" style="padding:12px 14px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--oo-fg-dim)">line — default</div>
+            <div class="lab6-frame lab6-frame--armed" style="padding:12px 14px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--oo-fg)">armed — pane border</div>
+            <div class="lab6-frame lab6-frame--divider" style="padding:12px 14px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--oo-muted)">divider — 20% alpha</div>
+          </div>
+        </div>
+      </div>
+      <div class="lab6-readout">
+        known cost · a box-shadow is not clipped and not hit-tested — a framed tile at the stage
+        edge paints one stroke into the gutter
+      </div>
+    </section>
+
+    <!-- ═══ C ═══ -->
+    <section class="lab6-block">
+      <div class="lab6-h">C · THE MASTHEAD FITS ITS MEASURE</div>
+      <p class="lab6-note">
+        <code>tan(atan2(available, available − captured))</code> evaluates to
+        <code>available ÷ captured</code> — CSS has no length division, and this is it. The
+        headline is scaled to exactly fill its container, with no JS and no resize observer.
+        Three mastheads, three different character counts, one identical rule. A
+        <code>clamp()</code> cannot do this, because the correct size depends on the string.
+      </p>
+
+      <!-- ceiling raised past the 132px hero cap so every line here genuinely
+           reaches the measure — the descending staircase IS the demonstration -->
+      <div class="oo-pane" style="padding:32px; display:grid; gap:26px; --lab6-fit-max:260px">
+        <div class="lab6-fit lab6-masthead">
+          <span><span>THE TAPE.</span></span>
+          <span aria-hidden="true">THE TAPE.</span>
+        </div>
+        <div class="lab6-fit lab6-masthead">
+          <span><span>MECHANISM AND CONSEQUENCE.</span></span>
+          <span aria-hidden="true">MECHANISM AND CONSEQUENCE.</span>
+        </div>
+        <div class="lab6-fit lab6-masthead">
+          <span><span>A SERIOUS OPERATOR BROADCASTING FROM A LIVE DESK.</span></span>
+          <span aria-hidden="true">A SERIOUS OPERATOR BROADCASTING FROM A LIVE DESK.</span>
+        </div>
+      </div>
+      <div class="lab6-readout">
+        one rule · three strings · three computed sizes — floor is the element's own
+        <span class="voice">28px</span>, ceiling <span class="voice">--lab6-fit-max</span>,
+        everything between is the measured ratio
+      </div>
+      <p class="lab6-note" style="margin-top:14px; margin-bottom:0">
+        Each string appears twice in the DOM. The second copy is <code>aria-hidden</code> and
+        <code>visibility: hidden</code>: it is the measuring ruler, and it exists because an
+        element carrying <code>container-type</code> is forbidden by containment from measuring
+        its own contents. The technique measures the <em>leftover</em> space beside the copy and
+        subtracts.
+      </p>
+    </section>
+
+    <!-- ═══ D ═══ -->
+    <section class="lab6-block lab6-seat">
+      <div class="lab6-h">D · SEATED SEMANTICS &amp; SELECTION INK</div>
+      <p class="lab6-note">
+        <code>color-mix(in srgb, var(--oo-green) 18%, var(--oo-console-stage))</code>. The market
+        tokens are tuned as ink on the stage and are right there; as fills they are neon slabs that
+        break the void law. Mixing the existing token into the surface gives a fill ramp without
+        making a new colour decision. Select any text on this page to see the second half —
+        <code>::selection</code> is two declarations the contract has never carried, so every
+        artifact currently inherits the OS blue-grey highlight on an amber console.
+      </p>
+
+      <div class="lab6-pair">
+        <div>
+          <div class="lab6-cap">raw token as fill — <b>floats off the stage</b></div>
+          <div class="lab6-ledger">
+            <div class="raw-up"><span>ES continuation long</span><span>+1.8R</span></div>
+            <div class="raw-down"><span>NQ fade, stopped</span><span>−1.0R</span></div>
+            <div><span>CL no-trade, no setup</span><span>0.0R</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="lab6-cap">mixed into the stage — <b>seated</b></div>
+          <div class="lab6-ledger">
+            <div class="seat-up"><span>ES continuation long</span><span class="up">+1.8R</span></div>
+            <div class="seat-down"><span>NQ fade, stopped</span><span class="down">−1.0R</span></div>
+            <div class="seat-warn"><span>CL no-trade, no setup</span><span>0.0R</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="lab6-readout">
+        zero-state rule (v1.4) held · the 0.0R row keeps base ink in both columns — colour is
+        earned by non-zero state
+      </div>
+    </section>
+
+    <section class="lab6-block">
+      <div class="lab6-h">VERDICT</div>
+      <p class="lab6-note">
+        <b style="color:var(--oo-fg); font-weight:400">B</b> and
+        <b style="color:var(--oo-fg); font-weight:400">D1</b> are drop-in and reversible — one
+        token and one two-line rule, no new naming authority, no layout consequences.
+        <b style="color:var(--oo-fg); font-weight:400">C</b> is the highest-value and lowest-risk
+        of the three big ones: it is additive, opt-in per element, and it answers a spec
+        requirement ("short phrases" mastheads) the current contract cannot meet.
+        <b style="color:var(--oo-fg); font-weight:400">A</b> is the one that is genuinely worth
+        arguing about — it is a second sizing philosophy sitting beside the existing one, which is
+        exactly how a design system quietly becomes a layout framework. It should not be promoted
+        on the strength of one lab. Reasoning and the evidence each candidate still owes:
+        <span class="voice">UNIT-FRAME-RECEIPT.md</span>.
+      </p>
+    </section>
+
+  </div>
+  <div class="oo-overlay oo-vignette"></div>
+</main>
+
+<footer class="oo-rail oo-rail--foot">
+  <span>css lab 06 · <span class="voice">no js</span> · no webgl · no contract changes</span>
+  <span>tokens v1.3 · components v1.5 · frozen</span>
+</footer>
+
+</body>
+</html>
