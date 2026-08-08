@@ -2,9 +2,10 @@
 
 Fun-track prototypes live here until they earn promotion into the stable design-system contract.
 
-Start at `index.html` — the contact sheet. It indexes all five labs, uses each lab's own
-static fallback SVG as its thumbnail, and deliberately carries **no WebGL of its own**, so
-it loads instantly and survives a dead GPU.
+Start at `index.html` — the contact sheet. It indexes the five **WebGL** labs, uses each
+lab's own static fallback SVG as its thumbnail, and deliberately carries **no WebGL of its
+own**, so it loads instantly and survives a dead GPU. Lab 06 is a CSS lab and is not on the
+contact sheet — it has no canvas to thumbnail; reach it from the table below.
 
 ```bash
 cd ~/Github/open-outcry
@@ -13,6 +14,8 @@ python -m http.server 8000
 ```
 
 ## Labs
+
+### WebGL labs
 
 | # | Lab | Register | Intent | Runtime |
 |---|---|---|---|---|
@@ -44,6 +47,24 @@ dependency section below and the bundle is checked in alongside `DEPTH-TAPE-RECE
 so re-pointing the page at a different file would silently invalidate the recorded hash.
 The cost is two checked-in copies of the same Three.js `0.185.1`: 540,603 bytes for Lab
 01's experiment-plus-Three bundle and 726,603 bytes for the shared runtime.
+
+### CSS labs
+
+| # | Lab | Register | Intent | Runtime |
+|---|---|---|---|---|
+| 06 | [Unit & Frame](unit-frame.html) | Console | Four candidate CSS mechanisms extracted from another design system | none — no JS, no WebGL |
+
+Lab 06 is a different kind of experiment from 01–05: it proposes changes to the *contract*
+rather than exploring a spatial idea, so it reads as a written argument with live specimens.
+Four mechanisms observed on <https://portal.nousresearch.com/> (a container-relative sizing
+unit, a four-shadow hairline frame, pure-CSS fit-to-measure display type, and semantic fills
+mixed into the surface), re-expressed in Console and ranked for promotion. It imports none
+of that site's appearance — it is blue with pill radii, which the spec explicitly rejects.
+Everything is declared page-locally under `--lab6-*` / `.lab6-*`. Full reasoning, measured
+evidence, and the promotion recommendation: **`UNIT-FRAME-RECEIPT.md`**.
+
+It also does not consume `lab-chrome.css` — that file is scaffolding for the four WebGL
+labs that share `lab-shell.js`, and Lab 06 shares nothing with them.
 
 ## Depth Tape — WebGL Lab 01
 
