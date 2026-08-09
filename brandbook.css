@@ -6,17 +6,22 @@
    THIS FILE IS NOT THE CONTRACT. Import order is tokens.css →
    components.css → brandbook.css. Everything here is prefixed
    --book- / .book- precisely so it cannot be consumed by accident.
-   The reusable contract stays frozen at tokens.css v1.3 and
-   components.css v1.5; this reconstruction is the FIRST production
-   consumer of the Lab 06/07 mechanisms, not their promotion.
+   The reusable contract is tokens.css v1.4 and components.css v1.6,
+   frozen again after the 2026-08-09 promotion. This page consumes it
+   like any other surface; nothing here is contract.
 
    Candidates carried page-locally, per the promotion doctrine:
      · --book-u          Lab 06 A — container-relative unit, three floors
-     · .book-frame       Lab 06 B — four-shadow hairline, single-width seams
      · .book-fit         Lab 06 C — fit-to-measure masthead (five uses, max)
-     · .book-seat-*      Lab 06 D2 — semantic fills seated with color-mix
-     · ::selection       Lab 06 D1 — register voice against void
-     · .book-figure      Lab 07 — sourced 1-bit engraving, native scale
+
+   PROMOTED to the contract on 2026-08-09 and REMOVED from this file — the
+   brand book now consumes them like any other consumer:
+     · .oo-frame / .oo-frame--armed        (was .book-frame)
+     · --r-seat-up / -down / -warn         (was --book-*-seat)
+     · ::selection, register-scoped        (was a bare rule here)
+     · .oo-plate-figure + --oo-plate-*     (was .book-figure)
+   Still page-local because one consumer is not two: the unit and
+   fit-to-measure. Lab 06 ranked the unit "do not promote on this evidence".
 
    TRAP inherited from components.css: never the `background:`
    shorthand on anything carrying scanlines. background-color only.
@@ -35,11 +40,7 @@ body {
   line-height: 1.6;
 }
 
-/* ── Lab 06 D1 · selection ink ──
-   The contract has never tokenised this, so every Open Outcry artifact
-   currently inherits the OS blue-grey highlight on an amber console —
-   a blue surface, which the spec bans outright. Register voice, void ink. */
-::selection { background-color: var(--r-voice); color: var(--oo-void); }
+/* selection ink: PROMOTED v1.6 (Lab 06 D1) — register-scoped in components.css */
 
 /* ── Lab 06 A · the unit ──
    Authored in artboard pixels against a 1440px container: calc(28 * u)
@@ -62,23 +63,8 @@ body {
   }
 }
 
-/* ── Lab 06 B · the frame is a shadow ──
-   Four zero-blur zero-spread shadows, one per side. Costs no layout, and
-   abutting cells keep a one-stroke seam instead of doubling — which is the
-   only reason it is here: the token ledger is a gap:0 cell field. Borders
-   remain correct for standalone panes, focus rings, explicit geometry.
-   Known cost: a box-shadow is neither clipped nor hit-tested, so a framed
-   cell at the stage edge paints one stroke into the gutter. */
-.book-frame {
-  --book-line: var(--r-line);
-  --book-w: var(--oo-stroke);
-  box-shadow:
-     var(--book-w) 0 0 0 var(--book-line),
-    calc(-1 * var(--book-w)) 0 0 0 var(--book-line),
-    0  var(--book-w) 0 0 var(--book-line),
-    0 calc(-1 * var(--book-w)) 0 0 var(--book-line);
-}
-.book-frame--armed { --book-line: var(--oo-pane-border); }
+/* four-shadow frame: PROMOTED v1.6 as .oo-frame (Lab 06 B) — the brand book's
+   token ledger was the abutting-cell consumer the candidate still owed */
 
 /* ── Lab 06 C · the masthead fits its measure ──
    tan(atan2(a, a - c)) == a / c. CSS has no length division; this is the
@@ -127,57 +113,31 @@ body {
     var(--book-fit-max, infinity * 1px) - var(--book-sentinel)
   );
 }
+/* the fitted size only approximates; nowrap keeps any overshoot on one line
+   rather than letting a display string wrap and blow past its own measure */
 @container (inline-size > 0) {
   .book-fit > :not([aria-hidden]) > * { white-space: nowrap; }
 }
 
-/* ── Lab 06 D2 · seated semantics ──
-   Market tokens are tuned as INK on the stage. As fills they are neon slabs
-   that break the void law, so a fill is the token mixed into the surface it
-   sits on rather than a new colour decision. Zero-state rule still holds:
-   a zero keeps base ink and takes no seat. */
-.book-seat {
-  --book-green-seat: color-mix(in srgb, var(--oo-green) 18%, var(--r-stage));
-  --book-red-seat:   color-mix(in srgb, var(--oo-red)   18%, var(--r-stage));
-  --book-amber-seat: color-mix(in srgb, var(--oo-amber) 14%, var(--r-stage));
-}
-.book-seat-up   { background-color: var(--book-green-seat); }
-.book-seat-down { background-color: var(--book-red-seat); }
-.book-seat-warn { background-color: var(--book-amber-seat); }
+/* seated semantics: PROMOTED v1.4 (Lab 06 D2) as --r-seat-up / --r-seat-down /
+   --r-seat-warn, declared per register so a fill seats into the surface it
+   actually sits on */
 
-/* ── Lab 07 · the plate figure ──
-   Delivered as an alpha MASK, never a coloured raster: one file renders
-   amber under Console and peach under Broadcast through --r-voice, so the
-   asset obeys register law without variants. Opacity is the only dial.
-   Native pixel scale, cropped by the host — a 1-bit dither shrunk to fit
-   is averaged into flat grey and stops being an engraving. There is no fit
-   variant on purpose. Atmosphere, never content: aria-hidden, no pointer
-   events, never a link. Default .14, hard ceiling .26. */
-.book-figure {
-  position: absolute;
-  pointer-events: none;
-  background-color: var(--r-voice);
-  -webkit-mask-image: var(--book-plate);
-          mask-image: var(--book-plate);
-  -webkit-mask-size: auto;        mask-size: auto;
-  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-  -webkit-mask-position: var(--book-plate-pos, center);
-          mask-position: var(--book-plate-pos, center);
-  opacity: var(--book-plate-strength, 0.14);
-}
-.book-plate--crowd   { --book-plate: url("assets/plates/panic-crowd-1884.png"); }
-.book-plate--portico { --book-plate: url("assets/plates/panic-portico-1884.png"); }
+/* plate figure: PROMOTED v1.6 as .oo-plate-figure. Only the asset URLs stay
+   here — an image path is consumer data, not contract. */
+.book-plate--crowd   { --oo-plate-image: url("assets/plates/panic-crowd-1884.png"); }
+.book-plate--portico { --oo-plate-image: url("assets/plates/panic-portico-1884.png"); }
 
 /* Plate reveal: opacity to authored strength plus a 24px mask shift, once
    per chapter. No scale, no blur, no repeated fade-up choreography. */
-.book-figure[data-reveal] {
+.oo-plate-figure[data-reveal] {
   opacity: 0;
-  --book-plate-pos: center calc(50% + 24px);
+  --oo-plate-position: center calc(50% + 24px);
   transition: opacity .9s linear, -webkit-mask-position .9s linear, mask-position .9s linear;
 }
-.book-figure[data-reveal].is-revealed {
-  opacity: var(--book-plate-strength, 0.14);
-  --book-plate-pos: center;
+.oo-plate-figure[data-reveal].is-revealed {
+  opacity: var(--oo-plate-strength);
+  --oo-plate-position: center;
 }
 
 /* ═══ Page shell ═══════════════════════════════════════════ */
@@ -366,32 +326,23 @@ button:focus-visible,
   padding: calc(120 * var(--book-u, 1px)) 0 calc(96 * var(--book-u, 1px));
   min-height: calc(560 * var(--book-u, 1px));
 }
-.book-hero .book-figure {
+.book-hero .oo-plate-figure {
   inset: auto -8% -14% auto;
   width: 640px; height: 1500px;
-  --book-plate-strength: .14;
+  --oo-plate-strength: .14;
 }
 .book-floor-plate {
   position: absolute; inset: 0;
   overflow: clip;
   z-index: 0;
 }
-.book-floor-plate .book-figure {
+.book-floor-plate .oo-plate-figure {
   inset: -10% auto auto -6%;
   width: 1600px; height: 871px;
-  --book-plate-strength: .12;
+  --oo-plate-strength: .12;
 }
 
-/* The moving crawl, contained.
-   .oo-tape is `overflow: hidden; white-space: nowrap`, which clips the paint
-   but does NOT stop the strip's intrinsic width contributing upward: four
-   repeats of a nowrap string propagated a min-content of thousands of pixels
-   through every ancestor until the stage hit its own 1080px max-width, and
-   the document tore by 690px at a 390px viewport. Size containment makes the
-   host's inline size independent of its contents, which is exactly the claim
-   the crawl is making anyway. (.book-fit never had this bug because
-   container-type: inline-size already implies the same containment.) */
-.book-crawl { contain: inline-size; }
+/* crawl containment: PROMOTED v1.6 into .oo-tape itself */
 
 /* ── Act III · the two-voice sequence ──
    Sequential plates, not a permanent 50/50 split; each stays dominant in its
@@ -524,10 +475,10 @@ button:focus-visible,
 
 /* ── Reduced motion: the artifact stays complete, it just stops moving ── */
 @media (prefers-reduced-motion: reduce) {
-  .book-figure[data-reveal] {
+  .oo-plate-figure[data-reveal] {
     transition: none;
-    opacity: var(--book-plate-strength, 0.14);
-    --book-plate-pos: center;
+    opacity: var(--oo-plate-strength);
+    --oo-plate-position: center;
   }
 }
 
@@ -584,8 +535,8 @@ button:focus-visible,
   .book-hero { padding: 64px 0 56px; min-height: 0; }
   /* the dial, never `opacity` — a raw opacity here would outrank the reveal
      class and paint the plate before its chapter is reached */
-  .book-hero .book-figure { inset: auto -30% -6% auto; --book-plate-strength: .10; }
-  .book-floor-plate .book-figure { inset: -4% auto auto -30%; }
+  .book-hero .oo-plate-figure { inset: auto -30% -6% auto; --oo-plate-strength: .10; }
+  .book-floor-plate .oo-plate-figure { inset: -4% auto auto -30%; }
   .book-voice-plate { padding: 24px 20px; }
   .book-law-pair { grid-template-columns: minmax(0, 1fr); }
   .book-receipt { padding: 22px 20px; }

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   OPEN OUTCRY — design tokens v1.3
+   OPEN OUTCRY — design tokens v1.4
    One identity. Two registers. One tape.
    Variables + register alias layer ONLY — classes live in components.css.
    Spec: ™ Open Outcry Design Language Spec 2026-06-09
@@ -57,6 +57,15 @@
   --oo-stroke: 1px;
   --oo-gutter: 56px;         /* horizontal stage gutter — consumer stages pad with it,
                                 .oo-plate--bleed mirrors it negative; one token, no mirroring */
+
+  /* ── Imagery (v1.4) ──
+     A sourced 1-bit engraving delivered as an alpha MASK, never a coloured
+     raster, so one file takes --r-voice and serves both registers. Opacity is
+     the entire dial and the honest range is narrow: below .06 it is invisible,
+     at .42 it competes with the text, at .70 the illustration has become the
+     subject. The ceiling is law, not a suggestion — see .oo-plate-figure. */
+  --oo-plate-strength:     0.14;
+  --oo-plate-strength-max: 0.26;
 }
 
 /* narrow widths tighten the gutter (matches components.css breakpoint) */
@@ -79,6 +88,16 @@
   --r-glow:      var(--oo-amber-glow);
   --r-line:      var(--oo-line);
   --r-display:   var(--oo-font-pixel);
+  /* seated fills (v1.4) — the market tokens are tuned as INK on the stage; used
+     raw as a FILL they are neon slabs that break the void law. A fill is the
+     same token mixed into the surface beneath it, so no new colour is decided.
+     Declared per register, not on :root, because a custom property referencing
+     another is substituted where it is DECLARED — one :root copy would seat
+     every register into the console stage. Zero-state rule still holds: a zero
+     keeps base ink and takes no seat. */
+  --r-seat-up:   color-mix(in srgb, var(--oo-green) 18%, var(--oo-console-stage));
+  --r-seat-down: color-mix(in srgb, var(--oo-red)   18%, var(--oo-console-stage));
+  --r-seat-warn: color-mix(in srgb, var(--oo-amber) 14%, var(--oo-console-stage));
 }
 .reg-broadcast {
   --r-stage:     var(--oo-broadcast-stage);
@@ -92,4 +111,7 @@
   --r-glow:      var(--oo-peach-glow);
   --r-line:      var(--oo-line-warm);
   --r-display:   var(--oo-font-serif);
+  --r-seat-up:   color-mix(in srgb, var(--oo-green) 18%, var(--oo-broadcast-stage));
+  --r-seat-down: color-mix(in srgb, var(--oo-red)   18%, var(--oo-broadcast-stage));
+  --r-seat-warn: color-mix(in srgb, var(--oo-amber) 14%, var(--oo-broadcast-stage));
 }

@@ -177,7 +177,7 @@
           ? `${esc(role)} — <span class="down">INK ONLY / NEVER SURFACE</span>`
           : esc(role);
         html +=
-          `<div class="book-token-row book-frame${rare ? ' is-rare' : ''}">` +
+          `<div class="book-token-row oo-frame${rare ? ' is-rare' : ''}">` +
             chip +
             `<span class="voice">${esc(name)}</span>` +
             `<span class="book-token-value">${esc(value)}</span>` +
@@ -186,8 +186,7 @@
       }
     }
     ledger.innerHTML = html;
-    ledger.classList.add('book-seat');
-  }
+      }
 
   /* ── the receipt's self-observed checks. Each reports what was measured
      in this session, or `n/a`. There is no compliance score. ── */
@@ -296,7 +295,7 @@
      Opacity to the authored strength plus a 24px mask shift. No scale, no
      blur, no repeated fade-up. Under reduced motion the CSS already paints
      the plate at full strength, so this observer simply never runs. */
-  const plates = $$('.book-figure[data-reveal]');
+  const plates = $$('.oo-plate-figure[data-reveal]');
   if (plates.length && !reduced.matches && 'IntersectionObserver' in window) {
     const po = new IntersectionObserver((entries, obs) => {
       for (const e of entries) {

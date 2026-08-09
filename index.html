@@ -50,7 +50,7 @@
       <div class="oo-grain oo-overlay" aria-hidden="true"></div>
       <div class="book-u oo-content">
         <div class="book-hero">
-          <div class="book-figure book-plate--portico" data-reveal aria-hidden="true"></div>
+          <div class="oo-plate-figure book-plate--portico" data-reveal aria-hidden="true"></div>
           <div class="oo-content">
             <div class="oo-kicker">&lt; act = <span style="color:var(--oo-terracotta)">"I"</span> &gt; opening bell <span aria-hidden="true">- - - - - -</span></div>
             <h1 class="book-fit book-masthead" id="h-opening-bell" style="margin-top:24px;">
@@ -70,8 +70,8 @@
             </p>
             <div class="oo-register-quote oo-register-quote--block" style="margin-top:30px; max-width:52ch;">
               &gt; cat CONTRACT<br>
-              tokens.css        <span class="voice">v1.3</span> · frozen<br>
-              components.css    <span class="voice">v1.5</span> · frozen<br>
+              tokens.css        <span class="voice">v1.4</span> · frozen<br>
+              components.css    <span class="voice">v1.6</span> · frozen<br>
               registers         <span class="voice">02</span> — console (default) / broadcast<br>
               promotion         two independent consumers, same friction<br>
               status            <span class="up">PUBLISHED</span><span class="oo-cursor" aria-hidden="true"></span>
@@ -84,7 +84,7 @@
     <!-- ══ ACT II · THE FLOOR — Broadcast, Tape as mechanism ══ -->
     <section class="book-act oo-plate oo-plate--bleed reg-broadcast" id="act-the-floor" aria-labelledby="h-the-floor" style="background-color:var(--r-stage);">
       <div class="book-floor-plate" aria-hidden="true">
-        <div class="book-figure book-plate--crowd" data-reveal></div>
+        <div class="oo-plate-figure book-plate--crowd" data-reveal></div>
       </div>
       <div class="oo-content book-u">
         <div>
@@ -124,7 +124,7 @@
         </div>
       </div>
 
-      <div class="oo-tape oo-content book-crawl" style="margin-top:28px;" aria-hidden="true">
+      <div class="oo-tape oo-content" style="margin-top:28px;" aria-hidden="true">
         <div class="oo-tickwrap" id="tape-crawl"></div>
       </div>
       <p class="book-caption oo-content" style="margin-top:10px;">
@@ -227,21 +227,21 @@
         <span class="voice">color-mix(in srgb, var(--oo-green) 18%, var(--r-stage))</span>. No new colour
         decision. The zero-state rule holds in both columns: a zero keeps base ink.
       </p>
-      <div class="oo-grid-2 oo-grid-2--wide book-seat" style="margin-top:18px;">
+      <div class="oo-grid-2 oo-grid-2--wide" style="margin-top:18px;">
         <div class="oo-pane" style="padding:16px;">
           <div class="oo-kicker" style="margin-bottom:10px;">raw token as fill — prohibited</div>
           <div class="book-ledger">
-            <div class="book-ledger-row book-frame" style="background-color:var(--oo-green); color:var(--oo-void);"><span>EURUSD</span><span>+1.4R</span><span class="book-ledger-role" style="color:var(--oo-void)">neon slab</span></div>
-            <div class="book-ledger-row book-frame" style="background-color:var(--oo-red); color:var(--oo-void);"><span>GBPJPY</span><span>-0.8R</span><span class="book-ledger-role" style="color:var(--oo-void)">neon slab</span></div>
-            <div class="book-ledger-row book-frame"><span>XAUUSD</span><span>0.0R</span><span class="book-ledger-role">zero keeps base ink</span></div>
+            <div class="book-ledger-row oo-frame" style="background-color:var(--oo-green); color:var(--oo-void);"><span>EURUSD</span><span>+1.4R</span><span class="book-ledger-role" style="color:var(--oo-void)">neon slab</span></div>
+            <div class="book-ledger-row oo-frame" style="background-color:var(--oo-red); color:var(--oo-void);"><span>GBPJPY</span><span>-0.8R</span><span class="book-ledger-role" style="color:var(--oo-void)">neon slab</span></div>
+            <div class="book-ledger-row oo-frame"><span>XAUUSD</span><span>0.0R</span><span class="book-ledger-role">zero keeps base ink</span></div>
           </div>
         </div>
         <div class="oo-pane" style="padding:16px;">
           <div class="oo-kicker" style="margin-bottom:10px;">seated fill — sanctioned</div>
           <div class="book-ledger">
-            <div class="book-ledger-row book-frame book-seat-up"><span>EURUSD</span><span class="up">+1.4R</span><span class="book-ledger-role">18% into the stage</span></div>
-            <div class="book-ledger-row book-frame book-seat-down"><span>GBPJPY</span><span class="down">-0.8R</span><span class="book-ledger-role">18% into the stage</span></div>
-            <div class="book-ledger-row book-frame"><span>XAUUSD</span><span>0.0R</span><span class="book-ledger-role">zero keeps base ink</span></div>
+            <div class="book-ledger-row oo-frame" style="background-color:var(--r-seat-up);"><span>EURUSD</span><span class="up">+1.4R</span><span class="book-ledger-role">18% into the stage</span></div>
+            <div class="book-ledger-row oo-frame" style="background-color:var(--r-seat-down);"><span>GBPJPY</span><span class="down">-0.8R</span><span class="book-ledger-role">18% into the stage</span></div>
+            <div class="book-ledger-row oo-frame"><span>XAUUSD</span><span>0.0R</span><span class="book-ledger-role">zero keeps base ink</span></div>
           </div>
         </div>
       </div>
@@ -343,11 +343,11 @@
         always reinforced by a word and a glyph.
       </p>
       <div class="book-ledger" style="margin-top:18px;">
-        <div class="book-state-row book-frame"><span class="book-badge">specimen</span><span class="voice">MARKET</span><span>ACTION: NONE</span><span>STATE: <span aria-hidden="true">●</span> CLOSED</span></div>
-        <div class="book-state-row book-frame"><span class="book-badge">specimen</span><span class="voice">AGENT RUN</span><span>RECEIPT: ATTACHED</span><span>STATE: <span class="up" aria-hidden="true">●</span> <span class="up">PASS</span></span></div>
-        <div class="book-state-row book-frame"><span class="book-badge">specimen</span><span class="voice">SERVICE / SYNC</span><span>LAST: 00:00:14 AGO</span><span>STATE: <span class="up" aria-hidden="true">●</span> <span class="up">HEALTHY</span></span></div>
-        <div class="book-state-row book-frame"><span class="book-badge">specimen</span><span class="voice">ARCHIVE</span><span>SOURCE: LCCN 00651213</span><span>STATE: <span class="up" aria-hidden="true">●</span> <span class="up">VERIFIED</span></span></div>
-        <div class="book-state-row book-frame"><span class="book-badge">specimen</span><span class="voice">EXECUTION</span><span>ORDER: REJECTED</span><span>STATE: <span class="down" aria-hidden="true">●</span> <span class="down">FAILED</span></span></div>
+        <div class="book-state-row oo-frame"><span class="book-badge">specimen</span><span class="voice">MARKET</span><span>ACTION: NONE</span><span>STATE: <span aria-hidden="true">●</span> CLOSED</span></div>
+        <div class="book-state-row oo-frame"><span class="book-badge">specimen</span><span class="voice">AGENT RUN</span><span>RECEIPT: ATTACHED</span><span>STATE: <span class="up" aria-hidden="true">●</span> <span class="up">PASS</span></span></div>
+        <div class="book-state-row oo-frame"><span class="book-badge">specimen</span><span class="voice">SERVICE / SYNC</span><span>LAST: 00:00:14 AGO</span><span>STATE: <span class="up" aria-hidden="true">●</span> <span class="up">HEALTHY</span></span></div>
+        <div class="book-state-row oo-frame"><span class="book-badge">specimen</span><span class="voice">ARCHIVE</span><span>SOURCE: LCCN 00651213</span><span>STATE: <span class="up" aria-hidden="true">●</span> <span class="up">VERIFIED</span></span></div>
+        <div class="book-state-row oo-frame"><span class="book-badge">specimen</span><span class="voice">EXECUTION</span><span>ORDER: REJECTED</span><span>STATE: <span class="down" aria-hidden="true">●</span> <span class="down">FAILED</span></span></div>
       </div>
 
       <!-- IV-E -->
@@ -357,33 +357,33 @@
         duration, its timing function, and what it becomes under reduced motion.
       </p>
       <div class="book-ledger" style="margin-top:18px;">
-        <div class="book-motion-row book-frame book-ledger-head"><span>specimen</span><span>duration · easing</span><span>reduced motion</span></div>
-        <div class="book-motion-row book-frame">
+        <div class="book-motion-row oo-frame book-ledger-head"><span>specimen</span><span>duration · easing</span><span>reduced motion</span></div>
+        <div class="book-motion-row oo-frame">
           <span><span class="voice">tape crawl</span> — continuity of state</span>
           <span>28s · linear · infinite</span>
           <span class="book-ledger-role">animation removed; text stays</span>
         </div>
-        <div class="book-motion-row book-frame">
+        <div class="book-motion-row oo-frame">
           <span><span class="voice">cursor</span> — the brand heartbeat <span class="oo-cursor" aria-hidden="true"></span></span>
           <span>950ms · steps(1)</span>
           <span class="book-ledger-role">static block</span>
         </div>
-        <div class="book-motion-row book-frame">
+        <div class="book-motion-row oo-frame">
           <span><span class="voice">scan beam</span> — an idle panel is still powered</span>
           <span>4s · linear · infinite</span>
           <span class="book-ledger-role">display: none</span>
         </div>
-        <div class="book-motion-row book-frame">
+        <div class="book-motion-row oo-frame">
           <span><span class="voice">path draw</span> — only when the drawing explains a flow</span>
           <span>2.6s · linear · once, on entry</span>
           <span class="book-ledger-role">drawn immediately, offset 0</span>
         </div>
-        <div class="book-motion-row book-frame">
+        <div class="book-motion-row oo-frame">
           <span><span class="voice">hover-arm</span> — the object is actionable</span>
           <span>150ms · linear</span>
           <span class="book-ledger-role">unchanged; it is a pointer state</span>
         </div>
-        <div class="book-motion-row book-frame">
+        <div class="book-motion-row oo-frame">
           <span><span class="voice">plate reveal</span> — once per chapter, page-local</span>
           <span>900ms · linear · opacity + 24px mask</span>
           <span class="book-ledger-role">plate paints at full strength, no transition</span>
@@ -418,28 +418,28 @@
 
         <div class="book-law" style="margin-top:26px;">
           <div class="book-law-pair">
-            <div class="book-law-cell book-law-cell--ok book-frame"><span class="book-verdict">▸ correct</span>one dominant register; the other appears once, as a quotation</div>
-            <div class="book-law-cell book-law-cell--no book-frame"><span class="book-verdict">▸ prohibited</span>a 50/50 mixture that leaves no one speaking</div>
+            <div class="book-law-cell book-law-cell--ok oo-frame"><span class="book-verdict">▸ correct</span>one dominant register; the other appears once, as a quotation</div>
+            <div class="book-law-cell book-law-cell--no oo-frame"><span class="book-verdict">▸ prohibited</span>a 50/50 mixture that leaves no one speaking</div>
           </div>
           <div class="book-law-pair">
-            <div class="book-law-cell book-law-cell--ok book-frame"><span class="book-verdict">▸ correct</span>a 1-bit plate cropped at native pixel scale</div>
-            <div class="book-law-cell book-law-cell--no book-frame"><span class="book-verdict">▸ prohibited</span>the same dither downscaled to fit — the browser averages it into flat grey</div>
+            <div class="book-law-cell book-law-cell--ok oo-frame"><span class="book-verdict">▸ correct</span>a 1-bit plate cropped at native pixel scale</div>
+            <div class="book-law-cell book-law-cell--no oo-frame"><span class="book-verdict">▸ prohibited</span>the same dither downscaled to fit — the browser averages it into flat grey</div>
           </div>
           <div class="book-law-pair">
-            <div class="book-law-cell book-law-cell--ok book-frame"><span class="book-verdict">▸ correct</span>imagery as the second read, behind the copy</div>
-            <div class="book-law-cell book-law-cell--no book-frame"><span class="book-verdict">▸ prohibited</span>mascot-scale illustration competing with the text</div>
+            <div class="book-law-cell book-law-cell--ok oo-frame"><span class="book-verdict">▸ correct</span>imagery as the second read, behind the copy</div>
+            <div class="book-law-cell book-law-cell--no oo-frame"><span class="book-verdict">▸ prohibited</span>mascot-scale illustration competing with the text</div>
           </div>
           <div class="book-law-pair">
-            <div class="book-law-cell book-law-cell--ok book-frame"><span class="book-verdict">▸ correct</span>a semantic fill seated into the surface with color-mix</div>
-            <div class="book-law-cell book-law-cell--no book-frame"><span class="book-verdict">▸ prohibited</span>the raw market token as a slab</div>
+            <div class="book-law-cell book-law-cell--ok oo-frame"><span class="book-verdict">▸ correct</span>a semantic fill seated into the surface with color-mix</div>
+            <div class="book-law-cell book-law-cell--no oo-frame"><span class="book-verdict">▸ prohibited</span>the raw market token as a slab</div>
           </div>
           <div class="book-law-pair">
-            <div class="book-law-cell book-law-cell--ok book-frame"><span class="book-verdict">▸ correct</span>square hardware — 0 to 2px radius, thin stroke, smoky fill</div>
-            <div class="book-law-cell book-law-cell--no book-frame"><span class="book-verdict">▸ prohibited</span>a rounded generic card with a drop shadow</div>
+            <div class="book-law-cell book-law-cell--ok oo-frame"><span class="book-verdict">▸ correct</span>square hardware — 0 to 2px radius, thin stroke, smoky fill</div>
+            <div class="book-law-cell book-law-cell--no oo-frame"><span class="book-verdict">▸ prohibited</span>a rounded generic card with a drop shadow</div>
           </div>
           <div class="book-law-pair">
-            <div class="book-law-cell book-law-cell--ok book-frame"><span class="book-verdict">▸ correct</span>motion that reports state, linear or steps()</div>
-            <div class="book-law-cell book-law-cell--no book-frame"><span class="book-verdict">▸ prohibited</span>a decorative loop, parallax soup, or bounce easing</div>
+            <div class="book-law-cell book-law-cell--ok oo-frame"><span class="book-verdict">▸ correct</span>motion that reports state, linear or steps()</div>
+            <div class="book-law-cell book-law-cell--no oo-frame"><span class="book-verdict">▸ prohibited</span>a decorative loop, parallax soup, or bounce easing</div>
           </div>
         </div>
 
@@ -460,10 +460,13 @@
             <p class="book-note" style="margin-top:12px; max-width:none;">
               A lab is evidence, not contract. A primitive enters <span class="voice">tokens.css</span> or
               <span class="voice">components.css</span> only when two real consumers independently exhibit the
-              same friction and the new rule reduces total variation. This page is the first production
-              consumer of the Lab 06 and 07 mechanisms — the unit, fit-to-measure, the four-shadow frame,
-              seated fills, selection ink and the plate figure all remain page-local in
-              <span class="voice">brandbook.css</span>. Being used here is not promotion.
+              same friction and the new rule reduces total variation. On <span class="voice">2026-08-09</span>
+              four of the six Lab 06/07 mechanisms cleared that bar and entered the contract: the
+              four-shadow frame, seated fills, selection ink and the plate figure. This page consumes
+              them now like any other surface. Two did not clear it and stay page-local in
+              <span class="voice">brandbook.css</span> — the container-relative unit, which Lab 06 rated
+              <em>do not promote on this evidence</em>, and fit-to-measure, which still has one consumer.
+              Being used here is evidence, not entitlement.
             </p>
           </div>
         </div>
@@ -479,11 +482,12 @@
           <dt>Name</dt><dd>OPEN OUTCRY / MACHINE-SUGGESTED BY FABLE / OPERATOR-RATIFIED BY USE</dd>
           <dt>Spec</dt><dd>Open Outcry Living Brand Book Reconstruction Spec, 2026-08-08 — direction “Pit &amp; Ledger”</dd>
           <dt>Design language</dt><dd>Open Outcry Design Language Spec, 2026-06-09 (still canonical; not superseded)</dd>
-          <dt>Contract</dt><dd>tokens.css <span class="voice">v1.3</span> · components.css <span class="voice">v1.5</span> · both frozen, untouched by this reconstruction</dd>
+          <dt>Contract</dt><dd>tokens.css <span class="voice">v1.4</span> · components.css <span class="voice">v1.6</span> · frozen again after the 2026-08-09 promotion</dd>
           <dt>Files loaded</dt><dd id="fact-files">n/a</dd>
           <dt>Tokens (live)</dt><dd><span class="voice" id="fact-tokens-2">n/a</span> — counted from the loaded tokens.css</dd>
           <dt>Component classes (live)</dt><dd><span class="voice" id="fact-components-2">n/a</span> — counted from the loaded components.css</dd>
-          <dt>Page-local</dt><dd>brandbook.css · brandbook.js — Lab 06/07 mechanisms held out of the contract</dd>
+          <dt>Promoted 2026-08-09</dt><dd>three bug-class fixes (focus ring, grid-item min-width, tape containment) plus four primitives: <span class="voice">.oo-frame</span> · <span class="voice">--r-seat-*</span> · <span class="voice">::selection</span> · <span class="voice">.oo-plate-figure</span></dd>
+          <dt>Page-local</dt><dd>brandbook.css · brandbook.js — the container-relative unit and fit-to-measure, both still one consumer short of promotion</dd>
           <dt>Plate source</dt><dd>Schell and Hogan, “The Panic — Scenes in Wall Street Wednesday Morning, May 14,” Harper's Weekly, 24 May 1884</dd>
           <dt>Plate rights</dt><dd>Library of Congress, <a class="oo-link" href="https://lccn.loc.gov/00651213">LCCN 00651213</a> — public domain</dd>
           <dt>Plate delivery</dt><dd>1-bit alpha masks, native scale, <span class="voice">.14</span> strength, <span class="voice">.26</span> ceiling</dd>

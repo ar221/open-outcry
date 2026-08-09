@@ -250,8 +250,18 @@ Components are a contract, not a full framework.
 - **Register quote:** the opposite register quoted inside the dominant register. It is a quotation, not a 50/50 mix.
 - **Stats:** mono big-number lockups. Semantic `.up` and `.down` ink must win over base stat ink.
 - **Warnings:** red boundary ink on square hardware, not modal panic styling.
+- **Frame:** the hairline as four zero-blur box-shadows rather than a border. Use it *only* where cells abut at `gap: 0` — a ledger, a token table, a heat field — so seams stay one stroke wide instead of doubling. Standalone objects keep the pane border.
+- **Seated fill:** a semantic used as a *fill* is the token mixed into the surface beneath it (`--r-seat-up` / `--r-seat-down` / `--r-seat-warn`), never the raw market token. Raw green as a slab breaks the void law. Ink stays raw; fills get seated.
+- **Plate figure:** sourced public-domain engraving delivered as an alpha mask, tinted by `--r-voice` so one file serves both registers. Native pixel scale, cropped never shrunk — a downscaled 1-bit dither averages to flat grey. Default `.14`, hard ceiling `.26`, `aria-hidden`, no pointer events. Editorial openers only; never behind live data or a number that must be read now.
+- **Selection:** register voice on void, scoped to the register classes. Without it every artifact inherits the OS blue-grey highlight — a blue surface, which this language bans.
 
 Implementation trap: never use the CSS `background:` shorthand on an element carrying scanlines. It resets `background-image` and silently erases the scanline layer. Use `background-color:`.
+
+Implementation trap: `minmax(0, 1fr)` constrains a grid *track*, not the grid *item* inside it. Items keep `min-width: auto` and will inflate to their own min-content regardless. Anything laid out as a grid child needs `min-width: 0`.
+
+Implementation trap: `overflow: hidden` clips a ticker's paint but not its intrinsic width contribution, so a crawl in normal flow still widens every ancestor. Size containment is the fix, and it ships on the tape.
+
+Every control carries a visible focus ring. Hover-arm is not focus: a pane expresses hover through `border-color` and `box-shadow`, neither of which the keyboard reaches. Focus is never colour alone.
 
 ## Do's and Don'ts
 

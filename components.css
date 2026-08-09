@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   OPEN OUTCRY — components v1.5
+   OPEN OUTCRY — components v1.6
    Import tokens.css first; these classes consume --r-* / --oo-* .
 
    ▲ TRAP — never use the `background:` shorthand on an element carrying
@@ -16,9 +16,15 @@
    must be added to that rule too — CI enforces this parity
    (experiments/verify-contract.mjs; run it before you push).
 
+   ▲ TRAP — `minmax(0, 1fr)` constrains a grid TRACK. A grid ITEM still
+   carries `min-width: auto` and will inflate to its own min-content
+   regardless, overflowing the track it was given. v1.4 fixed the tracks;
+   v1.6 fixes the items. Anything laid out as a grid child here declares
+   `min-width: 0`.
+
    Inventory:
    · textures      — .oo-scanlines · .oo-grain · .oo-vignette
-   · hardware      — .oo-pane · .oo-pane--armed · .oo-warning
+   · hardware      — .oo-pane · .oo-pane--armed · .oo-frame · .oo-frame--armed · .oo-warning
    · controls      — .oo-btn (compose on .oo-pane + .oo-hover)
    · rails & tape  — .oo-rail · .oo-rail--foot · .oo-rail--sticky · .oo-tape
    · glyphs        — .oo-kicker · .oo-dot · .oo-cursor
@@ -27,11 +33,24 @@
    · display type  — .oo-display-console · .oo-display-broadcast
    · motion        — .oo-tickwrap · .oo-scanbeam · .oo-hover · .oo-draw-path
    · plates        — .oo-plate · .oo-plate--bleed · .oo-plate-card · .oo-specimen
+   · imagery       — .oo-plate-figure
    · stat & prose  — .oo-stat · .oo-stat-value · .oo-stat-delta · .oo-prose
    · layout        — .oo-stage · .oo-grid-2 · .oo-grid-2--wide · .oo-grid-3 · .oo-grid-4
    · stacking      — .oo-overlay · .oo-content
    · quotation     — .oo-register-quote · .oo-register-quote--block
    ═══════════════════════════════════════════════════════════ */
+
+/* ── Selection ink (v1.6) ──
+   Register-scoped, deliberately not bare. Without it every Open Outcry
+   artifact inherits the OS blue-grey highlight on an amber console — a blue
+   surface, which the design language bans outright. Scoped to the register
+   classes rather than shipped globally: this sheet does not own bare
+   elements, and every consumer already carries a register class on <body>. */
+:where(.reg-console, .reg-broadcast)::selection,
+:where(.reg-console, .reg-broadcast) ::selection {
+  background-color: var(--r-voice);
+  color: var(--oo-void);
+}
 
 /* ── Textures ── */
 .oo-scanlines {
@@ -57,6 +76,34 @@
 }
 .oo-pane--armed { border-color: var(--oo-pane-border); }
 
+/* ── Frame: the hairline as four shadows, not a border (promoted v1.6) ──
+      Four zero-blur zero-spread box-shadows, one per side. Use it INSTEAD of
+      .oo-pane's border only where cells abut at gap:0 — a ledger, a token
+      table, a heat field. Two reasons it wins there and nowhere else:
+
+        · Abutting cells keep a ONE-stroke seam. Borders stack, so a gap:0
+          field shows a doubled rule at every internal edge; each shadow
+          sliver overlaps its neighbour's instead. Measured at 0px seam on the
+          brand book's token ledger.
+        · Zero layout cost. A border participates in the box; this does not.
+
+      Borders remain correct for standalone panes, explicit geometry, and
+      focus rings — this does not replace .oo-pane.
+
+      Known cost, stated honestly: a box-shadow is neither clipped nor
+      hit-tested, so a framed cell at the stage edge paints one stroke into
+      the gutter. The stage has padding; contain it there. ── */
+.oo-frame {
+  --oo-frame-ink: var(--r-line);
+  --oo-frame-w: var(--oo-stroke);
+  box-shadow:
+     var(--oo-frame-w) 0 0 0 var(--oo-frame-ink),
+    calc(-1 * var(--oo-frame-w)) 0 0 0 var(--oo-frame-ink),
+    0  var(--oo-frame-w) 0 0 var(--oo-frame-ink),
+    0 calc(-1 * var(--oo-frame-w)) 0 0 var(--oo-frame-ink);
+}
+.oo-frame--armed { --oo-frame-ink: var(--oo-pane-border); }
+
 /* ── Rails ── */
 .oo-rail {
   display: flex; justify-content: space-between; align-items: center;
@@ -68,6 +115,14 @@
   font-family: var(--oo-font-mono); font-size: 11px;
   color: var(--r-muted); border-top: 1px solid var(--r-line);
   overflow: hidden; white-space: nowrap;
+  /* v1.6 bug-class fix: `overflow: hidden` clips the crawl's PAINT but not its
+     intrinsic width contribution, so the strip propagated a min-content of
+     thousands of pixels up through every ancestor. In sticky chrome nothing
+     noticed; dropped into normal flow it pinned the brand book's stage to its
+     1080px cap and tore 690px of horizontal overflow at a 390px viewport.
+     Size containment makes the host's inline size independent of its
+     contents, which is the claim a scrolling ticker is making anyway. */
+  contain: inline-size;
 }
 /* breathing room lives on the moving strip (v1.4 — third consumer copy) */
 .oo-tape .oo-tickwrap { padding: 7px 0; }
@@ -111,6 +166,12 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
   text-underline-offset: 3px;
 }
 .oo-link:hover { text-decoration-color: var(--r-voice); }
+/* v1.6 bug-class fix — see the .oo-btn focus note below; a link on a dark
+   register surface needs the same ring for the same reason. */
+.oo-link:focus-visible {
+  outline: 2px solid var(--r-voice);
+  outline-offset: 2px;
+}
 
 /* ── Display type ── */
 .oo-display-console {
@@ -164,6 +225,11 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
   padding: 0 var(--oo-gutter);
   border-left: var(--oo-stroke) solid var(--r-line);
   border-right: var(--oo-stroke) solid var(--r-line);
+  /* v1.6: the stage is frequently a grid item now (a chapter rail beside it,
+     a sidebar, a shell column). A grid item keeps `min-width: auto` even when
+     its track is minmax(0, 1fr), so the stage inflated to its own min-content
+     and stopped at max-width — 1080px wide inside a 390px column. */
+  min-width: 0;
 }
 
 /* ── Plates: one section of a surface ── */
@@ -178,6 +244,46 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
 .oo-grid-2--wide { gap: 24px; }
 .oo-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .oo-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+/* v1.6 bug-class fix, the other half of the v1.4 one: the tracks above are
+   already minmax(0, 1fr), but each CHILD still carries `min-width: auto` and
+   will overflow the track it was handed. Zero specificity so a consumer that
+   genuinely wants an intrinsic child can still say so. */
+:where(.oo-grid-2, .oo-grid-3, .oo-grid-4) > * { min-width: 0; }
+
+/* ── Plate figure: sourced imagery as a masked second read (promoted v1.6) ──
+      The consumer supplies --oo-plate-image; the class supplies the law.
+
+      Delivered as an alpha MASK, never a coloured raster — the figure carries
+      no colour of its own, takes --r-voice, and so renders amber under Console
+      and peach under Broadcast from ONE file. A baked-in image would be a
+      fifth colour that ignores the register law.
+
+      NATIVE SCALE IS THE RULE. `mask-size: auto` and the host crops. A 1-bit
+      dither shrunk to fit is averaged into flat grey by the browser: the
+      engraving stops being an engraving and effective contrast collapses.
+      There is deliberately no `--fit` variant — a sanctioned class should not
+      expose the incorrect rendering mode.
+
+      Atmosphere, never content: pointer-events suppressed here, and the host
+      must also carry aria-hidden. Opacity is the entire dial; the honest band
+      is --oo-plate-strength (.14) to --oo-plate-strength-max (.26).
+
+      Scope: broadcast heroes, covers, section openers, editorial transitions.
+      NOT behind live data, charts, stats, execution controls, or any number
+      that has to be read immediately. One sourced family, no named character,
+      no poses, no generated pseudo-history. ── */
+.oo-plate-figure {
+  position: absolute;
+  pointer-events: none;
+  background-color: var(--r-voice);
+  -webkit-mask-image: var(--oo-plate-image);
+          mask-image: var(--oo-plate-image);
+  -webkit-mask-size: auto;        mask-size: auto;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: var(--oo-plate-position, center);
+          mask-position: var(--oo-plate-position, center);
+  opacity: var(--oo-plate-strength);
+}
 
 /* ── Gallery plate: 16:9 specimen card ── */
 .oo-plate-card { aspect-ratio: 16/9; padding: 28px; position: relative; overflow: hidden; }
@@ -220,6 +326,18 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
   font-family: var(--oo-font-mono); font-size: 12px; font-weight: 700;
   letter-spacing: .08em; text-transform: uppercase;
   color: var(--r-voice); text-decoration: none;
+}
+/* v1.6 bug-class fix — the contract shipped a control with NO visible focus
+   ring. `.oo-btn` composes on `.oo-pane` + `.oo-hover`, both of which express
+   state through `border-color` and `box-shadow`; neither declares `outline`,
+   and nothing else did either. Measured under keyboard focus on the brand
+   book: `outline-style` computed to `none`. Hover was armed, focus was
+   invisible — the control was usable by pointer and not by keyboard.
+   The ring is voice ink with an offset so it survives both registers and does
+   not collide with the pane's own border; focus is never colour alone. */
+.oo-btn:focus-visible {
+  outline: 2px solid var(--r-voice);
+  outline-offset: 2px;
 }
 
 /* ── Prose: body-paragraph measure ── */

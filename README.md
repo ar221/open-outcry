@@ -10,8 +10,8 @@ The repository is static: no build, framework, or package manager. Google Fonts 
 
 Consumers need two files:
 
-1. `tokens.css` v1.3 — variables plus the `--r-*` register alias layer.
-2. `components.css` v1.5 — the `.oo-*` class contract.
+1. `tokens.css` v1.4 — variables, the `--r-*` register alias layer, and seated semantic fills.
+2. `components.css` v1.6 — the `.oo-*` class contract.
 
 Import `tokens.css` first, then `components.css`. Everything else in this repository is evidence: a public reference surface, consumer examples, experiments, or receipts.
 
