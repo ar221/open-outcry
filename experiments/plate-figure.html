@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#181210">
+<title>PLATE FIGURE — Open Outcry CSS Lab 07</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Lab 07 — PLATE FIGURE. Broadcast register. No JS, no WebGL.
+
+   THE QUESTION
+   Nous Portal carries a large figure — a classical statue, 1-bit dithered,
+   blended into the field. Should Open Outcry have one?
+
+   THE ANSWER THIS LAB ARGUES
+   Yes, and not a mascot. A mascot is a personality device and the governing
+   test is "does it feel like a serious operator broadcasting from a live desk"
+   — a character with a face and a name fails that on contact. What Nous
+   actually ships is not a mascot either: it is an allegorical plate, ghosted
+   to near-invisibility, `pointer-events: none`, sized in the same unit as the
+   rest of the interface. That is a texture decision wearing an illustration.
+
+   Spec §5 covers glyphs and monoline SVG and stops. There is no imagery answer
+   at all, which is why five labs in a row reached for WebGL — a canvas was the
+   only sanctioned thing to look at. Spec §4 asks the void to read as
+   "electrical depth, not emptiness", and right now the only tools for that are
+   scanlines, grain and a vignette.
+
+   THE SUBJECT IS IN THE NAME
+   Open outcry is the era when markets ran on human voices. So the plate is not
+   an invented character: it is Harper's Weekly, 24 May 1884, "The Panic —
+   Scenes in Wall Street Wednesday Morning, May 14", drawn by Schell and Hogan.
+   Wood engraving, Library of Congress, public domain. Real, dated, sourced —
+   the same standard the spec already demands of numbers.
+
+   WHY NOT GENERATE ONE
+   "No AI-slop genericism" is a stated hard dislike, and a prompted trading
+   floor is exactly that. A period engraving is free of the risk, is actually
+   from the era the language is named after, and costs nothing.
+
+   WHAT IS NOT CONTRACT
+   All of it. tokens.css v1.3 and components.css v1.5 are untouched; everything
+   here is page-local under lab7 prefixes. See PLATE-FIGURE-RECEIPT.md.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+* { box-sizing: border-box; margin: 0; }
+:root { color-scheme: dark; }
+::selection { background: var(--oo-peach); color: var(--oo-void); }
+
+body {
+  background-color: var(--oo-void);
+  color: var(--oo-fg-warm);
+  font-family: var(--oo-font-mono);
+  font-size: var(--oo-type-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.l7-stage {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--oo-gutter);
+  background-color: var(--oo-broadcast-stage);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ═══ THE PRIMITIVE ══════════════════════════════════════════════════════════
+   One class. The engraving is delivered as a 1-bit alpha mask, never as a
+   coloured image, and that single decision is the whole proposal:
+
+     · The figure has NO colour of its own. It is painted with a background,
+       so it takes `--r-voice` and changes register with the plate — amber in
+       Console, peach in Broadcast. A baked-in image cannot do that; it would
+       be a fifth colour that ignores the register law.
+     · Opacity is the entire dial, and it is deliberately exposed as a token
+       rather than baked into the class, because the honest range is narrow
+       and the failure mode is one notch too loud.
+     · `pointer-events: none` and `aria-hidden` — the plate is atmosphere. It
+       is never content, never a link, never announced.
+
+   Cost: the mask is a raster. 1600x871 costs 274 KB and 625x1500 costs 101 KB,
+   in a repo that already checks in a 726 KB Three.js runtime. Dithering is
+   what keeps it cheap — a 1-bit alpha channel compresses far better than the
+   greyscale scan it came from (8.9 MB).
+   ── */
+.l7-figure {
+  position: absolute;
+  pointer-events: none;
+  background-color: var(--l7-ink, var(--r-voice));
+  -webkit-mask-image: var(--l7-plate);
+          mask-image: var(--l7-plate);
+  -webkit-mask-size: auto;   mask-size: auto;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center;  mask-position: center;
+  opacity: var(--l7-strength, 0.14);
+}
+.l7-plate--crowd   { --l7-plate: url("plates/panic-crowd-1884.png"); }
+.l7-plate--portico { --l7-plate: url("plates/panic-portico-1884.png"); }
+
+/* A DITHER MUST BE SHOWN NEAR 1:1, and this bit the first pass of this lab.
+   The ladder originally scaled the 1600px crowd plate into 204px cells — a
+   7.8x downscale. The browser averages the dots into flat grey: the engraving
+   stops being an engraving, effective contrast collapses, and the opacity band
+   I had labelled from that view was wrong by roughly a factor of two.
+
+   Native pixel size lets the host CROP it instead. Same reason the source uses
+   `object-cover` on its figures rather than fitting them. It is the operating
+   rule for the primitive: a plate is sized by cropping, never by shrinking to
+   fit. There is no fit variant — a sanctioned class should not expose the
+   incorrect rendering mode. */
+
+/* The unit from Lab 06, so the figure scales with the plate rather than the
+   window — this is how the source sizes its own figure (h: 1884 * u). */
+.l7-unit { container-type: inline-size; }
+.l7-unit > * {
+  --l7-u: max(calc(100cqw / 1440), 0.58px);
+}
+
+/* ── Hero: the actual proposal ── */
+.l7-hero {
+  position: relative;
+  overflow: clip;
+  padding: calc(150 * var(--l7-u)) 0 calc(120 * var(--l7-u));
+  min-height: calc(620 * var(--l7-u));
+}
+.l7-hero .l7-figure {
+  inset: calc(-60 * var(--l7-u)) calc(-30 * var(--l7-u)) auto auto;
+  width: calc(660 * var(--l7-u));
+  height: calc(1580 * var(--l7-u));
+}
+.l7-display {
+  font-family: var(--oo-font-serif);
+  font-size: clamp(40px, 6vw, 88px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  max-width: 15ch;
+}
+.l7-display em { font-style: italic; color: var(--oo-peach); font-weight: 500; }
+
+/* ── Ladder: same plate, same crop, five strengths.
+      Three across, not five: each cell must be wide enough to show the dither
+      at 1:1, or the comparison measures downscaling rather than opacity. ── */
+.l7-ladder { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.l7-cell {
+  position: relative; overflow: clip; aspect-ratio: 4/3;
+  background-color: var(--oo-broadcast-pane);
+  padding: 14px;
+}
+.l7-cell .l7-figure { inset: 0; width: 100%; height: 100%; }
+.l7-cell b {
+  position: relative; z-index: 1; font-weight: 400;
+  font-size: 11px; letter-spacing: 0.14em; color: var(--oo-fg-dim);
+}
+.l7-cell i {
+  position: absolute; z-index: 1; left: 14px; bottom: 12px; font-style: normal;
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--oo-muted-warm);
+}
+.l7-cell--verdict-ok  i { color: var(--oo-green); }
+.l7-cell--verdict-bad i { color: var(--oo-red); }
+
+/* ── Register proof: one plate, two registers, zero new assets ── */
+.l7-regpair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.l7-regcell { position: relative; overflow: clip; aspect-ratio: 16/10; padding: 26px 28px; }
+.l7-regcell .l7-figure { inset: auto -6% -18% auto; width: 62%; height: 150%; }
+.l7-regcell.reg-console   { background-color: var(--oo-console-stage); }
+.l7-regcell.reg-broadcast { background-color: var(--oo-broadcast-stage); }
+.l7-regcell h4 {
+  position: relative; z-index: 1; font-weight: 400; max-width: 12ch;
+  font-family: var(--r-display); font-size: 30px; line-height: 1.05; color: var(--r-voice);
+}
+.l7-regcell.reg-console h4 { text-transform: uppercase; text-shadow: 0 0 22px var(--oo-amber-glow); }
+.l7-regcell p {
+  position: relative; z-index: 1; margin-top: 12px; max-width: 26ch;
+  font-size: 12px; color: var(--r-fg-dim);
+}
+
+/* ── The wrong one ── */
+.l7-wrong {
+  position: relative; overflow: clip; aspect-ratio: 16/9;
+  background-color: var(--oo-broadcast-pane);
+  display: grid; place-items: center;
+}
+.l7-wrong .l7-figure {
+  inset: 0; width: 100%; height: 100%;
+  --l7-strength: 1; --l7-ink: var(--oo-terracotta);
+}
+
+/* ── Furniture ── */
+.l7-block { padding: 56px 0; border-top: 1px solid var(--oo-line-warm); }
+.l7-h {
+  font-family: var(--oo-font-serif); font-size: 30px; font-weight: 400;
+  letter-spacing: -0.01em; margin-bottom: 8px;
+}
+.l7-note { color: var(--oo-fg-dim); max-width: 66ch; font-size: 14px; margin-bottom: 24px; }
+.l7-note em { color: var(--oo-peach); }
+.l7-readout {
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--oo-muted-warm); margin-top: 16px;
+}
+.l7-content { position: relative; z-index: 1; }
+@media (max-width: 900px) { .l7-ladder { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .l7-regpair { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body class="reg-broadcast">
+
+<header class="oo-rail">
+  <span>&lt; lab = "plate-figure" &gt; - - - - -</span>
+  <span><span class="oo-dot"></span> CSS LAB 07 · NO CONTRACT CHANGES</span>
+</header>
+
+<main class="l7-stage oo-grain">
+  <div class="l7-content">
+
+    <!-- ═══ HERO — the proposal itself ═══ -->
+    <section class="l7-hero l7-unit">
+      <div>
+        <div class="l7-figure l7-plate--portico" aria-hidden="true" style="--l7-strength:.14"></div>
+        <div class="oo-kicker" style="position:relative;z-index:1">// lab 07 · imagery · the question of a figure</div>
+        <h1 class="l7-display" style="position:relative;z-index:1;margin-top:22px">
+          Not a mascot. <em>A plate.</em>
+        </h1>
+        <p class="oo-prose" style="position:relative;z-index:1;margin-top:26px">
+          Behind this headline is Federal Hall and the Washington statue, drawn for
+          Harper's Weekly on 24 May 1884 and dithered to one bit. It carries no colour of
+          its own — it is a native-scale crop painted with <span class="voice">--r-voice</span>,
+          at <span class="voice">14%</span>. Read the sentence first and the building second.
+          That order is the whole rule.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══ LADDER ═══ -->
+    <section class="l7-block">
+      <div class="l7-h">Where atmosphere becomes decoration</div>
+      <p class="l7-note">
+        One plate, one class, five values of <code>--l7-strength</code>. The plate is cropped
+        at native pixel scale in every cell; only opacity changes. Shrinking a 1-bit dither
+        would average its dots into grey and invalidate the comparison. The usable band ends
+        when the engraving competes with type for first read. Spec §4: <em>the void is
+        electrical depth, not emptiness</em>. A figure may give the void a reason to be dark,
+        but may not become the subject.
+      </p>
+      <div class="l7-ladder">
+        <div class="l7-cell"><div class="l7-figure l7-plate--crowd" aria-hidden="true" style="--l7-strength:.06"></div><b>0.06</b><i>too faint</i></div>
+        <div class="l7-cell l7-cell--verdict-ok"><div class="l7-figure l7-plate--crowd" aria-hidden="true" style="--l7-strength:.14"></div><b>0.14</b><i>atmosphere</i></div>
+        <div class="l7-cell l7-cell--verdict-ok"><div class="l7-figure l7-plate--crowd" aria-hidden="true" style="--l7-strength:.26"></div><b>0.26</b><i>ceiling</i></div>
+        <div class="l7-cell l7-cell--verdict-bad"><div class="l7-figure l7-plate--crowd" aria-hidden="true" style="--l7-strength:.42"></div><b>0.42</b><i>competing</i></div>
+        <div class="l7-cell l7-cell--verdict-bad"><div class="l7-figure l7-plate--crowd" aria-hidden="true" style="--l7-strength:.7"></div><b>0.70</b><i>illustration</i></div>
+        <div class="l7-cell" style="display:grid;place-content:center;background-color:transparent">
+          <b style="max-width:24ch;line-height:1.7;text-transform:none;letter-spacing:0">Native pixel scale, one shared crop. Only the opacity differs.</b>
+        </div>
+      </div>
+      <div class="l7-readout">recommended band · <span class="voice">0.12 – 0.26</span> at native pixel scale · outside it the plate is either invisible or in charge</div>
+    </section>
+
+    <!-- ═══ REGISTER PROOF ═══ -->
+    <section class="l7-block">
+      <div class="l7-h">One asset, both registers</div>
+      <p class="l7-note">
+        This is the argument for shipping engravings as <em>masks</em> rather than images.
+        The plate has no colour, so it inherits the register's voice ink like any other
+        contract element — amber under Console, peach under Broadcast. A coloured PNG would
+        be a fifth colour that ignores the register law and needs a second file to fix.
+        Both panes below load the same <span class="voice">panic-portico-1884.png</span>.
+      </p>
+      <div class="l7-regpair">
+        <div class="l7-regcell reg-console oo-scanlines">
+          <div class="l7-figure l7-plate--portico" aria-hidden="true" style="--l7-strength:.18"></div>
+          <h4>Hold the bid.</h4>
+          <p>Console: amber ink, scanlines pass over the plate, not under it.</p>
+        </div>
+        <div class="l7-regcell reg-broadcast">
+          <div class="l7-figure l7-plate--portico" aria-hidden="true" style="--l7-strength:.18"></div>
+          <h4>The room decides</h4>
+          <p>Broadcast: peach ink, film grain, no scanlines. Same file, no variant.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ THE WRONG ONE ═══ -->
+    <section class="l7-block">
+      <div class="l7-h">What a mascot would look like here</div>
+      <p class="l7-note">
+        Same asset, opaque, centred, at mascot scale. It is not ugly — that is the trap. It
+        is a <em>character</em>, and the moment a surface has one, every plate afterwards is
+        either carrying it or conspicuously missing it. It also fails the governing test on
+        contact: a serious operator broadcasting from a live desk does not have a logo
+        creature standing behind them.
+      </p>
+      <div class="l7-wrong">
+        <div class="l7-figure l7-plate--portico" aria-hidden="true"></div>
+      </div>
+      <div class="l7-readout">the difference between these two sections is one number</div>
+    </section>
+
+    <!-- ═══ VERDICT ═══ -->
+    <section class="l7-block">
+      <div class="l7-h">Recommendation</div>
+      <p class="l7-note">
+        Adopt the plate, refuse the mascot. Concretely: <em>one</em> sourced engraving family,
+        delivered as 1-bit masks, tinted by the register, cropped at native pixel scale,
+        capped at 0.26, and restricted to Broadcast heroes, covers and section openers —
+        never behind a Console dashboard, never behind live data, never on a morning brief
+        where a number must be read at 06:00. Spec §5 gains a short imagery clause; the
+        contract gains one class and two tokens only after a second consumer asks for it.
+      </p>
+      <p class="l7-note" style="margin-bottom:0">
+        The part worth arguing about is scope creep. One plate is a texture. Six plates is an
+        illustration library, then a commissioning budget, then a house illustrator — which
+        is the imagery version of <em>where design systems quietly become layout frameworks</em>.
+        Cap it at a family from a single source, or do not start.
+      </p>
+    </section>
+
+  </div>
+  <div class="oo-overlay oo-vignette"></div>
+</main>
+
+<footer class="oo-rail oo-rail--foot">
+  <span>plate · Harper's Weekly, 24 May 1884 · Schell and Hogan · wood engraving · Library of Congress · public domain</span>
+  <span>tokens v1.3 · components v1.5 · frozen</span>
+</footer>
+
+</body>
+</html>
