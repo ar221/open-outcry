@@ -394,14 +394,22 @@ button:focus-visible,
 .book-crawl { contain: inline-size; }
 
 /* ── Act III · the two-voice sequence ──
-   Sequential plates, not a permanent 50/50 split. On wide screens they
-   overlap slightly as facing editorial pages; each stays dominant in its
-   own region. */
+   Sequential plates, not a permanent 50/50 split; each stays dominant in its
+   own region.
+
+   The spec permits a slight horizontal overlap "as editorial pages" and the
+   first build took it: -28px each side, broadcast lifted over console. It
+   read as damage, not depth. Both plates are near-black on near-black, so the
+   only thing the overlap produced was an occluded top-left corner on the
+   console plate — the reader sees a broken box, not one sheet resting on
+   another. The cue that would sell it is a drop shadow, which Act V of this
+   same page prohibits by name. So the stagger is vertical only: the console
+   receipt drops 88px, which is enough offset to read as an answer arriving
+   after the claim, and both plates keep all four of their edges. */
 .book-sequence { display: grid; gap: 28px; }
 @media (min-width: 1100px) {
-  .book-sequence { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
-  .book-sequence > :first-child { margin-right: -28px; z-index: 1; }
-  .book-sequence > :last-child { margin-top: 88px; margin-left: -28px; }
+  .book-sequence { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .book-sequence > :last-child { margin-top: 88px; }
 }
 .book-voice-plate { padding: 36px 40px; position: relative; }
 
