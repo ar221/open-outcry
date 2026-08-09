@@ -1,0 +1,589 @@
+/* ═══════════════════════════════════════════════════════════
+   OPEN OUTCRY — brand book composition (page-local)
+   Pit & Ledger. Spec: ™ Open Outcry Living Brand Book Reconstruction
+   Spec 2026-08-08.
+
+   THIS FILE IS NOT THE CONTRACT. Import order is tokens.css →
+   components.css → brandbook.css. Everything here is prefixed
+   --book- / .book- precisely so it cannot be consumed by accident.
+   The reusable contract stays frozen at tokens.css v1.3 and
+   components.css v1.5; this reconstruction is the FIRST production
+   consumer of the Lab 06/07 mechanisms, not their promotion.
+
+   Candidates carried page-locally, per the promotion doctrine:
+     · --book-u          Lab 06 A — container-relative unit, three floors
+     · .book-frame       Lab 06 B — four-shadow hairline, single-width seams
+     · .book-fit         Lab 06 C — fit-to-measure masthead (five uses, max)
+     · .book-seat-*      Lab 06 D2 — semantic fills seated with color-mix
+     · ::selection       Lab 06 D1 — register voice against void
+     · .book-figure      Lab 07 — sourced 1-bit engraving, native scale
+
+   TRAP inherited from components.css: never the `background:`
+   shorthand on anything carrying scanlines. background-color only.
+   TRAP inherited from Lab 06: do not write the glob-slash form of
+   the --oo- / .oo- namespaces inside a CSS comment; the pair closes
+   the comment and the rest of the block silently becomes CSS.
+   ═══════════════════════════════════════════════════════════ */
+
+* { box-sizing: border-box; margin: 0; }
+html { scroll-behavior: auto; }       /* machines don't smooth-scroll */
+body {
+  background-color: var(--oo-void);
+  color: var(--r-fg);
+  font-family: var(--oo-font-mono);
+  font-size: var(--oo-type-body);
+  line-height: 1.6;
+}
+
+/* ── Lab 06 D1 · selection ink ──
+   The contract has never tokenised this, so every Open Outcry artifact
+   currently inherits the OS blue-grey highlight on an amber console —
+   a blue surface, which the spec bans outright. Register voice, void ink. */
+::selection { background-color: var(--r-voice); color: var(--oo-void); }
+
+/* ── Lab 06 A · the unit ──
+   Authored in artboard pixels against a 1440px container: calc(28 * u)
+   is literally 28px when the container is 1440 wide and scales with the
+   PLATE, not the window. Three floors, each doing a different job:
+     --book-u-anchor  chrome floor — layout stops shrinking, then wraps
+     --book-u-text    text floor, deliberately above the chrome floor
+     per-role rem     absolute legibility backstop on every text rule
+   The third is not decoration: Lab 06's first pass shipped two floors and
+   body copy computed to 11.1px. Narrow flips to a 460px artboard. */
+.book-u { container-type: inline-size; }
+.book-u > * {
+  --book-u-anchor: 0.58px;
+  --book-u: max(calc(100cqw / 1440), var(--book-u-anchor));
+  --book-u-text: max(var(--book-u), 0.62px);
+}
+@media (max-width: 720px) {
+  .book-u > * {
+    --book-u: min(calc(100cqw / 460), calc(1.2 * var(--book-u-anchor)));
+  }
+}
+
+/* ── Lab 06 B · the frame is a shadow ──
+   Four zero-blur zero-spread shadows, one per side. Costs no layout, and
+   abutting cells keep a one-stroke seam instead of doubling — which is the
+   only reason it is here: the token ledger is a gap:0 cell field. Borders
+   remain correct for standalone panes, focus rings, explicit geometry.
+   Known cost: a box-shadow is neither clipped nor hit-tested, so a framed
+   cell at the stage edge paints one stroke into the gutter. */
+.book-frame {
+  --book-line: var(--r-line);
+  --book-w: var(--oo-stroke);
+  box-shadow:
+     var(--book-w) 0 0 0 var(--book-line),
+    calc(-1 * var(--book-w)) 0 0 0 var(--book-line),
+    0  var(--book-w) 0 0 var(--book-line),
+    0 calc(-1 * var(--book-w)) 0 0 var(--book-line);
+}
+.book-frame--armed { --book-line: var(--oo-pane-border); }
+
+/* ── Lab 06 C · the masthead fits its measure ──
+   tan(atan2(a, a - c)) == a / c. CSS has no length division; this is the
+   workaround (Roman Komarov's text-fit, ratio credited to Jane Ori).
+   All three parts are load-bearing — registration, the hidden ruler copy,
+   and the ratio. Ship only the third and every masthead pins to its
+   ceiling, because atan2(a, 0) is 90deg and tan(90deg) is infinity.
+   Display type only. Five chapter mastheads, which is the authored
+   ceiling; body and component type never use it. */
+@property --book-cap {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: true;
+}
+.book-fit {
+  display: flex;
+  container-type: inline-size;
+  /* sentinel: without @property support --book-cap stays `initial`, the
+     var() falls back to 9999px, the max term goes negative, and clamp()
+     collapses to the 1em floor rather than rendering at infinity */
+  --book-cap: initial;
+  --book-sentinel: var(--book-cap, 9999px);
+  /* below the floor a long string overruns; clip rather than tear the stage */
+  overflow: clip;
+}
+.book-fit > [aria-hidden] { visibility: hidden; }
+.book-fit > :not([aria-hidden]) {
+  flex-grow: 1;
+  container-type: inline-size;
+  --book-cap: 100cqi;                 /* available: the whole measure */
+  --book-avail: var(--book-cap);
+}
+.book-fit > :not([aria-hidden]) > * {
+  --book-sentinel: inherit;
+  --book-cap: 100cqi;                 /* captured: what the ruler copy left */
+  --book-ratio: tan(atan2(var(--book-avail), var(--book-avail) - var(--book-cap)));
+  display: block;
+  inline-size: var(--book-avail);
+  /* --book-fit-nudge exists because the fitted size only APPROXIMATES: the
+     ratio is measured from the ruler copy and lands a few percent high on
+     faces whose advance widths are uniform, which is exactly Pixelify. One
+     scalar per face beats a per-breakpoint ceiling for every masthead. */
+  font-size: clamp(
+    1em,
+    1em * var(--book-ratio) * var(--book-fit-nudge, 1),
+    var(--book-fit-max, infinity * 1px) - var(--book-sentinel)
+  );
+}
+@container (inline-size > 0) {
+  .book-fit > :not([aria-hidden]) > * { white-space: nowrap; }
+}
+
+/* ── Lab 06 D2 · seated semantics ──
+   Market tokens are tuned as INK on the stage. As fills they are neon slabs
+   that break the void law, so a fill is the token mixed into the surface it
+   sits on rather than a new colour decision. Zero-state rule still holds:
+   a zero keeps base ink and takes no seat. */
+.book-seat {
+  --book-green-seat: color-mix(in srgb, var(--oo-green) 18%, var(--r-stage));
+  --book-red-seat:   color-mix(in srgb, var(--oo-red)   18%, var(--r-stage));
+  --book-amber-seat: color-mix(in srgb, var(--oo-amber) 14%, var(--r-stage));
+}
+.book-seat-up   { background-color: var(--book-green-seat); }
+.book-seat-down { background-color: var(--book-red-seat); }
+.book-seat-warn { background-color: var(--book-amber-seat); }
+
+/* ── Lab 07 · the plate figure ──
+   Delivered as an alpha MASK, never a coloured raster: one file renders
+   amber under Console and peach under Broadcast through --r-voice, so the
+   asset obeys register law without variants. Opacity is the only dial.
+   Native pixel scale, cropped by the host — a 1-bit dither shrunk to fit
+   is averaged into flat grey and stops being an engraving. There is no fit
+   variant on purpose. Atmosphere, never content: aria-hidden, no pointer
+   events, never a link. Default .14, hard ceiling .26. */
+.book-figure {
+  position: absolute;
+  pointer-events: none;
+  background-color: var(--r-voice);
+  -webkit-mask-image: var(--book-plate);
+          mask-image: var(--book-plate);
+  -webkit-mask-size: auto;        mask-size: auto;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: var(--book-plate-pos, center);
+          mask-position: var(--book-plate-pos, center);
+  opacity: var(--book-plate-strength, 0.14);
+}
+.book-plate--crowd   { --book-plate: url("assets/plates/panic-crowd-1884.png"); }
+.book-plate--portico { --book-plate: url("assets/plates/panic-portico-1884.png"); }
+
+/* Plate reveal: opacity to authored strength plus a 24px mask shift, once
+   per chapter. No scale, no blur, no repeated fade-up choreography. */
+.book-figure[data-reveal] {
+  opacity: 0;
+  --book-plate-pos: center calc(50% + 24px);
+  transition: opacity .9s linear, -webkit-mask-position .9s linear, mask-position .9s linear;
+}
+.book-figure[data-reveal].is-revealed {
+  opacity: var(--book-plate-strength, 0.14);
+  --book-plate-pos: center;
+}
+
+/* ═══ Page shell ═══════════════════════════════════════════ */
+
+.book-skip {
+  position: absolute; left: -9999px; top: 0; z-index: 40;
+  font-family: var(--oo-font-mono); font-size: 12px; letter-spacing: .08em;
+  text-transform: uppercase; padding: 10px 16px;
+  background-color: var(--oo-console-pane); color: var(--oo-amber);
+  border: 1px solid var(--oo-pane-border);
+}
+.book-skip:focus { left: 8px; top: 8px; }
+
+/* Focus is never colour alone: a 2px ring with an offset, on every
+   interactive element, in either register. Relying on each control to
+   declare its own ring is how a surface ends up with an invisible one —
+   measured on this page, the contract's own button had `outline-style: none`
+   under keyboard focus because nothing had ever restated it. */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--r-voice);
+  outline-offset: 2px;
+}
+
+/* Top rail: Console regardless of the act below it. Controls are chrome;
+   chrome is mono. Full-bleed strip, inner measure matched to the shell. */
+/* the shell measure is declared at root because the top rail lives OUTSIDE
+   the shell and has to match its inner gutter exactly */
+:root { --book-shell-max: 1360px; --book-tape-w: 244px; }
+
+.book-top {
+  position: sticky; top: 0; z-index: 30;
+  background-color: var(--oo-console-stage);
+  border-bottom: 1px solid var(--oo-line);
+}
+.book-top > .oo-rail {
+  max-width: var(--book-shell-max);
+  margin: 0 auto;
+  padding: 10px var(--oo-gutter);
+  border-bottom: none;
+  gap: 18px;
+}
+
+/* Page footer: the contentinfo landmark, and the only place the plate's
+   provenance appears outside the receipt. */
+.book-foot {
+  border-top: 1px solid var(--oo-line);
+  background-color: var(--oo-console-stage);
+}
+.book-foot > .oo-rail {
+  max-width: var(--book-shell-max);
+  margin: 0 auto;
+  padding: 14px var(--oo-gutter);
+  border-bottom: none;
+  gap: 18px; flex-wrap: wrap;
+}
+.book-top .book-top-right {
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.book-shell {
+  /* both re-measured by brandbook.js: the rail wraps and the Tape flips,
+     so sticky offsets and anchor scroll-margins are observed, not guessed */
+  --book-top-h: 41px;
+  --book-chrome-h: 41px;
+  max-width: var(--book-shell-max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: var(--book-tape-w) minmax(0, 1fr);
+}
+/* min-width:0 is load-bearing, not tidiness. minmax(0, 1fr) constrains the
+   TRACK; a grid item still carries min-width:auto and will inflate to its own
+   min-content regardless — which here pinned the stage to its 1080px cap at a
+   390px viewport and tore 690px of horizontal overflow into the document.
+   Same bug class as the v1.4 grid fix, one level up. */
+.book-shell > * { min-width: 0; }
+/* the shell owns the measure; the stage keeps its own 1080px content cap */
+.book-shell > .oo-stage { max-width: 1080px; }
+
+/* ── The Tape as navigation ──
+   Functional connective tissue: chapter state, not decorative crawl.
+   Static links only — moving ticker content never contains interactive
+   elements. Vertical rail on wide screens, horizontal strip when the rail
+   would start eating the prose measure. */
+.book-tape-nav {
+  position: sticky;
+  top: var(--book-top-h);
+  align-self: start;
+  max-height: calc(100vh - var(--book-top-h));
+  overflow: auto;
+  padding: 28px 20px 28px 0;
+  font-family: var(--oo-font-mono);
+}
+.book-tape-nav ol { list-style: none; padding: 0; margin: 10px 0 0; }
+.book-tape-nav a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--oo-muted); text-decoration: none;
+  border-left: 2px solid var(--oo-line);
+}
+.book-tape-nav a:hover { color: var(--oo-fg-dim); border-left-color: var(--oo-amber-line); }
+.book-tape-nav a:focus-visible { outline: 2px solid var(--oo-amber); outline-offset: -2px; }
+/* active state is never colour alone: ink + dot + a filled marker glyph */
+.book-tape-nav a[aria-current="location"] {
+  color: var(--oo-amber);
+  border-left-color: var(--oo-amber);
+  background-color: color-mix(in srgb, var(--oo-amber) 8%, transparent);
+}
+.book-tape-nav .book-tape-mark { color: var(--oo-ghost); }
+.book-tape-nav a[aria-current="location"] .book-tape-mark { color: var(--oo-amber); }
+.book-tape-nav .oo-dot { opacity: 0; flex: none; }
+.book-tape-nav a[aria-current="location"] .oo-dot { opacity: 1; }
+.book-tape-nav .book-tape-num {
+  color: var(--oo-ghost); font-size: 11px; margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══ Acts ═════════════════════════════════════════════════ */
+
+.book-act { scroll-margin-top: calc(var(--book-chrome-h) + 12px); }
+.book-act > h2 { margin-top: 14px; }
+
+.book-masthead {
+  font-family: var(--r-display);
+  font-size: 30px;                 /* the clamp FLOOR; the ratio scales up */
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  color: var(--r-fg);
+  font-weight: 560;
+}
+.book-masthead--console {
+  --book-fit-nudge: .955;
+  font-family: var(--oo-font-pixel);
+  text-transform: uppercase;
+  color: var(--oo-amber);
+  text-shadow: 0 0 24px var(--oo-amber-glow);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.book-masthead em { font-style: italic; color: var(--r-voice); font-weight: 500; }
+
+/* The floor is the clamp's `1em`, so it decides where fitting stops and
+   clipping starts. At 348px of measure a 30px floor put every long masthead
+   past the clip edge; dropping the floor hands the string back to the ratio,
+   which then fills the narrow measure exactly instead of losing its tail. */
+@media (max-width: 899px) { .book-masthead { font-size: 24px; } }
+@media (max-width: 720px) { .book-masthead { font-size: 19px; } }
+
+.book-lede {
+  font-family: var(--oo-font-serif);
+  font-size: max(calc(23 * var(--book-u-text, 1px)), 1.125rem);
+  line-height: 1.5;
+  color: var(--r-fg);
+  max-width: 46ch;
+}
+.book-note {
+  font-size: max(calc(15 * var(--book-u-text, 1px)), 0.875rem);
+  color: var(--r-fg-dim);
+  max-width: 62ch;
+}
+.book-caption {
+  font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--oo-muted);
+}
+
+/* Register quotation the other way: inside Console, the operator's margin
+   note is the only place the third face appears on the plate. */
+.book-operator-note {
+  font-family: var(--oo-font-serif);
+  font-size: 17px; line-height: 1.5;
+  color: var(--oo-fg-warm);
+  border-left: 2px solid var(--oo-peach);
+  padding: 4px 0 4px 16px;
+  max-width: 46ch;
+}
+.book-operator-note em { font-style: italic; color: var(--oo-peach); }
+
+/* Hero: the engraving is the second read, so it is sized by cropping and
+   the copy sits above it in the stacking order, never on top of detail. */
+.book-hero {
+  position: relative;
+  overflow: clip;
+  padding: calc(120 * var(--book-u, 1px)) 0 calc(96 * var(--book-u, 1px));
+  min-height: calc(560 * var(--book-u, 1px));
+}
+.book-hero .book-figure {
+  inset: auto -8% -14% auto;
+  width: 640px; height: 1500px;
+  --book-plate-strength: .14;
+}
+.book-floor-plate {
+  position: absolute; inset: 0;
+  overflow: clip;
+  z-index: 0;
+}
+.book-floor-plate .book-figure {
+  inset: -10% auto auto -6%;
+  width: 1600px; height: 871px;
+  --book-plate-strength: .12;
+}
+
+/* The moving crawl, contained.
+   .oo-tape is `overflow: hidden; white-space: nowrap`, which clips the paint
+   but does NOT stop the strip's intrinsic width contributing upward: four
+   repeats of a nowrap string propagated a min-content of thousands of pixels
+   through every ancestor until the stage hit its own 1080px max-width, and
+   the document tore by 690px at a 390px viewport. Size containment makes the
+   host's inline size independent of its contents, which is exactly the claim
+   the crawl is making anyway. (.book-fit never had this bug because
+   container-type: inline-size already implies the same containment.) */
+.book-crawl { contain: inline-size; }
+
+/* ── Act III · the two-voice sequence ──
+   Sequential plates, not a permanent 50/50 split. On wide screens they
+   overlap slightly as facing editorial pages; each stays dominant in its
+   own region. */
+.book-sequence { display: grid; gap: 28px; }
+@media (min-width: 1100px) {
+  .book-sequence { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+  .book-sequence > :first-child { margin-right: -28px; z-index: 1; }
+  .book-sequence > :last-child { margin-top: 88px; margin-left: -28px; }
+}
+.book-voice-plate { padding: 36px 40px; position: relative; }
+
+/* quotation reveal control — chrome, therefore mono, in either register */
+.book-reveal { margin-top: 22px; }
+.book-reveal > .oo-btn { width: 100%; }
+.book-reveal > .oo-btn:focus-visible { outline: 2px solid var(--r-voice); outline-offset: 2px; }
+.book-reveal > [id] { margin-top: 14px; }
+
+/* Display ceilings live here, not inline, so they can respond.
+   Two rules set them. First: a ceiling below the fitted size is a legitimate
+   design decision, but a masthead that stops at 60% of its measure reads as a
+   failure rather than a choice, so each ceiling sits at or just above what
+   the ratio asks for at the 1080px stage — and the Console masthead is
+   specified to hold the plate edge to edge, so its ceiling is the highest.
+   Second: Pixelify's advance widths make the fitted ratio overshoot by ~3%,
+   which at a 348px narrow measure pushed the trailing period past the clip
+   edge, so that masthead takes a much lower ceiling below 720px. */
+#h-opening-bell { --book-fit-max: 104px; }
+#h-the-floor    { --book-fit-max: 124px; }
+#h-two-voices   { --book-fit-max:  72px; }
+#h-the-ledger   { --book-fit-max: 158px; }
+#h-rules        { --book-fit-max:  88px; }
+@media (max-width: 720px) { #h-the-ledger { --book-fit-max: 52px; } }
+
+/* ── Act IV · the ledger ──
+   gap:0 cell field, which is the friction the four-shadow frame exists for. */
+.book-ledger { display: grid; gap: 0; }
+.book-ledger-row {
+  display: grid;
+  grid-template-columns: minmax(0, 15ch) minmax(0, 12ch) minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 9px 14px;
+  font-size: 12px;
+  background-color: var(--r-pane);
+}
+.book-ledger-row > :nth-child(2) { font-variant-numeric: tabular-nums; }
+.book-ledger-role { color: var(--oo-muted); }
+.book-chip {
+  display: inline-block; width: 100%; height: 14px;
+  border: 1px solid var(--oo-line);
+}
+
+/* Token ledger rows: chip · token · literal value · role. Rendered by
+   brandbook.js from the loaded stylesheet, so the table cannot drift. */
+.book-token-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 25ch) minmax(0, 17ch) minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 8px 14px;
+  font-size: 12px;
+  background-color: var(--r-pane);
+}
+.book-token-row > .book-token-value { font-variant-numeric: tabular-nums; color: var(--r-fg-dim); }
+.book-token-row.is-rare { background-color: var(--book-amber-seat, var(--r-pane)); }
+/* the rare inks are never a surface, so their swatch is not a fill: the
+   token paints a glyph on the void, which is the only sanctioned use */
+.book-chip--ink {
+  display: grid; place-items: center;
+  background-color: var(--oo-void);
+  font-size: 11px; line-height: 1;
+}
+.book-token-group {
+  padding: 10px 14px 6px;
+  background-color: var(--r-stage);
+}
+.book-ledger-head {
+  color: var(--oo-muted); letter-spacing: .12em; text-transform: uppercase;
+  font-size: 10px;
+}
+
+.book-state-row {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px;
+  padding: 12px 16px; font-size: 12px;
+}
+.book-badge {
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--oo-void); background-color: var(--oo-muted);
+  padding: 2px 7px;
+}
+
+.book-motion-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 20ch) minmax(0, 22ch);
+  gap: 14px; padding: 12px 16px; font-size: 12px;
+}
+.book-motion-row .book-ledger-role { color: var(--oo-muted); }
+
+/* ── Act V · correct against prohibited ── */
+.book-law { display: grid; gap: 0; }
+.book-law-pair {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+}
+.book-law-cell { padding: 14px 16px; font-size: 12px; background-color: var(--r-pane); }
+.book-law-cell .book-verdict {
+  display: block; font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.book-law-cell--ok  .book-verdict { color: var(--oo-green); }
+.book-law-cell--no  .book-verdict { color: var(--oo-red); }
+
+/* ── Closing receipt ── */
+.book-receipt { padding: 30px 34px; font-size: 12px; line-height: 2; }
+.book-receipt dl {
+  display: grid; grid-template-columns: minmax(0, 22ch) minmax(0, 1fr);
+  gap: 2px 18px; margin: 0;
+}
+.book-receipt dt { color: var(--oo-muted); letter-spacing: .08em; text-transform: uppercase; font-size: 11px; }
+.book-receipt dd { margin: 0; overflow-wrap: anywhere; }
+
+/* ── Reduced motion: the artifact stays complete, it just stops moving ── */
+@media (prefers-reduced-motion: reduce) {
+  .book-figure[data-reveal] {
+    transition: none;
+    opacity: var(--book-plate-strength, 0.14);
+    --book-plate-pos: center;
+  }
+}
+
+/* ═══ Responsive ═══════════════════════════════════════════
+   The Tape stays vertical until it threatens the prose measure, then it
+   becomes a sticky horizontal strip beneath the top rail. */
+@media (max-width: 1099px) {
+  .book-shell { grid-template-columns: minmax(0, 1fr); }
+  .book-tape-nav {
+    top: var(--book-top-h);
+    z-index: 20;
+    max-height: none;
+    padding: 0;
+    background-color: var(--oo-console-stage);
+    border-bottom: 1px solid var(--oo-line);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .book-tape-nav .book-tape-label { display: none; }
+  .book-tape-nav ol {
+    display: flex; margin: 0;
+    min-width: max-content;
+  }
+  .book-tape-nav a {
+    border-left: none;
+    border-bottom: 2px solid var(--oo-line);
+    white-space: nowrap;
+    min-height: 44px;
+  }
+  .book-tape-nav a:hover { border-bottom-color: var(--oo-amber-line); }
+  .book-tape-nav a[aria-current="location"] { border-bottom-color: var(--oo-amber); }
+  .book-tape-nav .book-tape-num { margin-left: 0; }
+  .book-act { scroll-margin-top: calc(var(--book-chrome-h) + 12px); }
+}
+
+@media (max-width: 899px) {
+  .book-motion-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .book-ledger-row { grid-template-columns: minmax(0, 1fr) minmax(0, 12ch); }
+  .book-ledger-row > .book-ledger-role { grid-column: 1 / -1; }
+  /* the token ledger keeps its swatch column and stacks the rest: name,
+     literal value, role — wrapping by field, never mid-token */
+  .book-token-row {
+    grid-template-columns: 40px minmax(0, 1fr);
+    row-gap: 3px;
+    align-items: start;
+  }
+  .book-token-row > .book-chip { align-self: center; }
+  .book-token-row > .book-token-value,
+  .book-token-row > .book-ledger-role { grid-column: 2; }
+}
+
+@media (max-width: 720px) {
+  .book-top > .oo-rail { flex-wrap: wrap; gap: 6px 14px; font-size: 11px; }
+  .book-hero { padding: 64px 0 56px; min-height: 0; }
+  /* the dial, never `opacity` — a raw opacity here would outrank the reveal
+     class and paint the plate before its chapter is reached */
+  .book-hero .book-figure { inset: auto -30% -6% auto; --book-plate-strength: .10; }
+  .book-floor-plate .book-figure { inset: -4% auto auto -30%; }
+  .book-voice-plate { padding: 24px 20px; }
+  .book-law-pair { grid-template-columns: minmax(0, 1fr); }
+  .book-receipt { padding: 22px 20px; }
+  .book-receipt dl { grid-template-columns: minmax(0, 1fr); gap: 0 0; }
+  .book-receipt dt { margin-top: 12px; }
+  .book-lede { max-width: none; }
+  /* long receipt/ledger values wrap by field, not character */
+  .book-state-row { gap: 4px 12px; }
+}

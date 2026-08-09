@@ -1,7 +1,9 @@
 # PLATE FIGURE — CSS Lab 07 receipt
 
 **File:** `experiments/plate-figure.html`
-**Assets:** `experiments/plates/panic-{crowd,portico}-1884.png`
+**Assets:** `assets/plates/panic-{crowd,portico}-1884.png` — canonical, shared. Relocated out of
+`experiments/plates/` on 2026-08-09 when the public brand book became the second consumer; the lab
+references `../assets/plates/`. One copy in the repo, never duplicated.
 **Date:** 2026-08-08
 **Contract touched:** none. `tokens.css` stays v1.3; `components.css` stays v1.5.
 

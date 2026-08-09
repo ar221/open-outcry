@@ -2,31 +2,63 @@
 
 **Live:** https://ar221.github.io/open-outcry/
 
-Ayaz's personal design language. Dual register: **Broadcast** (editorial serif, coffee-dark)
-× **Console** (pixel amber CRT), glued by **the Tape** (ticker rails, market semantics).
+Open Outcry is one identity expressed through two registers and one Tape. **Broadcast** is the human voice: judgment, thesis, and editorial direction. **Console** is the machine voice: mechanism, evidence, and receipt. **The Tape** binds both to state and provenance.
 
-- `tokens.css` — design variables (`--oo-*`) + the `.reg-console`/`.reg-broadcast` register
-  alias layer (`--r-*`) — nothing else. Import this into any project.
-  Requires fonts loaded by the consumer: [Fraunces (variable)](https://fonts.google.com/specimen/Fraunces), [Pixelify Sans](https://fonts.google.com/specimen/Pixelify+Sans), [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono). A `.reg-console`/`.reg-broadcast` class on an ancestor selects the register; console is the default.
-- `components.css` — the class contract. Import after tokens.css. Main classes:
-  - `.oo-scanlines` / `.oo-grain` / `.oo-vignette` — CRT and film textures
-  - `.oo-pane` / `.oo-pane--armed` / `.oo-warning` — smoky bordered plate hardware
-  - `.oo-rail` / `.oo-tape` — top rail and ticker tape chrome
-  - `.oo-rail--foot` — footer rail variant (border on top, not bottom)
-  - `.oo-link` — anchor treatment: voice ink, dim underline that ignites on hover
-  - `.oo-kicker` / `.oo-dot` / `.oo-cursor` — glyph syntax: eyebrow, live dot, heartbeat
-  - `.up` / `.down` / `.voice` — market ink (green / red / register voice accent)
-  - `.oo-display-console` / `.oo-display-broadcast` — the two display voices
-  - `.oo-tickwrap` / `.oo-scanbeam` / `.oo-hover` / `.oo-draw-path` — sanctioned motion
-  - `.oo-plate` / `.oo-plate--bleed` / `.oo-plate-card` / `.oo-specimen` — section plates and specimen cards
-  - `.oo-stat` / `.oo-stat-value` / `.oo-stat-delta` — stat lockup: kicker + big mono number + source/context third line (compose with `.oo-pane`). Zero-state rule: semantic ink only on non-zero counts
-  - `.oo-prose` — body-paragraph measure (dim ink, 54ch)
-  - `.oo-stage` — the consumer shell: centered 1080px stage, gutter padding, side strokes, register-aware fill
-  - `.oo-grid-2` / `.oo-grid-2--wide` / `.oo-grid-3` / `.oo-grid-4` — layout grids, all `minmax(0,1fr)` (collapse under 720px; grid-4 → 2-up)
-  - `.oo-overlay` / `.oo-content` — texture-overlay host and z-lifted content
-  - `.oo-register-quote` — one machine pane quoted inside broadcast; self-registering — the one class carries pane hardware, scanlines, and the console register. `--block` variant for multi-line quotes
-- `index.html` — the living brand book / documentation. Open it; it demonstrates its own rules.
-  Serve over http (`python -m http.server`) for the live token count — `file://` blocks stylesheet introspection and the tape shows `TOKENS n/a`.
+The repository is static: no build, framework, or package manager. Google Fonts are the public artifact's one external dependency.
 
-Spec of record: vault → `03 Projects/System/01 Specs/™ Open Outcry Design Language Spec 2026-06-09.md`
-Supersedes: Terminal Masterclass Brandbook (2026-05-21), absorbed as the Console register.
+## The reusable contract
+
+Consumers need two files:
+
+1. `tokens.css` v1.3 — variables plus the `--r-*` register alias layer.
+2. `components.css` v1.5 — the `.oo-*` class contract.
+
+Import `tokens.css` first, then `components.css`. Everything else in this repository is evidence: a public reference surface, consumer examples, experiments, or receipts.
+
+The contract stays frozen until two independent production consumers exhibit the same friction. A primitive enters the contract on repeated use, not because one page wants it.
+
+Consumers must load Fraunces variable, Pixelify Sans, and JetBrains Mono. The contract declares fallbacks but does not fetch the fonts.
+
+## The public brand book
+
+The living brand book consists of:
+
+- `index.html` — semantic content and specimens;
+- `brandbook.css` — page-local `--book-` / `.book-` composition: a container-relative unit, fit-to-measure mastheads, four-shadow frames, seated `color-mix()` fills, selection ink, and plate masks;
+- `brandbook.js` — dependency-free `IntersectionObserver` chapter state, register-quotation reveal controls, CSSOM-derived contract facts, and plate reveal, with no scroll polling loop;
+- `PRODUCT.md` — audience, actions, success test, and publication boundary;
+- `assets/plates/` — the canonical public-domain engraving masks.
+
+`brandbook.css` and `brandbook.js` are composition for this page only. They are not part of the reusable contract.
+
+## Examples
+
+- `examples/inir.html` — a Broadcast-led desktop-shell reference surface.
+- `examples/morning-brief.html` — a dual-register command-board specimen.
+- `examples/command-room-dashboard-friction.md` and `examples/daybreak-brief-friction.md` — production-consumer evidence recorded beside the examples.
+
+## Experiments
+
+`experiments/` holds WebGL labs and CSS labs, with receipts recording intent, constraints, and promotion gates. Lab 06 is `experiments/unit-frame.html`; Lab 07 is `experiments/plate-figure.html`. Labs are evidence, not contract.
+
+## Run locally
+
+From the repository root:
+
+```sh
+python -m http.server
+```
+
+Open `index.html` over HTTP. Under `file://`, stylesheet CSSOM introspection fails and the Tape reports `n/a`.
+
+## Verify the contract
+
+```sh
+node experiments/verify-contract.mjs
+```
+
+The script statically asserts that every contract class declaring a non-`none` `display` value appears in the top-level `[hidden] { display: none }` guard, and that the guard has no stale entries. `.github/workflows/contract.yml` runs the same command on pushes and pull requests in an Ubuntu checkout-only job, using the runner's preinstalled Node and no install step. It does not render pages or verify tokens, accessibility, HTML, links, or examples.
+
+## Plate credit
+
+Schell and Hogan, “The Panic — Scenes in Wall Street Wednesday Morning, May 14,” *Harper's Weekly*, 24 May 1884. Library of Congress, LCCN 00651213. Public domain.
