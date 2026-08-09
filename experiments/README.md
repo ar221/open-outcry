@@ -4,8 +4,8 @@ Fun-track prototypes live here until they earn promotion into the stable design-
 
 Start at `index.html` — the contact sheet. It indexes the five **WebGL** labs, uses each
 lab's own static fallback SVG as its thumbnail, and deliberately carries **no WebGL of its
-own**, so it loads instantly and survives a dead GPU. Lab 06 is a CSS lab and is not on the
-contact sheet — it has no canvas to thumbnail; reach it from the table below.
+own**, so it loads instantly and survives a dead GPU. Labs 06–07 are CSS labs and are not
+on the contact sheet — neither has a canvas to thumbnail; reach them from the table below.
 
 ```bash
 cd ~/Github/open-outcry
@@ -53,18 +53,27 @@ The cost is two checked-in copies of the same Three.js `0.185.1`: 540,603 bytes 
 | # | Lab | Register | Intent | Runtime |
 |---|---|---|---|---|
 | 06 | [Unit & Frame](unit-frame.html) | Console | Four candidate CSS mechanisms extracted from another design system | none — no JS, no WebGL |
+| 07 | [Plate Figure](plate-figure.html) | Broadcast | Sourced 1-bit market engraving as atmospheric figure, explicitly not a mascot | none — no JS, no WebGL |
 
-Lab 06 is a different kind of experiment from 01–05: it proposes changes to the *contract*
-rather than exploring a spatial idea, so it reads as a written argument with live specimens.
-Four mechanisms observed on <https://portal.nousresearch.com/> (a container-relative sizing
-unit, a four-shadow hairline frame, pure-CSS fit-to-measure display type, and semantic fills
-mixed into the surface), re-expressed in Console and ranked for promotion. It imports none
-of that site's appearance — it is blue with pill radii, which the spec explicitly rejects.
-Everything is declared page-locally under `--lab6-*` / `.lab6-*`. Full reasoning, measured
-evidence, and the promotion recommendation: **`UNIT-FRAME-RECEIPT.md`**.
+The CSS labs propose changes to the *contract* rather than exploring spatial ideas, so each
+reads as a written argument with live specimens.
 
-It also does not consume `lab-chrome.css` — that file is scaffolding for the four WebGL
-labs that share `lab-shell.js`, and Lab 06 shares nothing with them.
+**Lab 06 — Unit & Frame.** Four mechanisms observed on
+<https://portal.nousresearch.com/> (a container-relative sizing unit, a four-shadow hairline
+frame, pure-CSS fit-to-measure display type, and semantic fills mixed into the surface),
+re-expressed in Console and ranked for promotion. It imports none of that site's appearance —
+it is blue with pill radii, which the spec explicitly rejects. Everything is page-local under
+`--lab6-*` / `.lab6-*`. Full reasoning: **`UNIT-FRAME-RECEIPT.md`**.
+
+**Lab 07 — Plate Figure.** Answers the large-figure question raised by the Nous Portal:
+Open Outcry should adopt an atmospheric plate, not a mascot. A public-domain 1884 Wall Street
+wood engraving is Atkinson-dithered into two 1-bit masks, painted by `--r-voice`, rendered at
+native pixel scale, and restricted to editorial openers. It proves one asset can inherit amber
+or peach by register without shipping coloured variants. Everything is page-local under
+`--l7-*` / `.l7-*`. Full reasoning and provenance: **`PLATE-FIGURE-RECEIPT.md`**.
+
+Neither lab consumes `lab-chrome.css` — that file is scaffolding for the four WebGL labs that
+share `lab-shell.js`, and the CSS labs share nothing with them.
 
 ## Depth Tape — WebGL Lab 01
 
