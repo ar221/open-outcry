@@ -20,8 +20,8 @@ colors:
   on-surface: "#eee8df"
   on-surface-warm: "#efe6dc"
   on-surface-dim: "#aaa39a"
-  muted: "#686564"
-  muted-warm: "#7a6a5f"
+  muted: "#91877f"
+  muted-warm: "#a08b7b"
   ghost: "#3f3e3d"
   success: "#48dc7d"
   success-deep: "#1f9d55"
@@ -107,14 +107,14 @@ components:
     typography: "{typography.control}"
     rounded: "{rounded.md}"
     padding: "{spacing.button-x}"
-    height: 42px
+    height: 44px
   button-active:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
     typography: "{typography.control}"
     rounded: "{rounded.md}"
     padding: "{spacing.button-x}"
-    height: 42px
+    height: 44px
   rail:
     backgroundColor: "{colors.surface-console-stage}"
     textColor: "{colors.muted}"
@@ -174,6 +174,7 @@ Open Outcry is 90% darkness, warm off-white text, and one voice accent. Color is
 - **Console surfaces (`#070807`, `#0d0d0b`, `rgba(21, 18, 11, 0.72)`):** CRT stage, pane, and smoky translucent hardware.
 - **Broadcast surfaces (`#181210`, `#221813`):** coffee-warm editorial stage and pane.
 - **Text (`#eee8df`, `#efe6dc`, `#aaa39a`):** warm stamped whites. Never use pure white as default body text.
+- **Muted (`#91877f`, `#a08b7b`):** readable secondary ink for Console and Broadcast respectively. **Ghost (`#3f3e3d`) is decorative-only**: never use it for readable text or essential metadata.
 - **Tape semantics:** green is live/up/safe; red is down/footgun/warning; blue is evidence/search ink only; violet is provider/external ink only.
 
 Rules:
@@ -212,7 +213,7 @@ Every Open Outcry surface is a captured plate: top rail, content plane, bottom r
 - **Grid:** two or three columns on desktop; one column below narrow widths.
 - **Void:** leave dark space visible. Do not fill every corner.
 
-Mobile/fold adaptation: one column, tighter gutter, reduced display sizes, scanlines reduced or removed when they impair legibility, and controls remain large enough to tap.
+Mobile/fold adaptation: one column, tighter gutter, reduced display sizes, scanlines reduced or removed when they impair legibility, and controls retain a 44px minimum tap height.
 
 ## Elevation & Depth
 
@@ -241,7 +242,7 @@ Components are a contract, not a full framework.
 
 - **Pane:** base smoky hardware. Use for cards, receipts, warnings, stats, and quoted machine output.
 - **Armed pane:** a pane with stronger amber border; reserve for primary actions or active mechanism states.
-- **Button:** compose pane + hover-arm + mono uppercase control text. Controls are chrome; chrome is always mono.
+- **Button:** compose pane + hover-arm + mono uppercase control text. Controls are chrome; chrome is always mono and at least `44px` high.
 - **Rail:** path/state chrome. Sticky rails must use `background-color`, not the `background` shorthand.
 - **Tape:** ticker chrome. Use real document, task, market, or system counts; do not invent fake metrics.
 - **Kicker:** uppercase mono eyebrow with glyph syntax: `//`, `>`, or `< key = "value" >` depending on register.
@@ -254,6 +255,24 @@ Components are a contract, not a full framework.
 - **Seated fill:** a semantic used as a *fill* is the token mixed into the surface beneath it (`--r-seat-up` / `--r-seat-down` / `--r-seat-warn`), never the raw market token. Raw green as a slab breaks the void law. Ink stays raw; fills get seated.
 - **Plate figure:** sourced public-domain engraving delivered as an alpha mask, tinted by `--r-voice` so one file serves both registers. Native pixel scale, cropped never shrunk — a downscaled 1-bit dither averages to flat grey. Default `.14`, hard ceiling `.26`, `aria-hidden`, no pointer events. Editorial openers only; never behind live data or a number that must be read now.
 - **Selection:** register voice on void, scoped to the register classes. Without it every artifact inherits the OS blue-grey highlight — a blue surface, which this language bans.
+
+### Consumer setup
+
+Load `tokens.css` before `components.css`, load the three declared font families, and put the dominant register on the consumer root: `<body class="reg-broadcast">` or `<body class="reg-console">`. Do not depend on the Console aliases at `:root`: an explicit root register keeps aliases, register-scoped selection, and nested `.oo-*` composition aligned. Every plate still chooses one dominant register; quote the other rather than blending both.
+
+### Artifact composition recipes
+
+The three examples hold one illustrative subject constant — choosing static provenance for a published research note — and change only the document shape:
+
+- [Quiet report (`examples/editorial-report.html`)](examples/editorial-report.html): a restrained Broadcast `.oo-stage`, consumer-local sustained-reading prose inside `.oo-plate` sections, and a static Console provenance quotation. Three A4 pages in the verified Chromium export.
+- [Decision brief (`examples/decision-brief.html`)](examples/decision-brief.html): Broadcast recommendation first, concise consequences and alternative rows, then Console evidence. One A4 page in print.
+- [Presentation (`examples/presentation.html`)](examples/presentation.html): one dominant first read per consumer-local `.art-slide`; alternate registers between slides, not within one. Five landscape A4 pages, with each citation footer kept in its slide flow.
+
+Shared artifact layout belongs to the consumer in [`examples/artifact-compositions.css`](examples/artifact-compositions.css). Receipt rows stay consumer-local until two independent production consumers converge on an actual shape. Neither is a speculative `.oo-*` primitive.
+
+### Brand book usage
+
+The public brand book is a navigable reference consumer, not another contract layer. Its Tape navigation carries six numbered acts plus the unnumbered **Use Open Outcry** adoption stop; the Ledger exposes direct links to tokens, seated fills, type, hardware, states, and motion. Use the adoption plate's source routes for `tokens.css`, `components.css`, and `DESIGN.md` when implementing. Page-local `--book-*` / `.book-*` covers brand-book composition and interactions, including navigation, adoption guidance, receipts, grids, the container-relative unit, and four fit-to-measure chapter mastheads; the opening identity lockup is clamped rather than fitted. The book consumes `.oo-frame`, seated fills, selection ink, and `.oo-plate-figure` from v1.4/v1.6.
 
 Implementation trap: never use the CSS `background:` shorthand on an element carrying scanlines. It resets `background-image` and silently erases the scanline layer. Use `background-color:`.
 

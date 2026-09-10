@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!-- Consumer-local one-page brief: Broadcast frames the decision; Console is
+     quoted only inside the evidence pane. Source links remain beneath that
+     evidence and print their hrefs. Geometry is verified by actual PDF export. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decision brief — static provenance for a published note — Open Outcry</title>
+<meta name="description" content="An illustrative one-page decision brief: recommendation, consequences, alternatives and cited evidence.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<link rel="stylesheet" href="artifact-compositions.css">
+<style>
+  @page { size: A4 portrait; margin: 14mm 15mm; }
+  .br-plate { padding: 32px 0; }
+  .br-title { margin: 18px 0; max-width: 22ch; font-size: clamp(30px,4.6vw,56px); }
+  .br-plate .art-h2 { margin-bottom: 16px; }
+  .br-plate .art-ledger { margin-top: 20px; }
+  .br-copy { font-size: 15px; color: var(--r-fg-dim); }
+  .br-quote { margin-bottom: 12px; }
+  .br-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+  @media print {
+    .br-plate { padding: 10pt 0; }
+    .br-title { font-size: 24pt; margin: 8pt 0; max-width: none; }
+    .br-plate .art-h2 { font-size: 15pt; margin-bottom: 6pt; }
+    .art-lede { font-size: 10pt; line-height: 1.5; }
+    .br-copy, .art-ledger { font-size: 9pt; line-height: 1.5; }
+    .br-plate .art-ledger { margin-top: 8pt; }
+    .art-ledger > div { padding: 4pt 0; grid-template-columns: 80pt minmax(0, 1fr); gap: 10pt; }
+    .art-ledger dt { font-size: 8pt; }
+    .br-quote { font-size: 9pt; line-height: 1.5; padding: 8pt 10pt; margin-bottom: 6pt; }
+    .art-cite { font-size: 8pt; }
+    .oo-kicker, .oo-rail { font-size: 8pt; }
+    .br-links { display: none; }
+  }
+</style>
+</head>
+<body class="reg-broadcast art-quiet">
+<div class="oo-stage">
+  <header class="oo-rail oo-rail--sticky art-rail">
+    <span class="art-rail-path">&gt; <span class="voice">open-outcry</span>/examples/decision-brief</span>
+    <span class="art-rail-short"><span class="voice">Open Outcry</span> / decision brief</span>
+    <span class="art-rail-right"><span class="oo-kicker art-nowrap">ILLUSTRATIVE SPECIMEN</span><span class="art-nowrap">2026-09-08</span></span>
+  </header>
+  <main>
+    <section class="oo-plate br-plate" id="decision" aria-labelledby="h-decision">
+      <div class="oo-kicker">Decision / published research notes</div>
+      <h1 class="oo-display-broadcast br-title" id="h-decision">Freeze the receipt, then <em>re-issue instead of editing</em>.</h1>
+      <p class="art-lede">Write a note’s provenance at publication. Give each fact one owner. When the argument changes, publish a newly dated edition.</p>
+      <dl class="art-ledger">
+        <div><dt>Scope</dt><dd>Published notes and reports. Dashboards and the living brand book still resolve current state.</dd></div>
+        <div><dt>Status</dt><dd>Illustrative decision, not an adopted repository policy. Evidence below comes from public source files.</dd></div>
+      </dl>
+    </section>
+    <section class="oo-plate br-plate" id="consequences" aria-labelledby="h-consequences">
+      <h2 class="oo-display-broadcast art-h2" id="h-consequences">Consequences</h2>
+      <p class="br-copy"><strong>Gain:</strong> readers can reconstruct the author’s evidence without a live endpoint. The receipt travels with a checkout, archive or printed copy.</p>
+      <p class="br-copy"><strong>Cost:</strong> the facts age. Make the publication date explicit; remove live indicators. Review the receipt with the prose, and retain older editions.</p>
+    </section>
+    <section class="oo-plate br-plate" id="alternatives" aria-labelledby="h-alternatives">
+      <h2 class="oo-display-broadcast art-h2" id="h-alternatives">Alternatives</h2>
+      <dl class="art-ledger">
+        <div><dt>Live lookup</dt><dd>Rejected for dated notes: answers what is true now, not what supported the original argument.</dd></div>
+        <div><dt>Frozen + live</dt><dd>Rejected: two competing values need explanation and the live half adds an offline failure.</dd></div>
+        <div><dt>No receipt</dt><dd>Rejected: removes the reader’s direct route to the evidence.</dd></div>
+        <div><dt>Chosen</dt><dd>Frozen receipt, one owner, a new edition when the argument changes.</dd></div>
+      </dl>
+    </section>
+    <section class="oo-plate br-plate" id="evidence" aria-labelledby="h-evidence">
+      <h2 class="oo-display-broadcast art-h2" id="h-evidence">Evidence / limits</h2>
+      <div class="oo-register-quote oo-register-quote--block br-quote">
+        <span class="voice">[01]</span> The brand book now mirrors its version labels from one visible source.<br>
+        <span class="voice">[02]</span> Its token ledger reads the loaded stylesheet: current state is the intended subject.<br>
+        <span class="voice">[03]</span> The contract check asserts hidden-state guards, not provenance accuracy.
+      </div>
+      <p class="art-cite"><a class="oo-link" href="../brandbook.js">brandbook.js</a> · <a class="oo-link" href="../index.html#ledger-tokens">token ledger</a> · <a class="oo-link" href="../experiments/verify-contract.mjs">contract check</a></p>
+    </section>
+    <section class="oo-plate br-plate" id="sources" aria-labelledby="h-sources">
+      <h2 class="oo-display-broadcast art-h2" id="h-sources">Read alongside</h2>
+      <p class="art-cite"><a class="oo-link" href="editorial-report.html">Full argument</a> · <a class="oo-link" href="presentation.html">Five-slide presentation</a></p>
+      <nav class="br-links" aria-label="Related artifacts">
+        <a class="oo-pane oo-hover oo-btn" href="editorial-report.html">Read report</a>
+        <a class="oo-pane oo-hover oo-btn" href="presentation.html">Open deck</a>
+        <a class="oo-pane oo-hover oo-btn" href="../index.html#use-open-outcry">Use Open Outcry</a>
+      </nav>
+    </section>
+  </main>
+  <footer class="oo-rail oo-rail--foot art-rail">
+    <span>Open Outcry · tokens.css v1.4 · components.css v1.6</span>
+    <span class="oo-kicker">Frozen 2026-09-08</span>
+  </footer>
+</div>
+</body>
+</html>

@@ -27,9 +27,9 @@
   --oo-fg:          #eee8df;
   --oo-fg-warm:     #efe6dc;
   --oo-fg-dim:      #aaa39a;
-  --oo-muted:       #686564;
-  --oo-muted-warm:  #7a6a5f;
-  --oo-ghost:       #3f3e3d;
+  --oo-muted:       #91877f;
+  --oo-muted-warm:  #a08b7b;
+  --oo-ghost:       #3f3e3d;  /* decorative-only: never readable text or essential metadata */
 
   /* ── Market semantics (the Tape) ── */
   --oo-green:       #48dc7d;

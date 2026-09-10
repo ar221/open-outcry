@@ -12,7 +12,7 @@
 
    Candidates carried page-locally, per the promotion doctrine:
      · --book-u          Lab 06 A — container-relative unit, three floors
-     · .book-fit         Lab 06 C — fit-to-measure masthead (five uses, max)
+     · .book-fit         Lab 06 C — fit-to-measure masthead (four uses, max)
 
    PROMOTED to the contract on 2026-08-09 and REMOVED from this file — the
    brand book now consumes them like any other consumer:
@@ -72,8 +72,10 @@ body {
    All three parts are load-bearing — registration, the hidden ruler copy,
    and the ratio. Ship only the third and every masthead pins to its
    ceiling, because atan2(a, 0) is 90deg and tan(90deg) is infinity.
-   Display type only. Five chapter mastheads, which is the authored
-   ceiling; body and component type never use it. */
+   Display type only. Four chapter mastheads, which is the authored
+   ceiling; body and component type never use it. The opening plate is
+   deliberately NOT one of them: it carries the identity lockup, whose two
+   lines must be free to reflow on a narrow measure. */
 @property --book-cap {
   syntax: "<length>";
   initial-value: 0px;
@@ -158,6 +160,7 @@ body {
    under keyboard focus because nothing had ever restated it. */
 a:focus-visible,
 button:focus-visible,
+summary:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--r-voice);
   outline-offset: 2px;
@@ -234,9 +237,11 @@ button:focus-visible,
   font-family: var(--oo-font-mono);
 }
 .book-tape-nav ol { list-style: none; padding: 0; margin: 10px 0 0; }
+.book-tape-nav ol ul { list-style: none; padding: 0; margin: 0; }
 .book-tape-nav a {
   display: flex; align-items: center; gap: 10px;
   padding: 9px 12px;
+  min-height: 44px;
   font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
   color: var(--oo-muted); text-decoration: none;
   border-left: 2px solid var(--oo-line);
@@ -249,19 +254,56 @@ button:focus-visible,
   border-left-color: var(--oo-amber);
   background-color: color-mix(in srgb, var(--oo-amber) 8%, transparent);
 }
+/* the marker glyph is aria-hidden ornament, so it may sit on the ghost ink;
+   the chapter number is metadata a reader actually uses, so it may not */
 .book-tape-nav .book-tape-mark { color: var(--oo-ghost); }
 .book-tape-nav a[aria-current="location"] .book-tape-mark { color: var(--oo-amber); }
 .book-tape-nav .oo-dot { opacity: 0; flex: none; }
 .book-tape-nav a[aria-current="location"] .oo-dot { opacity: 1; }
 .book-tape-nav .book-tape-num {
-  color: var(--oo-ghost); font-size: 11px; margin-left: auto;
+  color: var(--oo-muted); font-size: 11px; margin-left: auto;
   font-variant-numeric: tabular-nums;
+}
+
+/* The adoption stop is not a chapter: it is the primary action, so it reads
+   as an affordance — voice-dim ink and a lit left edge even when idle. It
+   keeps its place in the tape's reading order so the chapter resolver stays
+   monotonic; nav order and page order must agree. */
+.book-tape-use > a {
+  color: var(--oo-amber-dim);
+  border-left-color: var(--oo-amber-line);
+}
+.book-tape-use > a:hover { color: var(--oo-amber); }
+
+/* Ledger subsections, nested one level under their chapter. Revealed only
+   while the Ledger is the current chapter and only in the vertical rail —
+   as a horizontal strip the tape is already a scroll container, and the
+   in-plate index (.book-subnav) is the narrow-screen route to the same six
+   anchors. */
+.book-tape-sub { display: none; }
+@media (min-width: 1100px) {
+  .book-tape-nav a[aria-current="location"] + .book-tape-sub { display: block; }
+  .book-tape-sub a {
+    padding-left: 30px;
+    font-size: 11px; letter-spacing: .08em;
+    border-left-color: var(--oo-line);
+  }
+  .book-tape-sub a::before {
+    content: "└"; color: var(--oo-ghost); margin-right: -2px;
+  }
 }
 
 /* ═══ Acts ═════════════════════════════════════════════════ */
 
 .book-act { scroll-margin-top: calc(var(--book-chrome-h) + 12px); }
 .book-act > h2 { margin-top: 14px; }
+/* Ledger subsection anchors. The measured chrome, not a guessed constant:
+   the top rail wraps and the tape flips to a horizontal strip, so a fixed
+   offset lands a heading under the sticky bars on exactly the viewport where
+   a reader most needs to see it. Slightly deeper than .book-act because a
+   subsection heading is a kicker, not a masthead — it has no display line
+   underneath it to absorb a tight landing. */
+.book-sub { scroll-margin-top: calc(var(--book-chrome-h) + 20px); }
 
 .book-masthead {
   font-family: var(--r-display);
@@ -288,6 +330,55 @@ button:focus-visible,
    which then fills the narrow measure exactly instead of losing its tail. */
 @media (max-width: 899px) { .book-masthead { font-size: 24px; } }
 @media (max-width: 720px) { .book-masthead { font-size: 19px; } }
+
+/* ── The identity lockup ──
+   The name was the smallest thing on the page: a path fragment in the top
+   rail, under a 104px headline about market history. Both readings are
+   wanted, so they are one object — the wordmark takes the display slot and
+   the market-history thesis answers it one step down the scale.
+
+   Deliberately clamped rather than fitted. Fit-to-measure needs a single
+   nowrap line, which is exactly the wrong behaviour for the opening pair on
+   a phone: a fitted "Markets once moved by voice." computes to ~19px there,
+   smaller than the body copy beneath it. A clamp keeps a display floor and
+   lets the line reflow. Two faces on the plate, as the register law
+   requires: Fraunces plus mono chrome. */
+.book-lockup { font-size: 1rem; font-weight: 400; }
+.book-wordmark {
+  display: block;
+  font-family: var(--oo-font-serif);
+  font-size: clamp(48px, 9.4vw, 104px);
+  font-weight: 600;
+  /* not 1: Fraunces' descender in "Open Outcry" overflows a 1em line box,
+     and the hero clips its overflow */
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+  color: var(--oo-fg-warm);
+  /* glow belongs to display titles; this is the authored broadcast bloom,
+     not decoration, and it introduces no new colour */
+  text-shadow: 0 0 46px var(--oo-peach-glow);
+}
+/* the identity rule: one terracotta hairline separating name from thesis */
+.book-wordmark::after {
+  content: "";
+  display: block;
+  width: clamp(72px, 9vw, 132px);
+  height: 1px;
+  background-color: var(--oo-terracotta);
+  margin-top: clamp(18px, 2vw, 28px);
+}
+.book-thesis {
+  display: block;
+  margin-top: clamp(16px, 1.8vw, 24px);
+  font-family: var(--oo-font-serif);
+  font-size: clamp(26px, 3.9vw, 44px);
+  font-weight: 560;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  color: var(--r-fg);
+  max-width: 24ch;
+  text-wrap: balance;
+}
 
 .book-lede {
   font-family: var(--oo-font-serif);
@@ -379,12 +470,105 @@ button:focus-visible,
    Second: Pixelify's advance widths make the fitted ratio overshoot by ~3%,
    which at a 348px narrow measure pushed the trailing period past the clip
    edge, so that masthead takes a much lower ceiling below 720px. */
-#h-opening-bell { --book-fit-max: 104px; }
+/* #h-opening-bell is absent on purpose: the opening plate carries the
+   identity lockup, which is clamped rather than fitted (see .book-wordmark) */
 #h-the-floor    { --book-fit-max: 124px; }
 #h-two-voices   { --book-fit-max:  72px; }
 #h-the-ledger   { --book-fit-max: 158px; }
 #h-rules        { --book-fit-max:  88px; }
 @media (max-width: 720px) { #h-the-ledger { --book-fit-max: 52px; } }
+
+/* ── The Ledger's own index ──
+   Persistent navigation lives in the tape rail; this is the same six anchors
+   inside the plate, which is the route that survives the narrow layout where
+   the nested rail is suppressed. Chrome, therefore mono, in either register. */
+.book-subnav {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 0;
+  border: 1px solid var(--r-line);
+  border-radius: var(--oo-radius);
+  background-color: var(--r-pane);
+}
+.book-subnav-label {
+  padding: 0 16px;
+  min-height: 44px;
+  display: flex; align-items: center;
+}
+.book-subnav a {
+  display: flex; align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-left: 1px solid var(--r-line);
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--r-voice); text-decoration: none;
+  transition: background-color .15s linear;
+}
+.book-subnav a:hover { background-color: color-mix(in srgb, var(--r-voice) 10%, transparent); }
+
+/* ── Use Open Outcry · the adoption plate ──
+   The primary action in PRODUCT.md is "open or copy the stable source
+   files", and the page had no anchor to any of them. Three source cards,
+   one disclosed recipe, three artifact consumers. No new primitive: the card
+   is .oo-pane, the affordance is .oo-btn, the code block is a page-local
+   monospace pane. */
+.book-source {
+  display: flex; flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+.book-source-role {
+  font-size: 13px; line-height: 1.6;
+  color: var(--r-fg-dim);
+}
+/* the control sits at the foot of the card whatever the role text measures,
+   so the three affordances read as one row rather than a ragged staircase */
+.book-source-open { margin-top: auto; align-self: flex-start; }
+
+.book-recipe {
+  margin-top: 20px;
+  border: 1px solid var(--r-line);
+  border-radius: var(--oo-radius);
+  background-color: var(--r-pane);
+}
+.book-recipe-summary {
+  display: flex; align-items: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--r-voice);
+  list-style: none;
+  cursor: crosshair;
+}
+/* the disclosure marker is the register's own glyph syntax, not a chevron.
+   `display: flex` above already drops the UA triangle in every current
+   engine; these two are the belt. They are SEPARATE rules on purpose — a
+   selector list containing one pseudo-element an engine does not know
+   invalidates the whole list, and ::-webkit-details-marker is not universal. */
+.book-recipe-summary::marker { content: ""; }
+.book-recipe-summary::-webkit-details-marker { display: none; }
+.book-recipe-summary::before {
+  content: "+ ";
+  color: var(--r-voice-dim);
+  margin-right: 10px;
+}
+.book-recipe[open] > .book-recipe-summary::before { content: "− "; }
+.book-recipe-body { padding: 0 18px 18px; }
+.book-code {
+  margin: 0;
+  padding: 16px 18px;
+  overflow-x: auto;
+  background-color: var(--oo-console-pane);
+  border: 1px solid var(--r-line);
+  border-radius: var(--oo-radius);
+  font-family: var(--oo-font-mono);
+  font-size: 12px; line-height: 1.8;
+  color: var(--oo-fg-dim);
+  /* same class of bug as the tape: a wide preformatted line clips its paint
+     but still contributes its intrinsic width to every ancestor */
+  contain: inline-size;
+}
+.book-recipe-note { margin-top: 14px; line-height: 1.7; letter-spacing: .06em; }
 
 /* ── Act IV · the ledger ──
    gap:0 cell field, which is the friction the four-shadow frame exists for. */
@@ -417,7 +601,9 @@ button:focus-visible,
   background-color: var(--r-pane);
 }
 .book-token-row > .book-token-value { font-variant-numeric: tabular-nums; color: var(--r-fg-dim); }
-.book-token-row.is-rare { background-color: var(--book-amber-seat, var(--r-pane)); }
+/* the rare inks get the sanctioned warn seat, not an undeclared page-local
+   variable — a fill is a semantic mixed into the surface beneath it */
+.book-token-row.is-rare { background-color: var(--r-seat-warn); }
 /* the rare inks are never a surface, so their swatch is not a fill: the
    token paints a glyph on the void, which is the only sanctioned use */
 .book-chip--ink {
@@ -438,6 +624,11 @@ button:focus-visible,
   display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px;
   padding: 12px 16px; font-size: 12px;
 }
+/* The specimen stamp inverts: void ink on the muted slab, so its contrast is
+   fixed by the pair and not by whatever surface the row happens to sit on.
+   That pairing is why the badge tracks --oo-muted rather than --oo-ghost —
+   ghost as a slab reads as disabled hardware, and ghost as ink cannot carry
+   a word a reader has to trust. */
 .book-badge {
   font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
   color: var(--oo-void); background-color: var(--oo-muted);
@@ -511,6 +702,8 @@ button:focus-visible,
   .book-tape-nav a:hover { border-bottom-color: var(--oo-amber-line); }
   .book-tape-nav a[aria-current="location"] { border-bottom-color: var(--oo-amber); }
   .book-tape-nav .book-tape-num { margin-left: 0; }
+  /* the adoption stop keeps its lit edge when the rail becomes a strip */
+  .book-tape-use > a { border-bottom-color: var(--oo-amber-line); }
   .book-act { scroll-margin-top: calc(var(--book-chrome-h) + 12px); }
 }
 
@@ -545,4 +738,15 @@ button:focus-visible,
   .book-lede { max-width: none; }
   /* long receipt/ledger values wrap by field, not character */
   .book-state-row { gap: 4px 12px; }
+  /* the opening pair reflows instead of fitting: the wordmark holds a 48px
+     display floor and the thesis wraps at 26px, both well above body copy */
+  .book-thesis { max-width: none; }
+  /* the Ledger index stacks — a wrapped row of framed chips leaves border
+     stubs mid-row, and a stacked list is the larger tap target anyway */
+  .book-subnav { flex-direction: column; align-items: stretch; }
+  .book-subnav a { border-left: none; border-top: 1px solid var(--r-line); }
+  .book-source { padding: 18px; }
+  .book-recipe-summary { padding: 10px 16px; }
+  .book-recipe-body { padding: 0 16px 16px; }
+  .book-code { padding: 14px; font-size: 11px; line-height: 1.7; }
 }

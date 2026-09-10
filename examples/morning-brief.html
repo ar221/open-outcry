@@ -1,130 +1,33 @@
 <!DOCTYPE html>
-<!-- ═══════════════════════════════════════════════════════════
-FRICTION LOG (second consumer) — examples/morning-brief.html
-Contract under test: tokens.css v1.1 + components.css v1.2 (frozen at the time)
-v1.3 UPDATE (2026-06-10): this log was the evidence that lifted the freeze.
-v1.4 UPDATE (2026-07-07): consumers #3/#4 re-hit ⑤⑥⑧ and the stage shell —
-promoted; this page now consumes .oo-stage/.oo-grid-4/.oo-stat-delta.
-Promoted items below are marked PROMOTED v1.3; the page now consumes them.
-Unpromoted observations stay logged as still-deferred evidence.
-Source data: ™ Morning Brief — 2026-06-09 — CRT Field-Console — generated.html
-Every page-local rule below was friction evidence. Honest count at v1.2: 9
-page-local rule groups + 2 page-local utility classes the contract owed us.
+<!--
+PUBLIC SPECIMEN — examples/morning-brief.html
 
-── VERDICTS ON THE TWO STANDING QUESTIONS ──
+Purpose: demonstrate Open Outcry's dual-register composition with an
+illustrative editorial brief. The common subject is choosing static provenance
+for a published research note. All decision content and status fields are
+explicitly illustrative; contract versions and linked source files are
+artifact-owned facts.
 
-1. --oo-gutter: PROMOTED v1.3. PAIN REAPPEARED. Third copy of the gutter coupling now exists
-   (index.html, inir.html, this file). `.oo-plate--bleed` hardcodes -56px
-   margins (and -20px under 720px) inside the frozen contract, so every
-   consumer stage MUST declare `padding: 0 56px` desktop / `0 20px` narrow
-   or the bleed tears. The number lives in two files that can't see each
-   other. Verdict: promote `--oo-gutter: 56px` (+ narrow override) to
-   tokens.css and make both `.oo-plate--bleed` and consumer stages consume
-   it. This is the single clearest v1.3 candidate.
-
-2. Shared sticky chrome: PROMOTED v1.3 as .oo-rail--sticky. PAIN REAPPEARED, identically. Header rail and
-   footer tape again needed page-local `position: sticky` + `z-index` +
-   an opaque background re-declaration (rules ② below) — byte-for-byte the
-   same glue inir.html wrote. Two consumers, same three lines each.
-   Verdict: contract owes either a `.oo-chrome` / `.oo-rail--sticky`
-   primitive or a documented recipe block. Note the background MUST be
-   re-declared with background-color (not shorthand) when the stage
-   carries .oo-scanlines — see trap note below.
-
-── PRIMITIVES I WISHED EXISTED ──
-
-· ACTION/BUTTON HARDWARE. PROMOTED v1.3 as .oo-btn — admitted as CHROME
-  ONLY (controls are chrome; chrome is always mono). Biggest gap this consumer hit. The hero needs
-  three CTAs ("Do it" / "Log blocker" / "Close"). Closest contract fit is
-  composing .oo-pane + .oo-hover (which even gives the black-on-voice
-  :active invert for free — good press feel), but display/padding/type
-  had to be page-local (.mb-btn, rule ④). First consumer had zero CTAs so
-  this never surfaced. Candidate: `.oo-btn` = pane hardware + mono 12px
-  uppercase + inline-flex + padding, hover/active from .oo-hover.
-· STAT DELTA SLOT. PROMOTED v1.4 as .oo-stat-delta. .oo-stat/.oo-stat-value carry kicker + number but real
-  telemetry always has a third line ("source: jobs.json", "99 GiB free").
-  Page-local .mb-delta (rule ⑤). Candidate: `.oo-stat-delta`.
-· 4-UP GRID. PROMOTED v1.4 as .oo-grid-4 (minmax(0,1fr) baked in). TRAP cockpit is naturally four numbers. Contract stops at
-  .oo-grid-3, so .mb-grid-4 is page-local (rule ⑥). Borderline — could
-  also be solved with a documented `style="grid-template-columns:..."`
-  idiom instead of a class.
-· LEDGER / RECEIPT ROWS. STILL DEFERRED. Source Ledger is label+path rows — pure Open
-  Outcry territory (receipts!) yet no primitive. Page-local .mb-ledger
-  (rule ⑦). Candidate worth designing properly, not rushing.
-· HERO SPLIT. Command board hero = wide editorial column + narrow machine
-  receipt. .oo-grid-2 is 1fr/1fr only; needed 1.5fr/1fr (.mb-hero, rule ③).
-  Probably fine to leave page-local — hero ratios are page personality.
-
-── PAGE-LOCAL RULES, FULL LIST ──
- ① shell reset + body + .stage — stage RETIRED v1.4, replaced by .oo-stage
-   (gutter coupling had already been retired v1.3)
- ② sticky header/footer chrome — RETIRED v1.3, replaced by .oo-rail--sticky
- ③ .mb-hero grid (1.5fr/1fr split + narrow collapse)
- ④ .mb-btn action hardware — RETIRED v1.3, replaced by .oo-btn
- ⑤ .mb-delta stat third line — RETIRED v1.4, replaced by .oo-stat-delta
- ⑥ .mb-grid-4 — RETIRED v1.4, replaced by .oo-grid-4
- ⑦ .mb-ledger receipt rows (STILL DEFERRED)
- ⑧ .oo-tape .oo-tickwrap padding (copied verbatim from inir.html — second
-   copy; the tape arguably owes itself vertical padding in-contract)
-   — PROMOTED v1.4: contract now pads .oo-tape .oo-tickwrap
- ⑨ narrow glue: kicker hidden in header, buttons wrap (stage gutter 20px
-   RETIRED v1.3 — tokens.css re-declares --oo-gutter narrow)
-
-── WHAT WORKED / NOTES ──
-· .oo-register-quote--block: first real use, and it earned its keep — ONE
-  class carried pane hardware, scanlines, and the console register flip
-  inside a .reg-broadcast hero. Zero page-local support needed. Good
-  primitive.
-· KNOWN TRAP respected: .stage carries .oo-scanlines, so its fill is
-  `background-color:` (shorthand would erase the scanline
-  background-image). Same discipline on the sticky chrome and the hero
-  plate fill. Trap did NOT bite because it was pre-briefed — it WILL bite
-  the first consumer that isn't. Strong case for a components.css header
-  comment warning about it. → DOCUMENTED v1.3: warning now heads
-  components.css, and .oo-rail--sticky bakes background-color in.
-· Register law was easy to hold everywhere EXCEPT the hero CTAs: buttons
-  are machine affordances (mono, uppercase) living on a broadcast plate.
-  Resolved by reading them as tape/chrome voice (kickers are mono on
-  broadcast plates already), not as a register breach — but the spec
-  should say this out loud: "controls are chrome, chrome is always mono."
-  → CODIFIED v1.3: the rule now sits verbatim above .oo-btn in
-  components.css and in the spec's v1.3 changelog.
-· INK vs STAT-VALUE precedence (found during in-browser verify): `.up` /
-  `.down` on the same element as `.oo-stat-value` silently lose — both are
-  single-class selectors and .oo-stat-value's `color` is declared later in
-  components.css. Consumer must nest the ink span INSIDE the value span.
-  Verdict: either document the nesting idiom or move ink classes below
-  .oo-stat-value... no — frozen; document it, or in v1.3 give .oo-stat-value
-  `color: var(--r-fg)` only as a fallback (e.g. `.oo-stat-value:where(...)`)
-  so ink classes can win. Real semantic-state coloring is core to a stat
-  primitive on a trading-flavored brand; this will bite every consumer.
-  → FIXED v1.3: base ink moved to :where(.oo-stat-value) (zero specificity);
-  nesting workaround removed from this page — ink classes sit directly on
-  the value element now.
-· Inline styles: this file follows the first consumer's idiom of inline
-  style="" for one-off spacing. Counted honestly, ~30 inline declarations.
-  Not contract gaps individually, but margin-top rhythm (14/20/24/28/32px)
-  repeats enough that a spacing scale in tokens.css would erase most.
-· No fake metrics: every number on this page is verbatim from the
-  2026-06-09 generated brief. The only mock-added ledger row is labeled
-  "(mock)". Mail pane reproduces the source's honest failure state
-  ("source unavailable: mail (skipped)") rather than inventing inbox data.
-═══════════════════════════════════════════════════════════ -->
+Contract: tokens.css v1.4 + components.css v1.6.
+Composition: Broadcast carries editorial judgment; Console carries the
+supporting receipt; the Tape repeats document context without claiming live
+state. Page-local CSS supplies only the asymmetric hero and source-ledger
+layouts retained from this consumer specimen.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Morning Brief — 2026-06-09 — Open Outcry (second consumer)</title>
+<title>Editorial Publication Brief — Open Outcry Public Specimen</title>
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../tokens.css">
 <link rel="stylesheet" href="../components.css">
 <style>
-  /* page layout glue only — all visual vocabulary comes from components.css.
-     every rule here is logged as friction evidence in the comment block above. */
+  /* Consumer-local layout only; visual vocabulary comes from components.css. */
 
-  /* ① shell */
+  /* Shell */
   * { box-sizing: border-box; margin: 0; }
   html { scroll-behavior: auto; }
   body {
@@ -134,20 +37,15 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
     font-size: var(--oo-type-body);
     line-height: 1.6;
   }
-  /* ① stage shell — RETIRED v1.4 (.oo-stage in markup; this was copy #3 of 5) */
+  /* Stage and sticky chrome are supplied by components.css. */
 
-  /* ② sticky chrome — RETIRED v1.3 (.oo-rail--sticky in markup) */
-
-  /* ③ hero command-board split */
+  /* Asymmetric editorial / receipt split */
   .mb-hero { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  section[id] { scroll-margin-top: 88px; }
 
-  /* ④ action hardware — RETIRED v1.3, promoted as .oo-btn */
+  /* Buttons, stat metadata, and responsive grids are supplied by components.css. */
 
-  /* ⑤ stat third line — RETIRED v1.4 (.oo-stat-delta in markup) */
-
-  /* ⑥ 4-up grid — RETIRED v1.4 (.oo-grid-4 in markup, minmax(0,1fr) baked in) */
-
-  /* ⑦ ledger receipt rows — contract gap */
+  /* Source-ledger receipt rows remain consumer-local. */
   .mb-ledger { font-size: 12px; }
   .mb-ledger > div {
     display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 16px;
@@ -156,218 +54,208 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
   .mb-ledger dt { color: var(--r-muted); letter-spacing: .06em; text-transform: uppercase; }
   .mb-ledger dd { color: var(--r-fg-dim); word-break: break-all; font-family: var(--oo-font-mono); }
 
-  /* ⑧ tape breathing room — RETIRED v1.4 (in contract) */
-
-  /* ⑨ narrow: dispatch packet (stage gutter now follows --oo-gutter) */
+  /* Tape spacing is supplied by components.css. */
+  /* Narrow specimen layout */
   @media (max-width: 720px) {
     header.oo-rail .oo-kicker { display: none; }
+    section[id] { scroll-margin-top: 112px; }
     .mb-hero { grid-template-columns: 1fr; }
     .mb-ledger > div { grid-template-columns: 1fr; gap: 2px; }
   }
 </style>
 </head>
-<body>
+<body class="reg-console">
 <div class="oo-stage oo-scanlines oo-grain">
 
   <header class="oo-rail oo-rail--sticky">
     <span>&gt; <span class="voice">open-outcry</span>/examples/morning-brief</span>
     <span style="display:flex; gap:16px; align-items:center;">
-      <span class="oo-kicker">SECOND CONSUMER · 2026-06-09 DATA</span>
-      <span><span class="oo-dot"></span> LIVE</span>
+      <span class="oo-kicker">PUBLIC SPECIMEN · STATIC PROVENANCE</span>
+      <span>ILLUSTRATIVE</span>
     </span>
   </header>
 
   <main>
 
-    <!-- ── 01 · COMMAND SLICE — broadcast plate; console appears only as quotation ── -->
-    <section class="oo-plate oo-plate--bleed reg-broadcast" style="background-color:var(--r-stage);">
+    <!-- 01 · Editorial decision: Broadcast judgment with a Console receipt quotation. -->
+    <section class="oo-plate oo-plate--bleed reg-broadcast" id="decision" style="background-color:var(--r-stage);">
       <div class="oo-grain oo-overlay" aria-hidden="true"></div>
       <div class="oo-content">
-        <div class="oo-kicker">// 01 · COMMAND SLICE — ONE THING <span style="color:var(--oo-ghost)">//</span> WIN CONDITION <span style="color:var(--oo-ghost)">//</span> COMMAND ROUTE</div>
+        <div class="oo-kicker">// 01 · EDITORIAL DECISION · PUBLIC SPECIMEN</div>
 
         <div class="mb-hero" style="margin-top:30px;">
           <div>
-            <h1 class="oo-display-broadcast" style="max-width:12ch;">
-              <em>UNBLOCK</em> JOB BANK.<span class="oo-cursor" aria-hidden="true"></span>
+            <h1 class="oo-display-broadcast" style="max-width:13ch;">
+              Publish with a <em>static provenance trail.</em>
             </h1>
             <p class="oo-prose" style="margin-top:26px;">
-              <span class="voice">Action:</span> A+ Core 1 recovery sprint — Professor Messer restart block.<br>
-              <span class="voice">Win condition:</span> advance the serious-track Job Hunt loop and
-              leave a receipt. The door is Job Bank.
+              <span class="voice">Illustrative action:</span> choose static provenance for a published research note.<br>
+              <span class="voice">Illustrative win condition:</span> every material claim points to a public source,
+              a captured publication date, and a durable citation before release.
             </p>
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:28px;">
-              <a class="oo-pane oo-pane--armed oo-hover oo-btn" href="https://www.jobbank.gc.ca/login?redirect_url=/myaccount">Do it</a>
-              <a class="oo-pane oo-hover oo-btn" href="file:///home/ayaz/Documents/Ayaz%20OS/03%20Projects/Job%20Hunt/02%20Applications/%E2%84%A2%20Job%20Bank%20Blocker%20Log%20%E2%80%94%202026-05-20.md">Log blocker</a>
-              <a class="oo-pane oo-hover oo-btn" href="file:///home/ayaz/Documents/Ayaz%20OS/03%20Projects/Job%20Hunt/%E2%84%A2%20Job%20Hunt%20%E2%80%94%20Tasks.md">Close</a>
+              <a class="oo-pane oo-pane--armed oo-hover oo-btn" href="#evidence">Inspect evidence</a>
+              <a class="oo-pane oo-hover oo-btn" href="#release-state">Review release</a>
+              <a class="oo-pane oo-hover oo-btn" href="#source-ledger">Open sources</a>
             </div>
           </div>
 
-          <!-- machine voice, quoted — first real use of the v1.2 primitive -->
+          <!-- Console appears here only as the machine-receipt quotation. -->
           <div class="oo-register-quote oo-register-quote--block">
-            <span class="voice">ayaz@vault:~$</span> brief-me --html<br>
-            <span class="voice">rendered</span> 2026-06-09T08:01:46.827000-04:00<br>
-            <span class="voice">source</span>&nbsp;&nbsp; brief-me 0.3.4<br>
-            <span class="voice">mode</span>&nbsp;&nbsp;&nbsp;&nbsp; command-slice<br>
-            <span class="voice">rule</span>&nbsp;&nbsp;&nbsp;&nbsp; markets pointer-only<span class="oo-cursor" aria-hidden="true"></span>
+            <span class="voice">publication-receipt</span> provenance-plan --static<br>
+            <span class="voice">subject</span>&nbsp;&nbsp; choosing static provenance<br>
+            <span class="voice">state</span>&nbsp;&nbsp;&nbsp;&nbsp; illustrative decision packet<br>
+            <span class="voice">scope</span>&nbsp;&nbsp;&nbsp;&nbsp; public sources only<br>
+            <span class="voice">rule</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no live-state claim<span class="oo-cursor" aria-hidden="true"></span>
           </div>
         </div>
 
         <div class="oo-grid-2" style="margin-top:36px;">
           <div class="oo-pane" style="padding:22px 26px; position:relative; overflow:hidden;">
             <div class="oo-grain oo-overlay" aria-hidden="true"></div>
-            <div class="oo-kicker oo-content" style="color:var(--oo-green);">WIN CONDITION</div>
+            <div class="oo-kicker oo-content" style="color:var(--oo-green);">ILLUSTRATIVE APPROVAL THRESHOLD</div>
             <p class="oo-content" style="font-size:14px; color:var(--r-fg-dim); margin-top:10px;">
-              <b style="color:var(--oo-green);">Receipt required.</b> Complete the route, or log the
-              blocker with the next verification path. No identity-verification details belong in the brief.
+              <b style="color:var(--oo-green);">Receipt required.</b> Preserve source title, public URL,
+              publication date, and the claim each source supports.
             </p>
           </div>
           <div class="oo-pane oo-warning" style="padding:22px 26px; position:relative; overflow:hidden;">
             <div class="oo-grain oo-overlay" aria-hidden="true"></div>
-            <div class="oo-kicker oo-content">DO-NOT-TOUCH — SINGLE-DOOR DAY</div>
+            <div class="oo-kicker oo-content">PUBLICATION BOUNDARY</div>
             <p class="oo-content" style="font-size:14px; color:var(--r-fg-dim); margin-top:10px;">
-              Do not let markets, tooling, or aesthetic work climb above the serious-track move.
+              Do not publish private notes, local paths, account state, personal workflows, or a frozen
+              status dressed as live evidence.
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── 02 · PRESSURE MAP — console plate ── -->
-    <section class="oo-plate">
-      <div class="oo-kicker">// 02</div>
-      <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">Pressure Map</h2>
+    <!-- 02 · Console compares illustrative editorial criteria. -->
+    <section class="oo-plate" id="evidence">
+      <div class="oo-kicker">// 02 · ILLUSTRATIVE DATA</div>
+      <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">Evidence Check</h2>
       <div class="oo-grid-3" style="margin-top:28px;">
         <div class="oo-pane oo-pane--armed oo-stat oo-hover">
-          <div class="oo-kicker">JOB HUNT</div>
-          <span class="oo-stat-value">21</span>
-          <span class="oo-stat-delta">open tasks · next: A+ Core 1 recovery sprint — Professor Messer restart block</span>
+          <div class="oo-kicker">PUBLIC SOURCE</div>
+          <span class="oo-stat-value">PASS</span>
+          <span class="oo-stat-delta">illustrative field · resolvable public URL</span>
         </div>
         <div class="oo-pane oo-stat oo-hover">
-          <div class="oo-kicker">VAULT CAPTURES</div>
-          <span class="oo-stat-value">31</span>
-          <span class="oo-stat-delta">inbox captures · <span class="up">0</span> fresh clippings</span>
+          <div class="oo-kicker">CAPTURE</div>
+          <span class="oo-stat-value">STATIC</span>
+          <span class="oo-stat-delta">illustrative field · dated publication snapshot</span>
         </div>
         <div class="oo-pane oo-stat oo-hover">
-          <div class="oo-kicker">ALFRED HANDOFFS</div>
-          <span class="oo-stat-value">2</span>
-          <span class="oo-stat-delta">pending in the bridge inbox</span>
+          <div class="oo-kicker">CLAIM MAP</div>
+          <span class="oo-stat-value">READY</span>
+          <span class="oo-stat-delta">illustrative field · citations attached to claims</span>
         </div>
       </div>
-      <p style="font-size:12px; color:var(--oo-ghost); margin-top:16px;">MAIL: source unavailable — mail (skipped). Honest gap, not zero pressure.</p>
+      <p style="font-size:12px; color:var(--r-muted); margin-top:16px;">SPECIMEN NOTE: these states demonstrate composition; they do not report a live publication.</p>
     </section>
 
-    <!-- ── 03 · MEMORY COCKPIT — console plate ── -->
-    <section class="oo-plate">
-      <div class="oo-kicker">// 03</div>
-      <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">Memory Cockpit</h2>
+    <!-- 03 · Console packet preserves the responsive four-up component specimen. -->
+    <section class="oo-plate" id="publication-packet">
+      <div class="oo-kicker">// 03 · ILLUSTRATIVE PACKET</div>
+      <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">Publication Packet</h2>
       <div class="oo-grid-4" style="margin-top:28px;">
         <div class="oo-pane oo-stat">
-          <div class="oo-kicker">TRAP CARDS</div>
-          <span class="oo-stat-value">5299</span>
+          <div class="oo-kicker">SOURCE TYPE</div>
+          <span class="oo-stat-value">PUBLIC</span>
         </div>
         <div class="oo-pane oo-stat">
-          <div class="oo-kicker">DUE</div>
-          <span class="oo-stat-value up">0</span>
+          <div class="oo-kicker">CAPTURE MODE</div>
+          <span class="oo-stat-value">STATIC</span>
         </div>
         <div class="oo-pane oo-stat">
-          <div class="oo-kicker">WEAK LINKS</div>
-          <span class="oo-stat-value">3480</span>
+          <div class="oo-kicker">CLAIM LINKS</div>
+          <span class="oo-stat-value">MAPPED</span>
         </div>
         <div class="oo-pane oo-stat">
-          <div class="oo-kicker">PERFORM PENDING</div>
-          <span class="oo-stat-value">5299</span>
+          <div class="oo-kicker">RELEASE MODE</div>
+          <span class="oo-stat-value">DATED</span>
         </div>
       </div>
       <p class="oo-prose" style="margin-top:24px; font-size:14px;">
-        Read-only memory rail: Test, Retain, Associate, Perform. No auto-writeback;
-        generated from local memory artifacts before the brief. Cockpit packet:
-        <a class="oo-link" href="file:///home/ayaz/.local/share/ayaz-memory-rag/trap/dashboard/2026-06-09.md">dashboard 2026-06-09.md</a> ·
-        <a class="oo-link" href="file:///home/ayaz/.local/share/ayaz-memory-rag/trap/summary/2026-06-09.json">summary 2026-06-09.json</a>
+        This illustrative packet favors a stable citation record over a dynamic feed. The note can be
+        reviewed later against the same public evidence without implying that its state updates in real time.
       </p>
     </section>
 
-    <!-- ── 04 · STOCKGUY RADAR — console plate, markets pointer-only ── -->
-    <section class="oo-plate">
-      <div class="oo-kicker">// 04</div>
-      <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">StockGuy Radar</h2>
+    <!-- 04 · Console explains the public evidence method. -->
+    <section class="oo-plate" id="method">
+      <div class="oo-kicker">// 04 · EDITORIAL METHOD</div>
+      <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">Provenance Method</h2>
       <div class="oo-grid-2" style="margin-top:28px;">
         <div class="oo-pane" style="padding:24px 28px;">
-          <div class="oo-kicker">SOURCE INTEL — YESTERDAY 11:00–12:00 CAPTURED</div>
+          <div class="oo-kicker">CAPTURE THE PUBLIC RECORD</div>
           <p style="font-size:14px; color:var(--r-fg-dim); margin-top:12px;">
-            The requested Twitch window is filed as source-intelligence. Highest-signal
-            takeaway: his insider-buying screen — CFO/CEO/COO open-market buys, post-IPO
-            context, EPS/sales growth, short float, valuation, sector rotation, and chart
-            damage. <span class="voice">Treat the framework as the useful object, not a trade trigger.</span>
+            Record the source title, publisher, public URL, and publication date. Attach each citation
+            to the sentence it supports rather than leaving evidence in an undifferentiated bibliography.
           </p>
         </div>
         <div class="oo-pane oo-warning" style="padding:24px 28px;">
-          <div class="oo-kicker">BOUNDARY — MARKETS STAY PAPER-ONLY HERE</div>
+          <div class="oo-kicker">SEPARATE FACT FROM INTERPRETATION</div>
           <p style="font-size:14px; color:var(--r-fg-dim); margin-top:12px;">
-            No tickers, trade calls, or sizing on this surface. Before any ticker gets
-            promoted: visually spot-check ASR tickers, confirm SEC/Form 4 evidence, and
-            separate microcap gambling from real thesis work.
-            <a class="oo-link" href="file:///home/ayaz/Documents/Ayaz%20OS/05%20Wiki/Topics/trading/thestockguy/%E2%84%A2%20TheStockGuy%20VOD%202026-06-08%2011-12%20Insider%20Buying%20and%20Macro%20Pass.md">Open TSG note</a>
+            Label editorial inference, preserve the source's original scope, and exclude private research
+            material from the public receipt. <a class="oo-link" href="#source-ledger">Inspect this specimen's sources.</a>
           </p>
         </div>
       </div>
     </section>
 
-    <!-- ── 05 · SUBSTRATE STATE — console plate ── -->
-    <section class="oo-plate">
-      <div class="oo-kicker">// 05</div>
-      <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">Substrate State</h2>
+    <!-- 05 · Console shows an illustrative, explicitly non-live release state. -->
+    <section class="oo-plate" id="release-state">
+      <div class="oo-kicker">// 05 · ILLUSTRATIVE RELEASE STATE</div>
+      <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">Release Receipt</h2>
       <div class="oo-grid-3" style="margin-top:28px;">
         <div class="oo-pane oo-stat">
-          <div class="oo-kicker">SERVICES</div>
-          <span class="oo-stat-value up">0 failed</span>
-          <span class="oo-stat-delta">no failed units returned by live check</span>
+          <div class="oo-kicker">NOTE</div>
+          <span class="oo-stat-value">DRAFT</span>
+          <span class="oo-stat-delta">illustrative editorial state</span>
         </div>
         <div class="oo-pane oo-stat">
-          <div class="oo-kicker">DISK</div>
-          <span class="oo-stat-value up">78%</span>
-          <span class="oo-stat-delta">used · 99 GiB free · source: shutil.disk_usage</span>
+          <div class="oo-kicker">PROVENANCE</div>
+          <span class="oo-stat-value up">STATIC</span>
+          <span class="oo-stat-delta">illustrative capture policy</span>
         </div>
-        <div class="oo-pane oo-warning oo-stat">
-          <div class="oo-kicker">HERMES CRON</div>
-          <span class="oo-stat-value down">1 / 9</span>
-          <span class="oo-stat-delta">failures / jobs · source: jobs.json</span>
+        <div class="oo-pane oo-stat">
+          <div class="oo-kicker">AUDIENCE</div>
+          <span class="oo-stat-value">PUBLIC</span>
+          <span class="oo-stat-delta">illustrative publication boundary</span>
         </div>
       </div>
       <div class="oo-pane oo-warning" style="padding:20px 26px; margin-top:16px;">
-        <div class="oo-kicker">LANE SEPARATION</div>
+        <div class="oo-kicker">STATIC RECEIPT</div>
         <p style="font-size:14px; color:var(--r-fg-dim); margin-top:10px;">
-          <b style="color:var(--oo-red);">Markets stay out of the Morning Brief.</b>
-          This surface may point to the separate Markets Brief, but it does not carry
-          tickers, trade calls, sizing, breadth, or broker actions.
-          <a class="oo-link" href="file:///home/ayaz/Documents/Ayaz%20OS/06%20System/Markets%20Briefs/%E2%84%A2%20Markets%20Brief%20%E2%80%94%20Home.md">Open Markets Brief home</a>
+          This example is a fixed design-system specimen, not an operational dashboard. For the stable
+          implementation contract, open <a class="oo-link" href="../tokens.css">tokens.css</a>,
+          <a class="oo-link" href="../components.css">components.css</a>, or
+          <a class="oo-link" href="../DESIGN.md">DESIGN.md</a>.
         </p>
       </div>
     </section>
 
-    <!-- ── 06 · SOURCE LEDGER — console plate ── -->
-    <section class="oo-plate">
-      <div class="oo-kicker">// 06</div>
+    <!-- 06 · Source ledger contains only repository-owned, navigable sources. -->
+    <section class="oo-plate" id="source-ledger">
+      <div class="oo-kicker">// 06 · ARTIFACT-OWNED SOURCES</div>
       <h2 class="oo-display-console" style="font-size:34px; margin-top:8px;">Source Ledger</h2>
       <dl class="mb-ledger" style="margin-top:28px;">
-        <div><dt>Generator</dt><dd>/home/ayaz/Github/dotfiles/scripts/brief-me</dd></div>
-        <div><dt>Style kit (source)</dt><dd>/home/ayaz/Documents/Ayaz OS/06 System/™ CRT Field-Console Brand Book v2.html</dd></div>
-        <div><dt>Restyle kit (mock)</dt><dd>~/Github/open-outcry — tokens.css + components.css v1.3 (freeze lifted by this page's friction log)</dd></div>
-        <div><dt>Visual standard</dt><dd>/home/ayaz/Documents/Ayaz OS/03 Projects/System/01 Specs/™ Ayaz OS Visual Artifact Standard.md</dd></div>
-        <div><dt>Job tasks</dt><dd>/home/ayaz/Documents/Ayaz OS/03 Projects/Job Hunt/™ Job Hunt — Tasks.md</dd></div>
-        <div><dt>Cron state</dt><dd>/home/ayaz/.hermes/profiles/alfred/cron/jobs.json</dd></div>
-        <div><dt>TRAP summary</dt><dd>/home/ayaz/.local/share/ayaz-memory-rag/trap/summary/2026-06-09.json</dd></div>
-        <div><dt>TRAP dashboard</dt><dd>/home/ayaz/.local/share/ayaz-memory-rag/trap/dashboard/2026-06-09.md</dd></div>
-        <div><dt>StockGuy source-intel</dt><dd>/home/ayaz/Documents/Ayaz OS/05 Wiki/Topics/trading/thestockguy/™ TheStockGuy VOD 2026-06-08 11-12 Insider Buying and Macro Pass.md</dd></div>
-        <div><dt>StockGuy Twitch window</dt><dd><a class="oo-link" href="https://www.twitch.tv/videos/2791682400?t=1h33m48s">twitch.tv/videos/2791682400?t=1h33m48s</a></dd></div>
-        <div><dt>Rendered</dt><dd>2026-06-09T08:01:46.827000-04:00</dd></div>
+        <div><dt>Design tokens · v1.4</dt><dd><a class="oo-link" href="../tokens.css">../tokens.css</a></dd></div>
+        <div><dt>Components · v1.6</dt><dd><a class="oo-link" href="../components.css">../components.css</a></dd></div>
+        <div><dt>Design contract</dt><dd><a class="oo-link" href="../DESIGN.md">../DESIGN.md</a></dd></div>
+        <div><dt>Product boundary</dt><dd><a class="oo-link" href="../PRODUCT.md">../PRODUCT.md</a></dd></div>
+        <div><dt>Public brand book</dt><dd><a class="oo-link" href="../index.html">../index.html</a></dd></div>
+        <div><dt>Consumer specimen</dt><dd><a class="oo-link" href="morning-brief.html">morning-brief.html</a></dd></div>
       </dl>
     </section>
 
-    <!-- ── FOOTER INDEX ── -->
+    <!-- Footer index closes the fixed specimen without a live-state claim. -->
     <section class="oo-plate" style="border-bottom:none; padding:32px 0;">
       <div class="oo-rail oo-rail--foot" style="padding:14px 0;">
-        <span>morning-brief · second consumer of <a class="oo-link" href="../index.html">open-outcry</a> v1.3</span>
-        <span class="oo-kicker">REGISTER LAW HELD · FRICTION LOG → v1.3 · MARKETS POINTER-ONLY</span>
+        <span>editorial publication brief · <a class="oo-link" href="../index.html">open-outcry</a></span>
+        <span class="oo-kicker">TOKENS v1.4 · COMPONENTS v1.6 · PUBLIC SPECIMEN</span>
       </div>
     </section>
 
@@ -375,10 +263,10 @@ page-local rule groups + 2 page-local utility classes the contract owed us.
 
   <footer class="oo-rail--sticky">
     <div class="oo-tape" aria-hidden="true"><div class="oo-tickwrap">
-       21 OPEN TASKS · 5299 CARDS · <span class="up">0 DUE</span> · 3480 WEAK LINKS · <span class="up">SERVICES 0 FAILED</span> · <span class="up">DISK 78%</span> · <span class="down">CRON 1/9 FAIL</span> ·
-       21 OPEN TASKS · 5299 CARDS · <span class="up">0 DUE</span> · 3480 WEAK LINKS · <span class="up">SERVICES 0 FAILED</span> · <span class="up">DISK 78%</span> · <span class="down">CRON 1/9 FAIL</span> ·
-       21 OPEN TASKS · 5299 CARDS · <span class="up">0 DUE</span> · 3480 WEAK LINKS · <span class="up">SERVICES 0 FAILED</span> · <span class="up">DISK 78%</span> · <span class="down">CRON 1/9 FAIL</span> ·
-       21 OPEN TASKS · 5299 CARDS · <span class="up">0 DUE</span> · 3480 WEAK LINKS · <span class="up">SERVICES 0 FAILED</span> · <span class="up">DISK 78%</span> · <span class="down">CRON 1/9 FAIL</span> ·
+       ILLUSTRATIVE SPECIMEN · STATIC PROVENANCE · PUBLIC SOURCES · DATED RECEIPT · NO LIVE-STATE CLAIM ·
+       ILLUSTRATIVE SPECIMEN · STATIC PROVENANCE · PUBLIC SOURCES · DATED RECEIPT · NO LIVE-STATE CLAIM ·
+       ILLUSTRATIVE SPECIMEN · STATIC PROVENANCE · PUBLIC SOURCES · DATED RECEIPT · NO LIVE-STATE CLAIM ·
+       ILLUSTRATIVE SPECIMEN · STATIC PROVENANCE · PUBLIC SOURCES · DATED RECEIPT · NO LIVE-STATE CLAIM ·
     </div></div>
   </footer>
 

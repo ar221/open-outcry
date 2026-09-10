@@ -212,7 +212,7 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
 .oo-draw-path.is-drawing { animation: oo-draw 2.6s linear forwards; }
 
 /* armed panes invert on click — black-on-voice */
-.oo-hover:active { background: var(--r-voice); color: var(--oo-void); }
+.oo-hover:active { background-color: var(--r-voice); color: var(--oo-void); }
 
 /* ── Stage: the consumer shell (promoted v1.4 — the brand book itself was the
       FIFTH copy of this boilerplate; every consumer had rebuilt it verbatim).
@@ -322,7 +322,7 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
       black-on-voice :active invert. ── */
 .oo-btn {
   display: inline-flex; align-items: center; justify-content: center;
-  padding: 11px 16px; min-height: 42px;
+  padding: 11px 16px; min-height: 44px;
   font-family: var(--oo-font-mono); font-size: 12px; font-weight: 700;
   letter-spacing: .08em; text-transform: uppercase;
   color: var(--r-voice); text-decoration: none;

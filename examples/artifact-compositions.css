@@ -1,0 +1,330 @@
+/* ═══════════════════════════════════════════════════════════
+   OPEN OUTCRY — artifact compositions (CONSUMER-LOCAL)
+
+   Loaded by three artifacts sharing one subject and one lane:
+     · editorial-report.html   sustained reading · Broadcast
+     · decision-brief.html     one page of judgment · Broadcast recommendation,
+                               Console evidence quoted
+     · presentation.html       five slides · spoken at distance
+
+   Not contract, not a promotion claim: tokens.css stays v1.4, components.css
+   stays v1.6. Load order is tokens → components → this file, so single-class
+   rules here win on source order (that is how .art-h2 retunes the size of
+   .oo-display-broadcast without !important).
+
+   QUIET RECIPE (.art-quiet) — the live-desk default minus its liveness, inside
+   the existing palette and faces:
+     · prose up to 17px/1.75 — read for ten minutes, not glanced at
+     · console display glow off — a room-carrying text-shadow smears a heading
+       you are reading a paragraph beneath
+     · no grain, no plate figure, no scanbeam — the audit direction for
+       sustained reading is fewer textures, not softer ones
+     · the tape frozen into a static provenance rail: no crawl, no live dot,
+       and no .oo-cursor anywhere — a dated document has no liveness to report
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Shell. Stays page-local: components.css does not own bare elements. ── */
+* { box-sizing: border-box; margin: 0; }
+html { scroll-behavior: auto; }   /* linear/steps only: no UA smooth-scroll easing */
+body {
+  background-color: var(--oo-void);
+  color: var(--r-fg);
+  font-family: var(--oo-font-mono);
+  font-size: var(--oo-type-body);
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+/* Wrapped narrow rails are taller; anchors must clear the actual reading chrome. */
+.art-quiet section[id] { scroll-margin-top: 60px; }
+.art-deck section[id] { scroll-margin-top: 0; }
+
+/* ── Quiet register: restraint applied to contract classes, scoped ── */
+.art-quiet .oo-display-console { text-shadow: none; }
+
+/* Header rail: WRAPS rather than dropping content. Hiding the specimen label
+   on a phone means the first screen of an illustrative document no longer
+   says it is illustrative, so the rail wraps, the date never breaks
+   mid-string, and the long pseudo-path collapses to a short label. */
+.art-rail { flex-wrap: wrap; gap: 4px 14px; }
+.art-rail-right { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
+.art-nowrap { white-space: nowrap; }
+.art-rail-short { display: none; }
+@media (max-width: 720px) {
+  .art-rail-path  { display: none; }
+  .art-rail-short { display: inline; }
+}
+/* Static rail: tape chrome, no motion. `contain: inline-size` on .oo-tape
+   (v1.6) is what makes a tape safe in normal flow; this strip wraps, because a
+   frozen receipt is not a crawl. */
+.art-quiet .oo-tape .art-static-strip {
+  display: block; padding: 8px 0;
+  white-space: normal;
+  color: var(--r-muted);
+}
+
+/* ── Sustained reading. 68ch of JetBrains Mono at 17px ≈ 694px: a file path
+      does not wrap mid-citation, and the line is still trackable. .oo-prose
+      stays right for a 54ch aside; this is the long column. ── */
+.art-read {
+  max-width: 68ch;
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--r-fg);
+}
+.art-read + .art-read { margin-top: 1.75em; }
+.art-read b, .art-read strong { color: var(--r-fg); font-weight: 700; }
+.art-read em { font-style: italic; color: var(--r-voice); }
+
+/* Standfirst: the paragraph that has to be read if nothing else is. */
+.art-lede {
+  max-width: 62ch;
+  font-size: 19px;
+  line-height: 1.65;
+  color: var(--r-fg);
+}
+
+/* Headings: composed on the display classes and retuned down — a 96px display
+   is a cover, not a section marker. */
+.art-h2 { font-size: clamp(26px, 3.2vw, 38px); }
+.art-h3 {
+  font-family: var(--oo-font-mono); font-size: 13px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--r-voice);
+}
+.art-secnum {
+  font-family: var(--oo-font-mono); font-size: 12px; letter-spacing: .18em;
+  color: var(--r-muted);
+}
+
+/* ── Ledger rows: label + value. A decision artifact is mostly this. ── */
+.art-ledger { font-size: 14px; }
+.art-ledger > div {
+  display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 18px;
+  padding: 11px 0; border-bottom: 1px solid var(--r-line);
+}
+.art-ledger > div:last-child { border-bottom: none; }
+.art-ledger dt {
+  color: var(--r-muted); letter-spacing: .06em; text-transform: uppercase;
+  font-size: 12px; padding-top: 2px;
+}
+.art-ledger dd { color: var(--r-fg-dim); overflow-wrap: anywhere; }
+
+/* ── Citation line: where a claim's evidence is, under the claim ── */
+.art-cite {
+  font-size: 13px; line-height: 1.6; color: var(--r-muted);
+  overflow-wrap: anywhere;
+}
+.art-cite::before { content: "source "; color: var(--r-voice-dim); }
+
+/* ── Alternatives: verdict rows, not a card grid ── */
+.art-alt {
+  display: grid; grid-template-columns: minmax(0, 1fr) 152px; gap: 20px;
+  padding: 18px 0; border-top: 1px solid var(--r-line); align-items: start;
+}
+.art-alt:last-of-type { border-bottom: 1px solid var(--r-line); }
+.art-verdict {
+  font-family: var(--oo-font-mono); font-size: 12px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; padding-top: 3px;
+}
+
+/* ── Sources: a list of paths and their roles ── */
+.art-sources { list-style: none; padding: 0; font-size: 14px; }
+.art-sources > li {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 18px; padding: 13px 0; border-top: 1px solid var(--r-line);
+}
+.art-sources > li:last-child { border-bottom: 1px solid var(--r-line); }
+.art-role { color: var(--r-muted); font-size: 13px; }
+
+/* ── Deck ─────────────────────────────────────────────────────
+   Anchors and native scrolling only: every deck control is an <a> to a real
+   slide id, so keyboard, back button, deep link and print all work with no
+   script and nothing here can be dead. ── */
+.art-deck-root { scroll-snap-type: y proximity; scroll-padding-top: 46px; }
+
+.art-slide {
+  min-height: calc(100vh - 46px); min-height: calc(100svh - 46px);
+  scroll-snap-align: start;
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 24px;
+  padding: 56px 0 88px;   /* clears the sticky rail above, the fixed nav below */
+  border-bottom: 1px solid var(--r-line);
+}
+.art-slide:last-of-type { border-bottom: none; }
+.art-slide-body { align-self: center; min-width: 0; }
+
+/* Projected type: read from the back of a room. At a 1280×720 projection these
+   resolve to ~20px body and ~29px lead. */
+.art-slide-body p, .art-slide-body li {
+  font-size: clamp(17px, 1.6vw, 22px); line-height: 1.6; max-width: 62ch;
+}
+.art-slide-lead {
+  font-size: clamp(20px, 2.3vw, 30px) !important;   /* wins over the rule above */
+  line-height: 1.45; color: var(--r-fg); max-width: 54ch;
+}
+.art-slide-foot {
+  display: flex; flex-wrap: wrap; gap: 10px 22px;
+  justify-content: space-between; align-items: baseline;
+  font-size: 12px; color: var(--r-muted);
+  border-top: 1px solid var(--r-line); padding-top: 12px;
+}
+
+/* Slide points: real enumeration, mono markers, no icon set. */
+.art-points { list-style: none; display: grid; gap: 18px; padding: 0; }
+.art-points > li { display: grid; grid-template-columns: 3.6ch minmax(0, 1fr); gap: 16px; }
+.art-points > li::before {
+  content: attr(data-n); color: var(--r-voice);
+  font-size: 13px; letter-spacing: .06em; padding-top: .45em;
+}
+
+/* Deck nav: fixed strip of numbered anchors plus prev/next. 44px targets
+   (v1.6's .oo-btn floor); opaque fill via background-color, never the
+   shorthand — the stage beneath carries scanlines. */
+.art-nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background-color: var(--r-stage);
+  border-top: 1px solid var(--r-line);
+}
+.art-nav-inner {
+  max-width: 1080px; margin: 0 auto; padding: 0 var(--oo-gutter);
+  display: flex; align-items: center; gap: 4px;
+  min-height: 52px;
+}
+.art-navlink {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px; padding: 0 8px;
+  font-family: var(--oo-font-mono); font-size: 12px; letter-spacing: .06em;
+  color: var(--r-muted); text-decoration: none;
+  border: 1px solid transparent; border-radius: var(--oo-radius);
+}
+.art-navlink:hover { color: var(--r-voice); border-color: var(--r-line); }
+.art-navlink:focus-visible { outline: 2px solid var(--r-voice); outline-offset: 2px; }
+/* The current-slide marker is scriptless and so lives with the deck: it is
+   driven by :target, which only the consuming page can enumerate. */
+.art-nav-step { margin-left: auto; padding: 0 14px; font-weight: 700; }
+.art-nav-step + .art-nav-step { margin-left: 0; }
+
+/* ── Narrow: stacked, tighter, targets intact ── */
+@media (max-width: 720px) {
+  .art-quiet section[id] { scroll-margin-top: 110px; }
+  .art-deck section[id] { scroll-margin-top: 70px; }
+  .art-read  { font-size: 16px; line-height: 1.7; }
+  .art-lede  { font-size: 17px; }
+  .art-ledger > div { grid-template-columns: minmax(0, 1fr); gap: 3px; }
+  .art-alt   { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .art-sources > li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+
+  /* A phone is not a projector. Snapping a 100svh slide on a short viewport
+     traps the reader between screens, so the deck becomes a document. */
+  .art-deck-root { scroll-snap-type: none; scroll-padding-top: 40px; }
+  .art-slide {
+    min-height: 0; scroll-snap-align: none;
+    padding: 40px 0 36px; gap: 20px;
+  }
+  .art-slide-body { align-self: start; }
+  .art-nav-inner { overflow-x: auto; gap: 2px; padding: 0 12px; }
+  .art-nav-step { margin-left: 8px; padding: 0 8px; }
+  body.art-deck { padding-bottom: 56px; }   /* nothing hides under the fixed nav */
+}
+
+/* ═══ PAPER ═══════════════════════════════════════════════════
+   ① The register inverts, the palette does not: --oo-fg becomes the paper,
+     --oo-void the ink. No new colour — the alias layer is re-seated, the same
+     mechanism tokens.css uses per register. Backgrounds are NOT forced with
+     print-color-adjust: drop the paper fill and the sheet is plain white with
+     #020302 ink, so it degrades upward.
+   ② The screen ramp does not survive paper. Ink, one mixed secondary, one
+     mixed accent — all three mixed from existing tokens, all measured against
+     the paper, hierarchy otherwise carried by size, weight and space.
+   ③ Texture, motion and chrome are screen affordances and leave. Panes keep
+     the border and lose the fill: a border prints, a smoke fill does not.
+   @page geometry stays page-local — report/brief portrait, deck landscape.
+   ═══════════════════════════════════════════════════════════ */
+@media print {
+  :root, .reg-console, .reg-broadcast, .oo-register-quote {
+    --r-stage: transparent;
+    --r-pane:  transparent;
+    --r-smoke: transparent;
+    --r-fg:      var(--oo-void);
+    --r-fg-dim:  color-mix(in srgb, var(--oo-void) 88%, var(--oo-fg));
+    --r-muted:   color-mix(in srgb, var(--oo-void) 62%, var(--oo-fg));
+    --r-line:    color-mix(in srgb, var(--oo-void) 45%, var(--oo-fg));
+    --r-glow:    transparent;
+    /* Paper voice is ONE accent, and it is not the screen accent. Raw
+       amber-line measures ~3.9:1 on #eee8df and peach/terracotta ~2.5:1 —
+       under the 4.5:1 floor for normal text, and this accent carries citation
+       labels, so it has to clear it. Seating amber-line 80% into the void
+       lands ≈#7c541c at ~5.5:1 against the paper. Same ramp, darker seat: no
+       new colour is decided, and the screen glow is not carried onto paper. */
+    --r-voice:     color-mix(in srgb, var(--oo-amber-line) 80%, var(--oo-void));
+    --r-voice-dim: color-mix(in srgb, var(--oo-amber-line) 80%, var(--oo-void));
+  }
+
+  body {
+    background-color: var(--oo-fg);
+    color: var(--oo-void);
+    font-size: 11pt; line-height: 1.55;
+  }
+  p, li, dd { orphans: 3; widows: 3; }
+
+  /* texture, motion, chrome */
+  .oo-scanlines, .oo-register-quote { background-image: none; }
+  .oo-register-quote { background-color: transparent; color: var(--r-fg); }
+  .oo-grain::before, .oo-vignette::after { display: none; }
+  .oo-plate-figure, .oo-scanbeam, .oo-cursor, .oo-dot,
+  .oo-tape, .art-nav, .oo-btn, .art-screen-only { display: none; }
+  .oo-rail--sticky { position: static; }
+  .oo-display-console { text-shadow: none; }
+  /* the display classes hardcode screen ink, so paper has to restate it */
+  .oo-display-console, .oo-display-broadcast { color: var(--oo-void); }
+  .oo-display-broadcast em, .voice { color: var(--r-voice); }
+
+  /* Inline screen accents must not survive as faint ink on paper. */
+  [style*="color:var(--oo-"], .up, .down { color: var(--r-voice) !important; }
+  .art-screen-only { display: none !important; }
+  /* geometry: the stage stops being a stage */
+  .oo-stage {
+    max-width: none; min-height: 0; padding: 0;
+    border-left: none; border-right: none;
+  }
+  .oo-plate, .oo-plate--bleed {
+    margin: 0; padding: 0 0 14pt; border-bottom: none; overflow: visible;
+  }
+  .oo-pane { background-color: transparent; border-color: var(--r-line); }
+  .oo-rail { border-color: var(--r-line); }
+  .oo-link { color: var(--oo-void); text-decoration-color: var(--r-voice); }
+
+  /* paper type */
+  .art-read  { font-size: 10.5pt; line-height: 1.6; max-width: none; color: var(--oo-void); }
+  .art-lede  { font-size: 12pt; max-width: none; }
+  .art-h2    { font-size: 19pt; }
+  .art-h3    { font-size: 9.5pt; }
+  .art-cite  { font-size: 8.5pt; }
+  .art-ledger { font-size: 9pt; }
+  .art-ledger > div { grid-template-columns: 150pt minmax(0, 1fr); gap: 12pt; }
+  .art-sources { font-size: 9pt; }
+  .art-slide-body p, .art-slide-body li { font-size: 13pt; max-width: none; }
+  .art-slide-lead { font-size: 20pt !important; }
+
+  /* Reports flow continuously; slides explicitly break below their footers. */
+  h1, h2, h3, .art-h2, .art-h3 { break-after: avoid; }
+  .oo-pane, .oo-register-quote, .art-alt, .art-ledger > div,
+  .oo-warning, .art-slide-foot, .art-sources > li { break-inside: avoid; }
+
+  /* deck: one slide per landscape page. Height goes auto — a printed 100svh
+     slide is a clipped slide — and the footer citation sits inside the slide's
+     own flow, so the break falls below it instead of through it. */
+  .art-slide {
+    min-height: 0; height: auto; padding: 0 0 6pt;
+    border-bottom: none; break-after: page; break-inside: avoid;
+    grid-template-rows: auto auto auto; gap: 14pt;
+  }
+  .art-slide:last-of-type { break-after: auto; }
+  .art-slide-body { align-self: start; }
+  body.art-deck { padding-bottom: 0; }
+
+  /* a printed link has no href, so print the path beside it */
+  .art-cite a::after, .art-sources a::after {
+    content: " (" attr(href) ")"; color: var(--r-muted); font-size: .88em;
+  }
+}
+

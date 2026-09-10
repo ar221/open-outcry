@@ -2,11 +2,12 @@
    OPEN OUTCRY — brand book behaviour (page-local)
    Dependency-free. No framework, no polyfill, no scroll polling.
 
-   Four jobs, and nothing else:
+   Five jobs, and nothing else:
      1. chrome measurement — the sticky rails publish their own height
      2. contract facts     — token/class counts read from the live CSSOM
-     3. the Tape           — chapter state via IntersectionObserver
-     4. quotation controls — one inset per plate, never a page repaint
+     3. version mirror     — one canonical node per version, echoed
+     4. the Tape           — chapter state via IntersectionObserver
+     5. quotation controls — one inset per plate, never a page repaint
 
    Everything degrades: over file:// the CSSOM is cross-origin-opaque and
    every derived fact reports `n/a` rather than a fabricated number.
@@ -97,6 +98,29 @@
   setText('fact-components-2',  pad(facts.components));
   setText('stat-components',    pad(facts.components));
 
+  /* ── 3 · the version mirror ──
+     The crawl used to carry typed version labels and drifted a whole minor
+     behind the contract receipt: v1.3/v1.5 on a page whose own receipt said
+     v1.4/v1.6. A moving strip that contradicts the document beside it is
+     worse than no strip. So the opening CONTRACT block is the single visible
+     source — it is the first factual thing a reader sees — and every other
+     appearance is mirrored from that node. No fetch, no parse, no second
+     copy to forget. Dated historical statements ("frozen again after the
+     2026-08-09 promotion") stay authored, because history does not move. */
+  const versionOf = id => {
+    const el = document.getElementById(id);
+    const text = el ? el.textContent.trim() : '';
+    return text || 'n/a';
+  };
+  const versions = {
+    tokens:     versionOf('ver-tokens'),
+    components: versionOf('ver-components'),
+  };
+  for (const el of $$('[data-ver]')) {
+    const v = versions[el.dataset.ver];
+    if (v) el.textContent = v;
+  }
+
   /* ── the crawl: the same figures, moving. Decorative duplicate of the
      stat row above it, doubled so the loop has no gap. Never a control. ── */
   const crawl = $('#tape-crawl');
@@ -105,8 +129,8 @@
       ` TOKENS <span class="voice">${pad(facts.tokens)}</span>` +
       ` · COMPONENTS <span class="voice">${pad(facts.components)}</span>` +
       ` · REGISTERS <span class="voice">02</span>` +
-      ` · TOKENS.CSS <span class="up">v1.3</span>` +
-      ` · COMPONENTS.CSS <span class="up">v1.5</span>` +
+      ` · TOKENS.CSS <span class="voice">${versions.tokens}</span>` +
+      ` · COMPONENTS.CSS <span class="voice">${versions.components}</span>` +
       ` · PLATE SOURCE <span class="up">VERIFIED</span>` +
       ` · CSS LABS <span class="voice">07</span>` +
       ` · FABRICATED METRICS <span class="down">00</span>` +
@@ -143,9 +167,9 @@
       ['--oo-fg',         'console primary · stamped white'],
       ['--oo-fg-warm',    'broadcast primary · creamier'],
       ['--oo-fg-dim',     'body prose in both registers'],
-      ['--oo-muted',      'console metadata'],
-      ['--oo-muted-warm', 'broadcast metadata'],
-      ['--oo-ghost',      'disabled · rule · placeholder'],
+      ['--oo-muted',      'console metadata · readable secondary ink'],
+      ['--oo-muted-warm', 'broadcast metadata · readable secondary ink'],
+      ['--oo-ghost',      'decorative only — rules, ornament glyphs, disabled hardware; never readable text or essential metadata'],
     ]],
     ['semantics — the Tape', [
       ['--oo-green',      'live · up · safe · pass'],
@@ -216,10 +240,16 @@
   addEventListener('resize', reportEnvironment, { passive: true });
   reduced.addEventListener('change', reportEnvironment);
 
-  /* ── 3 · the Tape carries chapter state ──
+  /* ── 4 · the Tape carries chapter state ──
      IntersectionObserver, not a scroll handler. The marker is never colour
-     alone — ink, dot and glyph all change together. */
-  const links = $$('#tape-nav a');
+     alone — ink, dot and glyph all change together.
+
+     Only the STOPS are observed. The Ledger's nested subsection links live
+     in the same rail but are not tape stops: resolving to one of them would
+     strip aria-current from the Ledger, which is what reveals the nested
+     list in the first place — the sublist would close the moment it was
+     used. `data-tape-stop` is the whole distinction. */
+  const links = $$('#tape-nav a[data-tape-stop]');
   const acts  = links
     .map(a => document.getElementById(decodeURIComponent(a.hash.slice(1))))
     .filter(Boolean);
@@ -322,7 +352,7 @@
     for (const p of paths) so.observe(p);
   }
 
-  /* ── 4 · quotation controls ──
+  /* ── 5 · quotation controls ──
      The old whole-page register toggle is retired: it taught the reader that
      register is a skin. Each control reveals ONE inset from the other
      register and never touches the dominant register of the page. Hidden

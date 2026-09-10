@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Freeze the receipt — an editorial report — Open Outcry</title>
+<meta name="description" content="An illustrative editorial report weighing frozen provenance against live lookups for published research notes.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<link rel="stylesheet" href="artifact-compositions.css">
+<style>
+  @page { size: A4 portrait; margin: 17mm 16mm; }
+  .rp-plate { padding: 38px 0; }
+  .rp-cover { padding: 64px 0 44px; }
+  .rp-title { margin: 24px 0; max-width: 19ch; font-size: clamp(34px,5.4vw,72px); }
+  .rp-head { display: grid; grid-template-columns: 5ch minmax(0,1fr); gap: 18px; align-items: baseline; margin-bottom: 22px; }
+  .rp-toc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 28px; }
+  .rp-toc a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; font-size: 12px; color: var(--r-fg-dim); border: 1px solid var(--r-line); text-decoration: none; }
+  .rp-toc a:hover { color: var(--r-voice); }
+  .rp-toc a:focus-visible { outline: 2px solid var(--r-voice); outline-offset: 2px; }
+  .rp-note { margin-top: 24px; font-size: 14px; color: var(--r-muted); max-width: 68ch; }
+  .rp-evidence + .rp-evidence { margin-top: 30px; }
+  .rp-evidence .art-h3 { margin-bottom: 12px; }
+  .rp-evidence .art-cite { margin-top: 12px; }
+  .rp-receipt { margin-top: 22px; }
+  @media (max-width: 720px) { .rp-head { grid-template-columns: 1fr; gap: 6px; } .rp-cover { padding-top: 36px; } }
+  @media print {
+    .rp-plate, .rp-cover { padding: 10pt 0; }
+    .rp-title { font-size: 27pt; max-width: none; margin: 10pt 0; }
+    .rp-toc { display: none; }
+    .rp-head { grid-template-columns: 4ch minmax(0,1fr); gap: 10pt; margin-bottom: 8pt; }
+    .art-read { font-size: 10pt; line-height: 1.55; }
+    .art-read + .art-read { margin-top: 8pt; }
+    .art-lede { font-size: 11pt; }
+    .rp-note { margin-top: 8pt; font-size: 9pt; max-width: none; }
+    .rp-evidence + .rp-evidence { margin-top: 12pt; }
+    .rp-evidence .art-h3 { margin-bottom: 6pt; }
+    .rp-evidence .art-cite { margin-top: 6pt; }
+    .art-role { font-size: 9pt; }
+    .art-sources > li { padding: 5pt 0; }
+    .rp-receipt { margin-top: 8pt; font-size: 9pt; padding: 8pt 10pt; }
+  }
+</style>
+</head>
+<body class="reg-broadcast art-quiet">
+<div class="oo-stage">
+  <header class="oo-rail oo-rail--sticky art-rail">
+    <span class="art-rail-path">&gt; <span class="voice">open-outcry</span>/examples/editorial-report</span>
+    <span class="art-rail-short"><span class="voice">Open Outcry</span> / editorial report</span>
+    <span class="art-rail-right"><span class="oo-kicker art-nowrap">ILLUSTRATIVE SPECIMEN</span><span class="art-nowrap">2026-09-08</span></span>
+  </header>
+  <main>
+    <header class="oo-plate rp-cover">
+      <div class="oo-kicker">Research note / document provenance</div>
+      <h1 class="oo-display-broadcast rp-title">A published note should <em>carry its own receipt</em>.</h1>
+      <p class="art-lede">A live lookup keeps a dashboard useful. The same lookup can change the evidence beneath a dated argument. Choose the source’s behavior to match the document’s job.</p>
+      <p class="rp-note">An illustrative decision, not a repository policy. The observations below come from public Open Outcry files; the recommendation is an editorial judgment based on those observations.</p>
+      <nav class="rp-toc" aria-label="Sections">
+        <a href="#claim">00 · Decision</a><a href="#argument">01 · Argument</a><a href="#evidence">02 · Evidence</a><a href="#cost">03 · Cost</a><a href="#alternatives">04 · Alternatives</a><a href="#conclusion">05 · Conclusion</a><a href="#sources">06 · Sources</a>
+      </nav>
+    </header>
+    <section class="oo-plate rp-plate" id="claim" aria-labelledby="h-claim">
+      <div class="rp-head"><span class="art-secnum">00</span><h2 class="oo-display-broadcast art-h2" id="h-claim">The decision</h2></div>
+      <p class="art-read">For a published research note, freeze the provenance at publication, give each fact one owner in the source, and issue a newly dated edition when the argument changes. Keep older editions available. This preserves the relationship between what an author saw and what they concluded.</p>
+      <p class="art-read">This rule does not apply to dashboards, status surfaces or the living brand book. Their reader is asking what is true now. A stale snapshot would frustrate that purpose.</p>
+    </section>
+    <section class="oo-plate rp-plate" id="argument" aria-labelledby="h-argument">
+      <div class="rp-head"><span class="art-secnum">01</span><h2 class="oo-display-broadcast art-h2" id="h-argument">Two questions, two sources</h2></div>
+      <p class="art-read">“What is the current value?” and “What supported this conclusion?” can require different answers. If a note fetches a new value every time it opens, its paragraph may remain unchanged while its apparent evidence moves. The reader can no longer tell which value the author used.</p>
+      <p class="art-read">Freezing the receipt makes that relationship inspectable. It does not make the claim correct or the citation permanent. A source URL can move, and a captured value can be wrong. The author still needs to name the source and observation date; important external evidence may need an archived copy or a version-pinned reference.</p>
+      <p class="art-read">A separate problem is duplication. Two handwritten copies of a version label can disagree even in a wholly static page. Whether the source is frozen or live, repeated appearances should derive from one owner. Choosing a publication model is not a substitute for choosing that owner.</p>
+    </section>
+    <section class="oo-plate rp-plate" id="evidence" aria-labelledby="h-evidence">
+      <div class="rp-head"><span class="art-secnum">02</span><h2 class="oo-display-broadcast art-h2" id="h-evidence">What this repository shows</h2></div>
+      <div class="rp-evidence">
+        <h3 class="art-h3">01 / A version label can have one owner</h3>
+        <p class="art-read">The brand book’s script reads the visible contract labels and mirrors them into other version nodes and the crawl. Its version-mirror comment records why: separately typed labels had drifted apart. The current mechanism repairs duplication; it does not independently establish that the owning label matches a stylesheet release.</p>
+        <p class="art-cite"><a class="oo-link" href="../brandbook.js">brandbook.js</a>, version mirror; <a class="oo-link" href="../index.html#act-opening-bell">opening contract block</a>.</p>
+      </div>
+      <div class="rp-evidence">
+        <h3 class="art-h3">02 / Live resolution can be the right choice</h3>
+        <p class="art-read">The token ledger reads the loaded stylesheet rather than maintaining a second typed table. That behavior belongs in a living reference: the values being demonstrated are the values the page actually uses. It illustrates why this report excludes current-state surfaces from its recommendation.</p>
+        <p class="art-cite"><a class="oo-link" href="../index.html#ledger-tokens">Token ledger</a>; <a class="oo-link" href="../brandbook.js">brandbook.js</a>, stylesheet inspection.</p>
+      </div>
+      <div class="rp-evidence">
+        <h3 class="art-h3">03 / A passing check has a limited claim</h3>
+        <p class="art-read">The contract verifier checks that display-declaring component classes carry a hidden-state guard. It does not check provenance, factual accuracy or every accessibility requirement. A receipt should name what a check establishes rather than turning a narrow pass into a general quality claim.</p>
+        <p class="art-cite"><a class="oo-link" href="../experiments/verify-contract.mjs">verify-contract.mjs</a>; <a class="oo-link" href="https://github.com/ar221/open-outcry/blob/main/.github/workflows/contract.yml">contract workflow</a>.</p>
+      </div>
+    </section>
+    <section class="oo-plate rp-plate" id="cost" aria-labelledby="h-cost">
+      <div class="rp-head"><span class="art-secnum">03</span><h2 class="oo-display-broadcast art-h2" id="h-cost">Staleness becomes explicit</h2></div>
+      <p class="art-read">A frozen receipt ages by design. Make its date easy to find, avoid live-status decoration, and separate later corrections from the original edition. This is editorial work: an author must preserve old copies and explain why a new one exists.</p>
+      <p class="art-read">The benefit is portability. The note can retain its own evidence summary without an endpoint, permission prompt or network request. External citations still require access; the receipt is not an archive of every linked source.</p>
+    </section>
+    <section class="oo-plate rp-plate" id="alternatives" aria-labelledby="h-alternatives">
+      <div class="rp-head"><span class="art-secnum">04</span><h2 class="oo-display-broadcast art-h2" id="h-alternatives">What was rejected</h2></div>
+      <dl class="art-ledger">
+        <div><dt>Live lookup</dt><dd>Right for a current-state mirror. Rejected for a dated note because the evidence can change without the argument changing.</dd></div>
+        <div><dt>Frozen + live badge</dt><dd>Potentially useful for an explicit comparison. Rejected here because the note does not need two competing values or another runtime dependency.</dd></div>
+        <div><dt>No receipt</dt><dd>Less authoring work, but removes the reader’s direct route from the conclusion to its supporting sources.</dd></div>
+        <div><dt>Chosen</dt><dd>Frozen receipt, one owner, new edition on change. Accept the maintenance cost and label the date.</dd></div>
+      </dl>
+    </section>
+    <section class="oo-plate rp-plate" id="conclusion" aria-labelledby="h-conclusion">
+      <div class="rp-head"><span class="art-secnum">05</span><h2 class="oo-display-broadcast art-h2" id="h-conclusion">Preserve the argument’s context</h2></div>
+      <p class="art-read">A published note should let a later reader reconstruct the author’s reasoning. Freeze what supported the claim, identify its source and date, and do not silently replace it with today’s answer. Use live resolution where today’s answer is the product.</p>
+    </section>
+    <section class="oo-plate rp-plate" id="sources" aria-labelledby="h-sources">
+      <div class="rp-head"><span class="art-secnum">06</span><h2 class="oo-display-broadcast art-h2" id="h-sources">Sources and companion forms</h2></div>
+      <ul class="art-sources">
+        <li><a class="oo-link" href="../brandbook.js">brandbook.js</a><span class="art-role">Version mirroring and live stylesheet inspection.</span></li>
+        <li><a class="oo-link" href="../experiments/verify-contract.mjs">verify-contract.mjs</a><span class="art-role">The scope of the hidden-state guard check.</span></li>
+        <li><a class="oo-link" href="decision-brief.html">decision-brief.html</a><span class="art-role">Recommendation, tradeoffs and evidence on one printed page.</span></li>
+        <li><a class="oo-link" href="presentation.html">presentation.html</a><span class="art-role">Five slides for a spoken argument.</span></li>
+      </ul>
+      <div class="oo-register-quote oo-register-quote--block rp-receipt" id="receipt">
+        <span class="voice">RECEIPT</span> / illustrative specimen / frozen 2026-09-08<br>
+        tokens.css v1.4 · components.css v1.6 · consumer-local composition<br>
+        Citations point to the working repository, not immutable archived copies.
+      </div>
+    </section>
+  </main>
+  <footer class="oo-rail oo-rail--foot art-rail"><a class="oo-link" href="../index.html#use-open-outcry">Use Open Outcry</a><span class="oo-kicker">Quiet recipe / static provenance</span></footer>
+</div>
+</body>
+</html>

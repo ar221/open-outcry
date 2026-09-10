@@ -15,23 +15,41 @@ Consumers need two files:
 
 Import `tokens.css` first, then `components.css`. Everything else in this repository is evidence: a public reference surface, consumer examples, experiments, or receipts.
 
+Set the dominant register explicitly on the consumer root so register aliases and selection ink resolve together:
+
+```html
+<body class="reg-broadcast"> <!-- or reg-console -->
+```
+
+Do not rely on the Console fallback at `:root`; the root class is part of the consumer setup.
+
 The contract stays frozen until two independent production consumers exhibit the same friction. A primitive enters the contract on repeated use, not because one page wants it.
 
-Consumers must load Fraunces variable, Pixelify Sans, and JetBrains Mono. The contract declares fallbacks but does not fetch the fonts.
+Consumers must load Fraunces variable, Pixelify Sans, and JetBrains Mono. The contract declares fallbacks but does not fetch the fonts. Controls use mono chrome in either register, keep a visible focus ring, and have a 44px minimum height. Use `--oo-muted` (`#91877f`) or `--oo-muted-warm` (`#a08b7b`) for readable secondary copy; `--oo-ghost` is decorative-only, never text or essential metadata.
 
 ## The public brand book
 
 The living brand book consists of:
 
-- `index.html` — semantic content and specimens;
-- `brandbook.css` — page-local `--book-` / `.book-` composition: a container-relative unit, fit-to-measure mastheads, four-shadow frames, seated `color-mix()` fills, selection ink, and plate masks;
+- `index.html` — semantic content and specimens, with six numbered acts plus the unnumbered **Use Open Outcry** adoption stop, and Ledger jumps to tokens, seated fills, type, hardware, states, and motion;
+- `brandbook.css` — page-local `--book-` / `.book-` brand-book composition and interactions, including navigation, adoption guidance, receipts, grids, the container-relative unit, and four fit-to-measure chapter mastheads;
 - `brandbook.js` — dependency-free `IntersectionObserver` chapter state, register-quotation reveal controls, CSSOM-derived contract facts, and plate reveal, with no scroll polling loop;
 - `PRODUCT.md` — audience, actions, success test, and publication boundary;
 - `assets/plates/` — the canonical public-domain engraving masks.
 
-`brandbook.css` and `brandbook.js` are composition for this page only. They are not part of the reusable contract.
+The book consumes the promoted `.oo-frame`, seated `--r-seat-*` fills, register-scoped selection, and `.oo-plate-figure` from the reusable contract; those are not page-local inventions. `brandbook.css` and `brandbook.js` remain composition for this page only and are not part of the reusable contract. Use the book navigation to inspect a rule in context; use its early source links when adopting the contract.
 
-## Examples
+## Examples and composition recipes
+
+The artifact examples use one deliberately illustrative subject — choosing static provenance for a published research note — so format changes can be compared without inventing a new primitive:
+
+- [`examples/editorial-report.html`](examples/editorial-report.html) — **quiet report:** start with a Broadcast `.oo-stage`, use restrained `.oo-plate` sections and sustained-reading prose, then attach static provenance in a Console quotation pane.
+- [`examples/decision-brief.html`](examples/decision-brief.html) — **decision brief:** Broadcast recommendation, concise consequence paragraphs and alternative rows, then a Console evidence quotation. Prints on one A4 page.
+- [`examples/presentation.html`](examples/presentation.html) — **presentation:** five consumer-local `.art-slide` sections, each with one dominant first read; the evidence slide speaks Console, the others Broadcast. Prints one slide per landscape A4 page.
+
+Their shared artifact layout lives in consumer-local [`examples/artifact-compositions.css`](examples/artifact-compositions.css). Receipt rows also remain consumer-local pending repeated, independently agreed shape; neither the stylesheet nor those rows extend the v1.4/v1.6 contract.
+
+Existing references remain:
 
 - `examples/inir.html` — a Broadcast-led desktop-shell reference surface.
 - `examples/morning-brief.html` — a dual-register command-board specimen.

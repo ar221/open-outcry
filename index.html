@@ -31,15 +31,25 @@
 
 <div class="book-shell">
 
-  <nav class="book-tape-nav" id="tape-nav" aria-label="Chapters">
+  <nav class="book-tape-nav" id="tape-nav" aria-label="Sections">
     <div class="oo-kicker book-tape-label">// the tape</div>
     <ol>
-      <li><a href="#act-opening-bell"><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>Opening Bell<span class="book-tape-num">01</span></a></li>
-      <li><a href="#act-the-floor"><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>The Floor<span class="book-tape-num">02</span></a></li>
-      <li><a href="#act-two-voices"><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>Two Voices<span class="book-tape-num">03</span></a></li>
-      <li><a href="#act-the-ledger"><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>The Ledger<span class="book-tape-num">04</span></a></li>
-      <li><a href="#act-rules"><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>Rules<span class="book-tape-num">05</span></a></li>
-      <li><a href="#act-receipt"><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>Receipt<span class="book-tape-num">06</span></a></li>
+      <li><a href="#act-opening-bell" data-tape-stop><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>Opening Bell<span class="book-tape-num">01</span></a></li>
+      <li class="book-tape-use"><a href="#use-open-outcry" data-tape-stop><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>Use Open Outcry<span class="book-tape-num" aria-hidden="true">↗</span></a></li>
+      <li><a href="#act-the-floor" data-tape-stop><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>The Floor<span class="book-tape-num">02</span></a></li>
+      <li><a href="#act-two-voices" data-tape-stop><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>Two Voices<span class="book-tape-num">03</span></a></li>
+      <li><a href="#act-the-ledger" data-tape-stop><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>The Ledger<span class="book-tape-num">04</span></a>
+        <ul class="book-tape-sub">
+          <li><a href="#ledger-tokens">tokens</a></li>
+          <li><a href="#ledger-seated">seated fills</a></li>
+          <li><a href="#ledger-type">type</a></li>
+          <li><a href="#ledger-hardware">hardware</a></li>
+          <li><a href="#ledger-states">states</a></li>
+          <li><a href="#ledger-motion">motion</a></li>
+        </ul>
+      </li>
+      <li><a href="#act-rules" data-tape-stop><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>Rules<span class="book-tape-num">05</span></a></li>
+      <li><a href="#act-receipt" data-tape-stop><span class="book-tape-mark" aria-hidden="true">▸</span><span class="oo-dot" aria-hidden="true"></span>Receipt<span class="book-tape-num">06</span></a></li>
     </ol>
   </nav>
 
@@ -53,9 +63,9 @@
           <div class="oo-plate-figure book-plate--portico" data-reveal aria-hidden="true"></div>
           <div class="oo-content">
             <div class="oo-kicker">&lt; act = <span style="color:var(--oo-terracotta)">"I"</span> &gt; opening bell <span aria-hidden="true">- - - - - -</span></div>
-            <h1 class="book-fit book-masthead" id="h-opening-bell" style="margin-top:24px;">
-              <span><span>Markets once moved by voice.</span></span>
-              <span aria-hidden="true">Markets once moved by voice.</span>
+            <h1 class="book-lockup" id="h-opening-bell" style="margin-top:26px;">
+              <span class="book-wordmark">Open Outcry</span>
+              <span class="book-thesis">Markets once moved by voice.</span>
             </h1>
             <p class="book-lede" style="margin-top:26px;">
               Open Outcry keeps the judgment human and the <em style="color:var(--oo-peach)">evidence inspectable</em>.
@@ -70,8 +80,8 @@
             </p>
             <div class="oo-register-quote oo-register-quote--block" style="margin-top:30px; max-width:52ch;">
               &gt; cat CONTRACT<br>
-              tokens.css        <span class="voice">v1.4</span> · frozen<br>
-              components.css    <span class="voice">v1.6</span> · frozen<br>
+              tokens.css        <span class="voice" id="ver-tokens">v1.4</span> · frozen<br>
+              components.css    <span class="voice" id="ver-components">v1.6</span> · frozen<br>
               registers         <span class="voice">02</span> — console (default) / broadcast<br>
               promotion         two independent consumers, same friction<br>
               status            <span class="up">PUBLISHED</span><span class="oo-cursor" aria-hidden="true"></span>
@@ -79,6 +89,142 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ══ USE OPEN OUTCRY · the adoption plate — Console ════ -->
+    <section class="book-act oo-plate" id="use-open-outcry" aria-labelledby="h-use">
+      <div class="oo-kicker">&gt; use = <span class="voice">"open-outcry"</span> · source · recipe · artifacts</div>
+      <h2 class="oo-display-console" id="h-use" style="font-size:clamp(22px,2.8vw,34px); margin-top:14px;">Take the contract.</h2>
+      <p class="book-note" style="margin-top:16px;">
+        Two stylesheets and one specification. No build step, no package manager, no framework, no
+        theme engine. Copy the files, keep the import order, declare one register on the root element —
+        everything else composes from the classes already listed in the Ledger.
+      </p>
+
+      <div class="oo-grid-3 book-source-row" style="margin-top:22px;">
+        <div class="oo-pane book-source">
+          <div class="oo-kicker">tokens.css</div>
+          <p class="book-source-role">
+            Variables and the <span class="voice">--r-*</span> register alias layer: surfaces, voice,
+            text ramps, market semantics, type, hardware, seated fills.
+          </p>
+          <a class="oo-btn oo-pane oo-hover book-source-open" href="tokens.css">Open tokens.css</a>
+        </div>
+        <div class="oo-pane book-source">
+          <div class="oo-kicker">components.css</div>
+          <p class="book-source-role">
+            The classes: panes, frames, rails, tape, kickers, display type, grids, plate figure,
+            register quotation, selection ink.
+          </p>
+          <a class="oo-btn oo-pane oo-hover book-source-open" href="components.css">Open components.css</a>
+        </div>
+        <div class="oo-pane book-source">
+          <div class="oo-kicker">DESIGN.md</div>
+          <p class="book-source-role">
+            The specification the two files answer to: register law, type rules, layout, elevation,
+            shapes, component contract, do's and don'ts.
+          </p>
+          <a class="oo-btn oo-pane oo-hover book-source-open" href="DESIGN.md">Open DESIGN.md</a>
+        </div>
+      </div>
+
+      <details class="book-recipe">
+        <summary class="book-recipe-summary">Minimal correct composition — fonts, import order, consumer reset, root register, plate</summary>
+        <div class="book-recipe-body">
+<pre class="book-code" tabindex="0">&lt;!-- 1 · three faces, nothing else --&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&amp;family=Pixelify+Sans:wght@500;600&amp;family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&amp;display=swap"&gt;
+
+&lt;!-- 2 · import order is load-bearing: tokens declare, components consume --&gt;
+&lt;link rel="stylesheet" href="tokens.css"&gt;
+&lt;link rel="stylesheet" href="components.css"&gt;
+
+&lt;!-- 3 · the consumer's reset. The contract owns CLASSES, never bare
+         elements, so it ships none: without this block the page is a
+         white Times document with dark panes floating on it. --&gt;
+&lt;style&gt;
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background-color: var(--oo-void);   /* the stage paints its own fill */
+    color: var(--r-fg);
+    font-family: var(--oo-font-mono);
+    font-size: var(--oo-type-body);
+    line-height: 1.6;
+  }
+&lt;/style&gt;
+
+&lt;!-- 4 · declare ONE register on the root element --&gt;
+&lt;body class="reg-console"&gt;
+
+  &lt;!-- 5 · stage → plate → content --&gt;
+  &lt;main class="oo-stage oo-scanlines"&gt;
+    &lt;section class="oo-plate"&gt;
+      &lt;div class="oo-kicker"&gt;&amp;gt; provenance = "static"&lt;/div&gt;
+
+      &lt;!-- Console display. On a reg-broadcast page swap the class:
+           .oo-display-broadcast, or the plate speaks in Pixelify. --&gt;
+      &lt;h1 class="oo-display-console"&gt;Cite it once.&lt;/h1&gt;
+
+      &lt;div class="oo-pane" style="padding:20px"&gt;
+        &lt;p class="oo-prose"&gt;A published note carries its own source line.
+        A lookup at read time is a dependency, not a citation.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+&lt;/body&gt;</pre>
+          <p class="book-note book-recipe-note">
+            The register class is not decoration, but it is not the whole story: tokens.css
+            declares the Console aliases on <span class="voice">:root</span> as well as on
+            <span class="voice">.reg-console</span>, so an unclassed page silently renders Console.
+            What it loses is <span class="voice">::selection</span>, which is scoped strictly to the
+            two register classes and reverts to the OS blue-grey highlight this language bans.
+          </p>
+          <p class="book-note book-recipe-note">
+            Broadcast has no <span class="voice">:root</span> fallback at all — it needs
+            <span class="voice">.reg-broadcast</span>, and it needs the display class swapped with it.
+            <span class="voice">.oo-display-console</span> hardcodes Pixelify and amber rather than
+            reading <span class="voice">--r-display</span>, so a Broadcast plate that keeps it is a
+            serif page shouting in pixel type.
+          </p>
+        </div>
+      </details>
+
+      <div class="oo-kicker" style="margin-top:38px;">&gt; artifacts · one subject, three surfaces</div>
+      <p class="book-note" style="margin-top:12px;">
+        All three compose the same explicitly illustrative subject — <span class="voice">choosing static
+        provenance for a published research note</span> — so what differs between them is composition,
+        not content. Specimen material throughout; no live personal, account or service data.
+      </p>
+      <div class="oo-grid-3 book-source-row" style="margin-top:18px;">
+        <div class="oo-pane book-source">
+          <div class="oo-kicker">editorial report</div>
+          <p class="book-source-role">
+            Sustained reading, Broadcast dominant: claim, argument, evidence, cost, alternatives,
+            sources, one machine receipt.
+          </p>
+          <a class="oo-btn oo-pane oo-hover book-source-open" href="examples/editorial-report.html">Open the report</a>
+        </div>
+        <div class="oo-pane book-source">
+          <div class="oo-kicker">decision brief</div>
+          <p class="book-source-role">
+            One page that has to be acted on: the decision, its consequences, the alternatives it
+            closes, and the evidence under it.
+          </p>
+          <a class="oo-btn oo-pane oo-hover book-source-open" href="examples/decision-brief.html">Open the brief</a>
+        </div>
+        <div class="oo-pane book-source">
+          <div class="oo-kicker">presentation</div>
+          <p class="book-source-role">
+            Cover and body at projection scale: display type, deliberate void, and provenance carried
+            on a static rail rather than a footnote.
+          </p>
+          <a class="oo-btn oo-pane oo-hover book-source-open" href="examples/presentation.html">Open the deck</a>
+        </div>
+      </div>
+      <p class="book-caption" style="margin-top:14px;">
+        three examples · one consumer family, not two independent consumers · their composition stays
+        consumer-local, so nothing here is promotion evidence
+      </p>
     </section>
 
     <!-- ══ ACT II · THE FLOOR — Broadcast, Tape as mechanism ══ -->
@@ -211,8 +357,18 @@
         <span aria-hidden="true">The ledger.</span>
       </h2>
 
+      <nav class="book-subnav" aria-label="Ledger sections">
+        <span class="oo-kicker book-subnav-label">// jump to</span>
+        <a href="#ledger-tokens">tokens</a>
+        <a href="#ledger-seated">seated fills</a>
+        <a href="#ledger-type">type</a>
+        <a href="#ledger-hardware">hardware</a>
+        <a href="#ledger-states">states</a>
+        <a href="#ledger-motion">motion</a>
+      </nav>
+
       <!-- IV-A -->
-      <h3 class="oo-kicker" style="margin-top:44px; color:var(--r-fg-dim);">IV-A · token ledger</h3>
+      <h3 class="oo-kicker book-sub" id="ledger-tokens" style="margin-top:44px; color:var(--r-fg-dim);">IV-A · token ledger</h3>
       <p class="book-note" style="margin-top:10px;">
         Values are read from the loaded stylesheet at runtime, so this table cannot drift from
         <span class="voice">tokens.css</span>. Cells abut at <span class="voice">gap: 0</span> and are framed by
@@ -220,7 +376,7 @@
       </p>
       <div class="book-ledger" id="token-ledger" style="margin-top:18px;"></div>
 
-      <h3 class="oo-kicker" style="margin-top:34px; color:var(--r-fg-dim);">IV-A2 · a semantic is ink; seat it before you fill with it</h3>
+      <h3 class="oo-kicker book-sub" id="ledger-seated" style="margin-top:34px; color:var(--r-fg-dim);">IV-A2 · a semantic is ink; seat it before you fill with it</h3>
       <p class="book-note" style="margin-top:10px;">
         The market tokens are tuned as ink on the stage. Used raw as a fill they are neon slabs that
         break the void law, so a fill is the same token mixed into the surface beneath it —
@@ -247,7 +403,7 @@
       </div>
 
       <!-- IV-B -->
-      <h3 class="oo-kicker" style="margin-top:44px; color:var(--r-fg-dim);">IV-B · type has three jobs</h3>
+      <h3 class="oo-kicker book-sub" id="ledger-type" style="margin-top:44px; color:var(--r-fg-dim);">IV-B · type has three jobs</h3>
       <div class="oo-grid-3" style="margin-top:18px;">
         <div class="oo-pane" style="padding:22px;">
           <div class="oo-kicker">Fraunces · judgment</div>
@@ -277,14 +433,14 @@
           <span class="voice">prefers-reduced-motion: reduce</span>
         </p>
         <p class="book-caption" style="margin-top:12px;">
-          fit-to-measure is restricted to the five chapter mastheads on this page. Body and component
+          fit-to-measure is restricted to the four chapter mastheads on this page. Body and component
           type never use it — the technique puts the string in the DOM twice, which is correct for a
           masthead and wrong for prose.
         </p>
       </div>
 
       <!-- IV-C -->
-      <h3 class="oo-kicker" style="margin-top:44px; color:var(--r-fg-dim);">IV-C · hardware earns its frame</h3>
+      <h3 class="oo-kicker book-sub" id="ledger-hardware" style="margin-top:44px; color:var(--r-fg-dim);">IV-C · hardware earns its frame</h3>
       <p class="book-note" style="margin-top:10px;">
         A frame means the object is independent, actionable, or an explicit specimen. Anything else is
         card carpet.
@@ -337,7 +493,7 @@
       </div>
 
       <!-- IV-D -->
-      <h3 class="oo-kicker" style="margin-top:44px; color:var(--r-fg-dim);">IV-D · state must say what happened</h3>
+      <h3 class="oo-kicker book-sub" id="ledger-states" style="margin-top:44px; color:var(--r-fg-dim);">IV-D · state must say what happened</h3>
       <p class="book-note" style="margin-top:10px;">
         Every row below is a <span class="voice">specimen</span>, not live personal data. Semantic colour is
         always reinforced by a word and a glyph.
@@ -351,7 +507,7 @@
       </div>
 
       <!-- IV-E -->
-      <h3 class="oo-kicker" style="margin-top:44px; color:var(--r-fg-dim);">IV-E · motion communicates state</h3>
+      <h3 class="oo-kicker book-sub" id="ledger-motion" style="margin-top:44px; color:var(--r-fg-dim);">IV-E · motion communicates state</h3>
       <p class="book-note" style="margin-top:10px;">
         Linear or <span class="voice">steps()</span>. Machines do not ease-in-out. Each specimen declares its
         duration, its timing function, and what it becomes under reduced motion.
@@ -482,7 +638,7 @@
           <dt>Name</dt><dd>OPEN OUTCRY / MACHINE-SUGGESTED BY FABLE / OPERATOR-RATIFIED BY USE</dd>
           <dt>Spec</dt><dd>Open Outcry Living Brand Book Reconstruction Spec, 2026-08-08 — direction “Pit &amp; Ledger”</dd>
           <dt>Design language</dt><dd>Open Outcry Design Language Spec, 2026-06-09 (still canonical; not superseded)</dd>
-          <dt>Contract</dt><dd>tokens.css <span class="voice">v1.4</span> · components.css <span class="voice">v1.6</span> · frozen again after the 2026-08-09 promotion</dd>
+          <dt>Contract</dt><dd>tokens.css <span class="voice" data-ver="tokens">n/a</span> · components.css <span class="voice" data-ver="components">n/a</span> · frozen again after the 2026-08-09 promotion — mirrored from the opening contract block, never typed twice</dd>
           <dt>Files loaded</dt><dd id="fact-files">n/a</dd>
           <dt>Tokens (live)</dt><dd><span class="voice" id="fact-tokens-2">n/a</span> — counted from the loaded tokens.css</dd>
           <dt>Component classes (live)</dt><dd><span class="voice" id="fact-components-2">n/a</span> — counted from the loaded components.css</dd>

@@ -95,7 +95,7 @@
 
   <div class="lab-head">
     <h1 class="oo-display-console lab-title">BLUEPRINT.</h1>
-    <p class="oo-prose lab-note">The repo drawing itself. Six files, nine audited edges. No <code>@import</code> anywhere — components.css inherits 18 <code>var(--oo-*)</code> names plus the 9 <code>var(--r-*)</code> register aliases. Every consumer <code>&lt;link&gt;</code>s both sheets; the direct links are the dimmer strand.</p>
+    <p class="oo-prose lab-note">Historical snapshot of the repo drawing at tokens v1.3 / components v1.5: six files, nine audited edges, and no <code>@import</code>. The dated counts and artwork are preserved as recorded; the current reusable contract is tokens.css v1.4 / components.css v1.6.</p>
   </div>
 
   <div class="lab-viewport" data-lab-viewport>
@@ -106,7 +106,7 @@
          dead expando and the still stays display:none forever. -->
     <div class="lab-static" data-lab-static hidden>
     <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet" role="img"
-         aria-label="Static dependency schematic of the Open Outcry repo: tokens.css declares 59 custom properties, 37 --oo-* plus 22 --r-* register aliases, and feeds components.css through 18 var(--oo-*) plus 9 var(--r-*) references; components.css feeds index.html, examples/inir, examples/brief and experiments/*; all four consumers also link tokens.css directly. Six nodes, nine edges, no @import anywhere.">
+         aria-label="Historical snapshot of the Open Outcry dependency schematic at tokens.css v1.3 and components.css v1.5. The dated drawing records six nodes, nine edges and no @import; the current contract is tokens.css v1.4 and components.css v1.6.">
       <!-- Hand-authored. Same six nodes and same nine edges as the live plate,
            fully drawn, orthogonally routed. Monoline SVG is the source language
            of design-language §5, so the fallback here is not a degraded print
@@ -211,9 +211,9 @@
 
   <div class="oo-grid-4 lab-readout">
     <div class="oo-pane oo-stat">
-      <span class="oo-kicker">&gt; CONTRACT</span>
+      <span class="oo-kicker">&gt; HISTORICAL SNAPSHOT</span>
       <span class="oo-stat-value voice">v1.3 / v1.5</span>
-      <span class="oo-stat-delta">tokens.css &middot; components.css</span>
+      <span class="oo-stat-delta">captured contract &middot; current v1.4 / v1.6</span>
     </div>
     <div class="oo-pane oo-stat">
       <span class="oo-kicker">&gt; TOKENS</span>
@@ -233,7 +233,7 @@
   </div>
 
   <footer class="oo-rail oo-rail--foot lab-rail--foot">
-    <span class="lab-meta">TOKENS -&gt; COMPONENTS -&gt; CONSUMERS &middot; v1.5 CONTRACT</span>
+    <span class="lab-meta">HISTORICAL SNAPSHOT &middot; v1.3 / v1.5 &middot; CURRENT CONTRACT v1.4 / v1.6</span>
     <button class="oo-btn oo-pane oo-hover lab-control" type="button" data-lab-control aria-pressed="false">[ PAUSE FEED ]</button>
   </footer>
 

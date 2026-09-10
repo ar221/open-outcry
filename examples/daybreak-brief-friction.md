@@ -29,3 +29,15 @@ Worked with zero glue: `.oo-register-quote--block` (source ledger),
 `.oo-rail--sticky` (header + footer tape), `:where()` stat ink (semantic
 up/down directly on `.oo-stat-value`), `--oo-gutter` bleed coupling, per-plate
 register flips (`.reg-console` sections inside a `.reg-broadcast` page).
+
+## Artifact-family observation — 2026-09-08
+
+The new document examples add a related label/value implementation:
+`artifact-compositions.css` defines `.art-ledger`; `morning-brief.html` retains
+`.mb-ledger`. These are two local implementations, not proof of two new
+independent production consumers. The earlier `.db-head` recurrence above
+remains evidence; this observation does not reset that history or promote a class.
+
+The report, brief and presentation share one consumer-local print composition
+in `artifact-compositions.css`: one implementation, one artifact family.
+Both row shape and print composition remain unpromoted.

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<!-- examples/presentation.html — Open Outcry documents lane, 3 of 3.
+     Five slides on the same illustrative subject as editorial-report.html and
+     decision-brief.html: choosing static provenance for a published note.
+     01 cover · 02 argument · 03 evidence · 04 cost and alternatives ·
+     05 conclusion.
+
+     Register alternates per slide, which is the plate rule applied to a deck:
+     the speaker is Broadcast, the evidence slide is Console. Never mixed on
+     one slide.
+
+     No script. Navigation is anchors to real slide ids, so keyboard, back
+     button, deep link and print all work and nothing here can be dead. Native
+     scroll-snap pages tall viewports; a phone gets a stacked document instead,
+     because snapping a 100svh slide on a short screen traps the reader between
+     screens. In print each slide is one landscape page with its citation
+     footer inside its own flow, so the break falls below the footer.
+
+     Contract: ../tokens.css v1.4 + ../components.css v1.6, untouched.
+     Composition: artifact-compositions.css. -->
+<html lang="en" class="art-deck-root">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Static provenance — five slides — Open Outcry</title>
+<meta name="description" content="An illustrative Open Outcry deck: five slides arguing that a published research note should freeze its provenance at publication.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<link rel="stylesheet" href="artifact-compositions.css">
+<style>
+  /* One slide per landscape page. Page geometry is page-local. */
+  @page { size: A4 landscape; margin: 12mm 14mm; }
+
+  /* Console slide: its stage colour has to reach the gutter, so it mirrors the
+     gutter token negative the way .oo-plate--bleed does. */
+  .pr-bleed {
+    margin-left: calc(-1 * var(--oo-gutter));
+    margin-right: calc(-1 * var(--oo-gutter));
+    padding-left: var(--oo-gutter);
+    padding-right: var(--oo-gutter);
+  }
+
+  /* Quoted machine output has to survive a projector: .oo-register-quote is
+     11–12px by contract, which is a receipt size, not a room size. */
+  .pr-quote { font-size: clamp(16px, 1.6vw, 22px); line-height: 1.65; }
+
+  /* Current-slide marker, no script. :target follows the URL fragment, so it
+     tracks nav clicks and deep links but not free scrolling — which is why
+     every slide also states its own position in its footer. The nav is the
+     slides' later sibling in the DOM specifically so `~` can reach it. */
+  main:not(:has(.art-slide:target)) .art-nav [href="#s01"],
+  #s01:target ~ .art-nav [href="#s01"],
+  #s02:target ~ .art-nav [href="#s02"],
+  #s03:target ~ .art-nav [href="#s03"],
+  #s04:target ~ .art-nav [href="#s04"],
+  #s05:target ~ .art-nav [href="#s05"] {
+    color: var(--oo-void);
+    background-color: var(--r-voice);
+  }
+
+  .pr-kicker-row { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
+  .pr-links { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  @media print {
+    .pr-bleed { margin: 0; padding: 0; }
+    .pr-quote { font-size: 9.5pt; line-height: 1.55; padding: 8pt 10pt; }
+    .art-points { gap: 9pt; }
+    .art-slide-foot { font-size: 8pt; padding-top: 6pt; }
+    .oo-kicker { font-size: 8pt; }
+    .art-h2 { font-size: 20pt; }
+    #h-s01 { font-size: 26pt !important; }
+  }
+</style>
+</head>
+<body class="art-deck reg-broadcast art-quiet">
+
+<main class="oo-stage">
+
+  <header class="oo-rail oo-rail--sticky art-rail">
+    <span class="art-rail-path">&gt; <span class="voice">open-outcry</span>/examples/presentation</span>
+    <span class="art-rail-short"><span class="voice">Open Outcry</span> / five slides</span>
+    <span class="art-rail-right">
+      <span class="oo-kicker art-nowrap">ILLUSTRATIVE SPECIMEN</span>
+      <span class="art-nowrap">2026-09-08</span>
+    </span>
+  </header>
+
+  <!-- ══ 01 · COVER — Broadcast ══ -->
+  <section class="art-slide" id="s01" aria-labelledby="h-s01">
+    <div class="pr-kicker-row">
+      <span class="oo-kicker">
+        &lt; deck = <span style="color:var(--oo-terracotta)">"static-provenance"</span> &gt; documents lane
+      </span>
+      <span class="oo-kicker art-nowrap">FROZEN 2026-09-08</span>
+    </div>
+
+    <div class="art-slide-body">
+      <h1 class="oo-display-broadcast" id="h-s01" style="max-width:20ch; font-size:clamp(32px,5vw,66px);">
+        Provenance is <em>part of the claim</em>.
+      </h1>
+      <p class="art-slide-lead" style="margin-top:24px;">
+        Choosing static provenance for a published research note — and what it costs.
+      </p>
+      <p style="margin-top:20px; color:var(--r-fg-dim);">
+        An illustrative specimen. The decision is illustrative; the evidence comes from public
+        files in this repository.
+      </p>
+    </div>
+
+    <div class="art-slide-foot">
+      <span>Open Outcry · documents lane · tokens.css v1.4 · components.css v1.6</span>
+      <span class="art-nowrap">SLIDE 01 / 05</span>
+    </div>
+  </section>
+
+  <!-- ══ 02 · ARGUMENT — Broadcast ══ -->
+  <section class="art-slide" id="s02" aria-labelledby="h-s02">
+    <div class="oo-kicker">// 02 · argument</div>
+
+    <div class="art-slide-body">
+      <h2 class="oo-display-broadcast art-h2" id="h-s02" style="max-width:26ch;">
+        Two ways to attach evidence. They answer different questions.
+      </h2>
+
+      <ol class="art-points" style="margin-top:28px;">
+        <li data-n="01">
+          <p><b>Resolve at read time</b> — the note always shows current state. It answers
+            <em>what is true now</em>.</p>
+        </li>
+        <li data-n="02">
+          <p><b>Freeze at publication</b> — the note shows the state it was written against. It
+            answers what was true <b>then</b>.</p>
+        </li>
+        <li data-n="03">
+          <p>A note is a dated claim, so only the second is answerable. Give it read-time
+            provenance and the evidence moves underneath the conclusion with no record of the
+            move.</p>
+        </li>
+      </ol>
+    </div>
+
+    <div class="art-slide-foot">
+      <span>Argued at length in editorial-report.html · 01 · Argument</span>
+      <span class="art-nowrap">SLIDE 02 / 05</span>
+    </div>
+  </section>
+
+  <!-- ══ 03 · EVIDENCE — Console. One slide, one register: the machine speaks
+          here and the speaker does not. ══ -->
+  <section class="art-slide reg-console pr-bleed oo-scanlines" id="s03" aria-labelledby="h-s03"
+           style="background-color:var(--r-stage);">
+    <div class="oo-kicker">&gt; evidence · public files in this repository</div>
+
+    <div class="art-slide-body">
+      <h2 class="oo-display-console art-h2" id="h-s03">Three findings.</h2>
+
+      <div class="oo-register-quote oo-register-quote--block pr-quote" style="margin-top:22px;">
+        <span class="voice">[01]</span> One owner: the version mirror removes duplicated labels.<br><br>
+        <span class="voice">[02]</span> Current state: the token ledger reads its loaded stylesheet.<br><br>
+        <span class="voice">[03]</span> Limited proof: the contract check verifies hidden-state guards, not factual accuracy.
+      </div>
+    </div>
+
+    <div class="art-slide-foot">
+      <span>brandbook.js · index.html#act-opening-bell · index.html#act-the-ledger · experiments/verify-contract.mjs</span>
+      <span class="art-nowrap">SLIDE 03 / 05</span>
+    </div>
+  </section>
+
+  <!-- ══ 04 · COST AND ALTERNATIVES — Broadcast ══ -->
+  <section class="art-slide" id="s04" aria-labelledby="h-s04">
+    <div class="oo-kicker">// 04 · cost and alternatives</div>
+
+    <div class="art-slide-body">
+      <h2 class="oo-display-broadcast art-h2" id="h-s04" style="max-width:26ch;">
+        Freezing does not prevent staleness. It <em>declares</em> it.
+      </h2>
+
+      <div class="oo-pane oo-warning" style="padding:18px 22px; margin-top:22px; max-width:64ch;">
+        <div class="oo-kicker">THE COST</div>
+        <p style="margin-top:8px;">
+          A snapshot stops reporting current state when its source changes. Keep its date
+          legible and retain older editions. No crawl, live dot or cursor: this is a dated claim.
+        </p>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="art-alt">
+          <div><p><b>A · Resolve at read time.</b> Right for mirrors, wrong question for a dated note.</p></div>
+          <div class="art-verdict down">Rejected</div>
+        </div>
+        <div class="art-alt">
+          <div><p><b>B · Frozen block plus live badge.</b> Two owners for one fact; fails offline as if the note were wrong.</p></div>
+          <div class="art-verdict down">Rejected</div>
+        </div>
+        <div class="art-alt">
+          <div><p><b>C · No provenance block.</b> Cheapest, and every claim becomes uncheckable.</p></div>
+          <div class="art-verdict down">Rejected</div>
+        </div>
+        <div class="art-alt">
+          <div><p><b>D · Freeze · one owner · re-issue.</b> A locatable citation, bought with declared staleness.</p></div>
+          <div class="art-verdict up">Chosen</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="art-slide-foot">
+      <span>Verdicts in full: decision-brief.html · Alternatives</span>
+      <span class="art-nowrap">SLIDE 04 / 05</span>
+    </div>
+  </section>
+
+  <!-- ══ 05 · CONCLUSION — Broadcast, with the frozen block quoted ══ -->
+  <section class="art-slide" id="s05" aria-labelledby="h-s05">
+    <div class="oo-kicker">// 05 · conclusion</div>
+
+    <div class="art-slide-body">
+      <h2 class="oo-display-broadcast art-h2" id="h-s05" style="max-width:24ch;">
+        Freeze it, own it once, re-issue it.
+      </h2>
+
+      <ol class="art-points" style="margin-top:24px;">
+        <li data-n="01"><p>A note's provenance block is content. Review it with the prose.</p></li>
+        <li data-n="02"><p>A version label printed twice is a defect, whichever copy is right.</p></li>
+        <li data-n="03"><p>A document that says it is frozen has to look frozen.</p></li>
+      </ol>
+
+      <div class="oo-register-quote oo-register-quote--block pr-quote" style="margin-top:24px; max-width:64ch;">
+        <span class="voice">verdict</span> static provenance · one owner · re-issue on change<br>
+        <span class="voice">scope</span>&nbsp;&nbsp; published notes — not dashboards or mirrors<br>
+        <span class="voice">dated</span>&nbsp;&nbsp; 2026-09-08 · this deck reports no live state
+      </div>
+
+      <div class="pr-links art-screen-only" style="margin-top:24px;">
+        <a class="oo-pane oo-pane--armed oo-hover oo-btn" href="editorial-report.html">Full report</a>
+        <a class="oo-pane oo-hover oo-btn" href="decision-brief.html">Decision brief</a>
+        <a class="oo-pane oo-hover oo-btn" href="../index.html#use-open-outcry">Open Outcry</a>
+      </div>
+    </div>
+
+    <div class="art-slide-foot">
+      <span>editorial-report.html · decision-brief.html · tokens.css v1.4 · components.css v1.6</span>
+      <span class="art-nowrap">SLIDE 05 / 05</span>
+    </div>
+  </section>
+
+  <!-- ══ NAVIGATION — after the slides so the current-slide rules reach it
+          with `~`. Fixed to the viewport bottom; hidden in print, where the
+          page break is the navigation. ══ -->
+  <nav class="art-nav" aria-label="Slides">
+    <div class="art-nav-inner">
+      <a class="art-navlink" href="#s01">01</a>
+      <a class="art-navlink" href="#s02">02</a>
+      <a class="art-navlink" href="#s03">03</a>
+      <a class="art-navlink" href="#s04">04</a>
+      <a class="art-navlink" href="#s05">05</a>
+      <a class="art-navlink art-nav-step" href="#s01">&#8593; Cover</a>
+      <a class="art-navlink art-nav-step" href="#s05">End &#8595;</a>
+    </div>
+  </nav>
+
+</main>
+
+</body>
+</html>
