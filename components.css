@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   OPEN OUTCRY — components v1.6
+   OPEN OUTCRY — components v1.7
    Import tokens.css first; these classes consume --r-* / --oo-* .
 
    ▲ TRAP — never use the `background:` shorthand on an element carrying
@@ -33,7 +33,7 @@
    · display type  — .oo-display-console · .oo-display-broadcast
    · motion        — .oo-tickwrap · .oo-scanbeam · .oo-hover · .oo-draw-path
    · plates        — .oo-plate · .oo-plate--bleed · .oo-plate-card · .oo-specimen
-   · imagery       — .oo-plate-figure
+   · imagery       — .oo-plate-figure · .oo-media (+ --crop / --pixel) · .oo-media-caption
    · stat & prose  — .oo-stat · .oo-stat-value · .oo-stat-delta · .oo-prose
    · layout        — .oo-stage · .oo-grid-2 · .oo-grid-2--wide · .oo-grid-3 · .oo-grid-4
    · stacking      — .oo-overlay · .oo-content
@@ -285,6 +285,77 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
   opacity: var(--oo-plate-strength);
 }
 
+/* ── Instructional media: content imagery as evidence (promoted v1.7) ──
+      The OTHER imagery class. .oo-plate-figure is atmosphere: an alpha mask,
+      tinted to the register voice, aria-hidden, opacity-capped. Instructional
+      media is CONTENT — a screenshot, a native asset, a diagram — and every
+      one of those rules INVERTS:
+
+        · original colours preserved — no mask, no tint, no filter, no
+          register recolouring; the image is the evidence;
+        · intrinsic proportions preserved — see the sizing law below;
+        · alt text says what the image shows; a caption names what it does
+          and does not claim; provenance (source, hash, licence) is recorded
+          beside the artifact, consumer-side;
+        · never aria-hidden, never pointer-suppressed.
+
+      Promotion evidence (two independent production consumers, same friction):
+      · Chef RPG field manual (2026-09-19): `width:100%` screenshots kept
+        their HTML `height="1080"`, vertically stretching every illustration
+        and cropping the cover — while overflow checks stayed green. The
+        accepted correction is exactly the sizing law below.
+      · Project Zomboid survivor guide (2026-09-14): rebuilt the same
+        recipe consumer-locally — `.mast img` / `.towns img`
+        (width:100%, display:block, captioned figures) and
+        `.moodle-strip img` (32px sprites, image-rendering:pixelated) —
+        with CSS width:100% over fixed width="480" height="270"
+        attributes and no height:auto anywhere. Matching attributes do
+        NOT protect: the height presentational hint stays 270px while
+        CSS width flexes. Measured live in the shipped guide
+        (read-only, Chromium): .towns img up to 52.5% relative aspect
+        error at 768px and 30.4% at 390px; .mast img 39.0% at 768px and
+        16.9% at 1440px. Only the square 32px icons render true.
+
+      THE SIZING LAW. Keep width/height ATTRIBUTES in the markup — they
+      reserve layout and prevent shift — but they never win over the loaded
+      image's real ratio: `height: auto` + `aspect-ratio: auto` make the
+      rendered box follow naturalWidth/naturalHeight at every container
+      width. Verification compares the rendered content-box ratio against
+      natural dimensions, borders subtracted, subpixel rounding tolerated
+      (experiments/verify-artifact.py). Zero overflow alone is not sign-off.
+
+      CONTAIN IS THE DEFAULT. An instructional image is shown whole; cropping
+      evidence is falsification. The crop variant below is an explicit opt-in
+      for editorial framing only — never for a screenshot, a chart, or any
+      image a caption cites as evidence. ── */
+.oo-media { margin: 0; min-width: 0; }
+.oo-media img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+}
+
+/* Editorial crop, declared: the HOST states the frame — set an aspect-ratio
+   or a height on it page-locally — and the image covers it. Wins over the
+   contain default on source order at equal specificity. */
+.oo-media--crop { overflow: hidden; }
+.oo-media--crop img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Pixel art: native sprites scale UP crisp at integer multiples and are never
+   scaled down — a downscaled sprite averages into grey mush exactly the way a
+   downscaled engraving dither does (same physics as .oo-plate-figure's
+   native-scale rule, opposite delivery: real pixels, real colours). */
+.oo-media--pixel img { image-rendering: pixelated; }
+
+/* Caption: mono meta under the image, readable ink — never --oo-ghost. */
+.oo-media-caption {
+  font-family: var(--oo-font-mono);
+  font-size: 13px; line-height: 1.5;
+  color: var(--r-fg-dim);
+  padding-top: 10px;
+}
+
 /* ── Gallery plate: 16:9 specimen card ── */
 .oo-plate-card { aspect-ratio: 16/9; padding: 28px; position: relative; overflow: hidden; }
 
@@ -391,6 +462,7 @@ footer.oo-rail--sticky { top: auto; bottom: 0; }
 .oo-grid-4[hidden],
 .oo-stat-value[hidden],
 .oo-stat-delta[hidden],
+.oo-media[hidden],
 .oo-btn[hidden] { display: none; }
 
 /* ── Reduced motion ── */

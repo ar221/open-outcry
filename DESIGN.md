@@ -254,6 +254,7 @@ Components are a contract, not a full framework.
 - **Frame:** the hairline as four zero-blur box-shadows rather than a border. Use it *only* where cells abut at `gap: 0` — a ledger, a token table, a heat field — so seams stay one stroke wide instead of doubling. Standalone objects keep the pane border.
 - **Seated fill:** a semantic used as a *fill* is the token mixed into the surface beneath it (`--r-seat-up` / `--r-seat-down` / `--r-seat-warn`), never the raw market token. Raw green as a slab breaks the void law. Ink stays raw; fills get seated.
 - **Plate figure:** sourced public-domain engraving delivered as an alpha mask, tinted by `--r-voice` so one file serves both registers. Native pixel scale, cropped never shrunk — a downscaled 1-bit dither averages to flat grey. Default `.14`, hard ceiling `.26`, `aria-hidden`, no pointer events. Editorial openers only; never behind live data or a number that must be read now.
+- **Instructional media:** the other imagery class. `.oo-media` is content and evidence — screenshots, native assets, diagrams — and inverts every plate-figure rule: original colors preserved (no mask, no tint, no filter), intrinsic proportions preserved (`height: auto` + `aspect-ratio: auto`, even when width/height attributes reserve layout), useful alt text, a caption naming what the image does and does not claim, and provenance recorded beside the artifact. Contain is the default; `.oo-media--crop` is an explicit editorial opt-in and never touches evidence imagery. `.oo-media--pixel` scales native sprites up crisp at integer multiples, never down. The decorative engraving-mask rules do not apply to instructional images.
 - **Selection:** register voice on void, scoped to the register classes. Without it every artifact inherits the OS blue-grey highlight — a blue surface, which this language bans.
 
 ### Consumer setup
@@ -267,12 +268,13 @@ The three examples hold one illustrative subject constant — choosing static pr
 - [Quiet report (`examples/editorial-report.html`)](examples/editorial-report.html): a restrained Broadcast `.oo-stage`, consumer-local sustained-reading prose inside `.oo-plate` sections, and a static Console provenance quotation. Three A4 pages in the verified Chromium export.
 - [Decision brief (`examples/decision-brief.html`)](examples/decision-brief.html): Broadcast recommendation first, concise consequences and alternative rows, then Console evidence. One A4 page in print.
 - [Presentation (`examples/presentation.html`)](examples/presentation.html): one dominant first read per consumer-local `.art-slide`; alternate registers between slides, not within one. Five landscape A4 pages, with each citation footer kept in its slide flow.
+- [Illustrated manual (`examples/field-manual.html`)](examples/field-manual.html): a Console reference manual — desktop section navigation that reflows on a phone, `.oo-media` explanatory imagery with captions and provenance, sprite/name/mechanic rows, labeled responsive tables, section search, and `<details>` disclosures. Composition stays page-local; verified with `experiments/verify-artifact.py` and packaged self-contained with `experiments/package-artifact.py`.
 
 Shared artifact layout belongs to the consumer in [`examples/artifact-compositions.css`](examples/artifact-compositions.css). Receipt rows stay consumer-local until two independent production consumers converge on an actual shape. Neither is a speculative `.oo-*` primitive.
 
 ### Brand book usage
 
-The public brand book is a navigable reference consumer, not another contract layer. Its Tape navigation carries six numbered acts plus the unnumbered **Use Open Outcry** adoption stop; the Ledger exposes direct links to tokens, seated fills, type, hardware, states, and motion. Use the adoption plate's source routes for `tokens.css`, `components.css`, and `DESIGN.md` when implementing. Page-local `--book-*` / `.book-*` covers brand-book composition and interactions, including navigation, adoption guidance, receipts, grids, the container-relative unit, and four fit-to-measure chapter mastheads; the opening identity lockup is clamped rather than fitted. The book consumes `.oo-frame`, seated fills, selection ink, and `.oo-plate-figure` from v1.4/v1.6.
+The public brand book is a navigable reference consumer, not another contract layer. Its Tape navigation carries six numbered acts plus the unnumbered **Use Open Outcry** adoption stop; the Ledger exposes direct links to tokens, seated fills, type, hardware, states, and motion. Use the adoption plate's source routes for `tokens.css`, `components.css`, and `DESIGN.md` when implementing. Page-local `--book-*` / `.book-*` covers brand-book composition and interactions, including navigation, adoption guidance, receipts, grids, the container-relative unit, and four fit-to-measure chapter mastheads; the opening identity lockup is clamped rather than fitted. The book consumes `.oo-frame`, seated fills, selection ink, and `.oo-plate-figure` from v1.4/v1.7.
 
 Implementation trap: never use the CSS `background:` shorthand on an element carrying scanlines. It resets `background-image` and silently erases the scanline layer. Use `background-color:`.
 
@@ -281,6 +283,8 @@ Implementation trap: `minmax(0, 1fr)` constrains a grid *track*, not the grid *i
 Implementation trap: `overflow: hidden` clips a ticker's paint but not its intrinsic width contribution, so a crawl in normal flow still widens every ancestor. Size containment is the fix, and it ships on the tape.
 
 Every control carries a visible focus ring. Hover-arm is not focus: a pane expresses hover through `border-color` and `box-shadow`, neither of which the keyboard reaches. Focus is never colour alone.
+
+Implementation trap: zero horizontal overflow is not visual sign-off. A `width: 100%` image that keeps an HTML `height` attribute renders vertically stretched inside a perfectly overflow-free page — measured live on a production field manual, where every screenshot distorted and the cover cropped while `scrollWidth` stayed green. The sizing law on `.oo-media` prevents the class of bug; artifact verification compares each rendered content box against `naturalWidth`/`naturalHeight` and inspects fresh screenshots visually.
 
 ## Do's and Don'ts
 

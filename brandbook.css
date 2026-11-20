@@ -6,7 +6,7 @@
    THIS FILE IS NOT THE CONTRACT. Import order is tokens.css →
    components.css → brandbook.css. Everything here is prefixed
    --book- / .book- precisely so it cannot be consumed by accident.
-   The reusable contract is tokens.css v1.4 and components.css v1.6,
+   The reusable contract is tokens.css v1.4 and components.css v1.7,
    frozen again after the 2026-08-09 promotion. This page consumes it
    like any other surface; nothing here is contract.
 

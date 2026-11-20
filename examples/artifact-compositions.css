@@ -6,9 +6,15 @@
      · decision-brief.html     one page of judgment · Broadcast recommendation,
                                Console evidence quoted
      · presentation.html       five slides · spoken at distance
+   and by one reference-manual consumer reusing the quiet recipe:
+     · field-manual.html       illustrated manual · Console, quiet — reuses
+                               .art-rail, .art-lede/.art-read, .art-h2/.art-h3,
+                               .art-secnum, .art-cite, .art-ledger,
+                               .art-sources and the static provenance strip;
+                               its manual-specific layout stays page-local .fm-*
 
    Not contract, not a promotion claim: tokens.css stays v1.4, components.css
-   stays v1.6. Load order is tokens → components → this file, so single-class
+   stays v1.7. Load order is tokens → components → this file, so single-class
    rules here win on source order (that is how .art-h2 retunes the size of
    .oo-display-broadcast without !important).
 
