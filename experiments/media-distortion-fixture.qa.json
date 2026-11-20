@@ -1,0 +1,150 @@
+{
+  "artifact": "experiments/media-distortion-fixture.html",
+  "offline": false,
+  "viewports": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "images": [
+        {
+          "alt": "Distorted: 2:1 test card forced toward 16:9 by a stale height attribute",
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgCAIAAADywSLLAAAMgUlEQVR4nO3da3QU5R3H8SdkFy",
+          "natural": [
+            320,
+            160
+          ],
+          "rendered": [
+            680,
+            1080
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0.685185,
+          "aspectPass": false
+        },
+        {
+          "alt": "Corrected: 2:1 test card rendered at its intrinsic proportions",
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgCAIAAADywSLLAAAMgUlEQVR4nO3da3QU5R3H8SdkFy",
+          "natural": [
+            320,
+            160
+          ],
+          "rendered": [
+            680,
+            340
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        }
+      ],
+      "overflowElements": [],
+      "clipped": [],
+      "focusWalk": "no focusable elements",
+      "interactions": "none detected"
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768,
+      "innerWidth": 768,
+      "images": [
+        {
+          "alt": "Distorted: 2:1 test card forced toward 16:9 by a stale height attribute",
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgCAIAAADywSLLAAAMgUlEQVR4nO3da3QU5R3H8SdkFy",
+          "natural": [
+            320,
+            160
+          ],
+          "rendered": [
+            680,
+            1080
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0.685185,
+          "aspectPass": false
+        },
+        {
+          "alt": "Corrected: 2:1 test card rendered at its intrinsic proportions",
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgCAIAAADywSLLAAAMgUlEQVR4nO3da3QU5R3H8SdkFy",
+          "natural": [
+            320,
+            160
+          ],
+          "rendered": [
+            680,
+            340
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        }
+      ],
+      "overflowElements": [],
+      "clipped": [],
+      "focusWalk": "no focusable elements",
+      "interactions": "none detected"
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "images": [
+        {
+          "alt": "Distorted: 2:1 test card forced toward 16:9 by a stale height attribute",
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgCAIAAADywSLLAAAMgUlEQVR4nO3da3QU5R3H8SdkFy",
+          "natural": [
+            320,
+            160
+          ],
+          "rendered": [
+            350,
+            1080
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0.837963,
+          "aspectPass": false
+        },
+        {
+          "alt": "Corrected: 2:1 test card rendered at its intrinsic proportions",
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgCAIAAADywSLLAAAMgUlEQVR4nO3da3QU5R3H8SdkFy",
+          "natural": [
+            320,
+            160
+          ],
+          "rendered": [
+            350,
+            175
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        }
+      ],
+      "overflowElements": [],
+      "clipped": [],
+      "focusWalk": "no focusable elements",
+      "interactions": "none detected"
+    }
+  ],
+  "toleranceRelative": 0.005,
+  "fonts": [],
+  "loadedFontFamilies": [],
+  "requiredFonts": [
+    "Pixelify Sans"
+  ],
+  "brokenAnchors": [],
+  "consoleErrors": [],
+  "failures": [
+    "FONT MISSING 'Pixelify Sans' never reached status \"loaded\" (loaded: none)",
+    "ASPECT      1440px: Distorted: 2:1 test card forced toward 16:9 by a stale height attribute — rendered [680, 1080] vs natural [320, 160] (relative error 68.5185% > 0.5%)",
+    "ASPECT      768px: Distorted: 2:1 test card forced toward 16:9 by a stale height attribute — rendered [680, 1080] vs natural [320, 160] (relative error 68.5185% > 0.5%)",
+    "ASPECT      390px: Distorted: 2:1 test card forced toward 16:9 by a stale height attribute — rendered [350, 1080] vs natural [320, 160] (relative error 83.7963% > 0.5%)"
+  ],
+  "passed": false
+}
