@@ -1,0 +1,960 @@
+{
+  "artifact": "examples/field-manual.html",
+  "offline": false,
+  "viewports": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "images": [
+        {
+          "alt": "Open Outcry brand book opening: Tape navigation on the left, the Open Outcry serif lockup, the thesis paragraph, and the start of the amber cat CONTRACT block.",
+          "src": "file://examples/field-manual-assets/brandbook-contract-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            445,
+            250.31
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Brand book Act IV: THE LEDGER in amber pixel display type, a jump-to rail, and the token ledger table listing --oo-void, --oo-console-stage and --oo-console-pane with swatches.",
+          "src": "file://examples/field-manual-assets/brandbook-ledger-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            728,
+            409.5
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: green lamp radiating light",
+          "src": "file://examples/field-manual-assets/signal-live.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: red octagon with a double bar",
+          "src": "file://examples/field-manual-assets/signal-halt.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: amber double chevron pointing right",
+          "src": "file://examples/field-manual-assets/signal-armed.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: two pairs of peach quotation marks",
+          "src": "file://examples/field-manual-assets/signal-quote.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: blue magnifying glass",
+          "src": "file://examples/field-manual-assets/signal-evidence.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: violet two-prong plug",
+          "src": "file://examples/field-manual-assets/signal-provider.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Brand book token ledger, full frame: masthead, jump rail and three token rows all visible.",
+          "src": "file://examples/field-manual-assets/brandbook-ledger-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            728,
+            409.5
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Editorial strip cropped from the brand book opening, centered on the navigation and lockup.",
+          "src": "file://examples/field-manual-assets/brandbook-contract-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            728,
+            159.25
+          ],
+          "loaded": true,
+          "cropHost": true
+        }
+      ],
+      "overflowElements": [],
+      "clipped": [],
+      "focusWalk": [
+        {
+          "desc": "a.fm-skip",
+          "outlineStyle": "auto",
+          "outlineWidth": "1px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "input#search",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "button#clear.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "summary",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "summary",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        }
+      ],
+      "interactions": {
+        "emptyState": true,
+        "clearRestoresViaKeyboard": true,
+        "searchMatches": 2,
+        "hiddenTargetNav": {
+          "hash": "#signals",
+          "revealed": true
+        },
+        "detailsKeyboardToggles": "2/2"
+      }
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768,
+      "innerWidth": 768,
+      "images": [
+        {
+          "alt": "Open Outcry brand book opening: Tape navigation on the left, the Open Outcry serif lockup, the thesis paragraph, and the start of the amber cat CONTRACT block.",
+          "src": "file://examples/field-manual-assets/brandbook-contract-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            289,
+            162.56
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Brand book Act IV: THE LEDGER in amber pixel display type, a jump-to rail, and the token ledger table listing --oo-void, --oo-console-stage and --oo-console-pane with swatches.",
+          "src": "file://examples/field-manual-assets/brandbook-ledger-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            416,
+            234
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: green lamp radiating light",
+          "src": "file://examples/field-manual-assets/signal-live.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: red octagon with a double bar",
+          "src": "file://examples/field-manual-assets/signal-halt.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: amber double chevron pointing right",
+          "src": "file://examples/field-manual-assets/signal-armed.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: two pairs of peach quotation marks",
+          "src": "file://examples/field-manual-assets/signal-quote.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: blue magnifying glass",
+          "src": "file://examples/field-manual-assets/signal-evidence.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: violet two-prong plug",
+          "src": "file://examples/field-manual-assets/signal-provider.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Brand book token ledger, full frame: masthead, jump rail and three token rows all visible.",
+          "src": "file://examples/field-manual-assets/brandbook-ledger-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            416,
+            234
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Editorial strip cropped from the brand book opening, centered on the navigation and lockup.",
+          "src": "file://examples/field-manual-assets/brandbook-contract-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            416,
+            91
+          ],
+          "loaded": true,
+          "cropHost": true
+        }
+      ],
+      "overflowElements": [],
+      "clipped": [],
+      "focusWalk": [
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-skip",
+          "outlineStyle": "auto",
+          "outlineWidth": "1px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "input#search",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "button#clear.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "summary",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "summary",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        }
+      ],
+      "interactions": {
+        "emptyState": true,
+        "clearRestoresViaKeyboard": true,
+        "searchMatches": 2,
+        "hiddenTargetNav": {
+          "hash": "#signals",
+          "revealed": true
+        },
+        "detailsKeyboardToggles": "2/2"
+      }
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "images": [
+        {
+          "alt": "Open Outcry brand book opening: Tape navigation on the left, the Open Outcry serif lockup, the thesis paragraph, and the start of the amber cat CONTRACT block.",
+          "src": "file://examples/field-manual-assets/brandbook-contract-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            326,
+            183.38
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Brand book Act IV: THE LEDGER in amber pixel display type, a jump-to rail, and the token ledger table listing --oo-void, --oo-console-stage and --oo-console-pane with swatches.",
+          "src": "file://examples/field-manual-assets/brandbook-ledger-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            326,
+            183.38
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: green lamp radiating light",
+          "src": "file://examples/field-manual-assets/signal-live.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: red octagon with a double bar",
+          "src": "file://examples/field-manual-assets/signal-halt.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: amber double chevron pointing right",
+          "src": "file://examples/field-manual-assets/signal-armed.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: two pairs of peach quotation marks",
+          "src": "file://examples/field-manual-assets/signal-quote.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: blue magnifying glass",
+          "src": "file://examples/field-manual-assets/signal-evidence.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Pixel sprite: violet two-prong plug",
+          "src": "file://examples/field-manual-assets/signal-provider.png",
+          "natural": [
+            16,
+            16
+          ],
+          "rendered": [
+            48,
+            48
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Brand book token ledger, full frame: masthead, jump rail and three token rows all visible.",
+          "src": "file://examples/field-manual-assets/brandbook-ledger-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            326,
+            183.38
+          ],
+          "loaded": true,
+          "cropHost": false,
+          "aspectError": 0,
+          "aspectPass": true
+        },
+        {
+          "alt": "Editorial strip cropped from the brand book opening, centered on the navigation and lockup.",
+          "src": "file://examples/field-manual-assets/brandbook-contract-1280.png",
+          "natural": [
+            1280,
+            720
+          ],
+          "rendered": [
+            326,
+            71.31
+          ],
+          "loaded": true,
+          "cropHost": true
+        }
+      ],
+      "overflowElements": [],
+      "clipped": [],
+      "focusWalk": [
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-link",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-skip",
+          "outlineStyle": "auto",
+          "outlineWidth": "1px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "input#search",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "button#clear.oo-btn",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "a.fm-navlink",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "summary",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        },
+        {
+          "desc": "summary",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "visibleRing": true
+        }
+      ],
+      "interactions": {
+        "emptyState": true,
+        "clearRestoresViaKeyboard": true,
+        "searchMatches": 2,
+        "hiddenTargetNav": {
+          "hash": "#signals",
+          "revealed": true
+        },
+        "detailsKeyboardToggles": "2/2"
+      }
+    }
+  ],
+  "toleranceRelative": 0.005,
+  "fonts": [
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "loaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "unloaded"
+    },
+    {
+      "family": "JetBrains Mono",
+      "status": "loaded"
+    },
+    {
+      "family": "Pixelify Sans",
+      "status": "unloaded"
+    },
+    {
+      "family": "Pixelify Sans",
+      "status": "unloaded"
+    },
+    {
+      "family": "Pixelify Sans",
+      "status": "unloaded"
+    },
+    {
+      "family": "Pixelify Sans",
+      "status": "unloaded"
+    },
+    {
+      "family": "Pixelify Sans",
+      "status": "unloaded"
+    },
+    {
+      "family": "Pixelify Sans",
+      "status": "loaded"
+    }
+  ],
+  "loadedFontFamilies": [
+    "JetBrains Mono",
+    "Pixelify Sans"
+  ],
+  "requiredFonts": [
+    "Pixelify Sans",
+    "JetBrains Mono"
+  ],
+  "brokenAnchors": [],
+  "consoleErrors": [],
+  "failures": [],
+  "passed": true
+}

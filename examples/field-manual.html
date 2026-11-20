@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<!-- OPEN OUTCRY · illustrated field manual (consumer example)
+
+     Subject: operating the Open Outcry desk — deliberately self-referential,
+     like the other artifact examples, so the illustrated-manual FORMAT can be
+     read without inventing content this public repository cannot license.
+     Production shape references: two private illustrated game guides (Chef RPG
+     field manual 2026-09-19, Project Zomboid survivor guide 2026-09-14) whose
+     shared friction promoted .oo-media in v1.7. No proprietary content here:
+     screenshots depict this repository's own brand book; sprites are original
+     specimens (examples/field-manual-assets/PROVENANCE.md).
+
+     Contract: ../tokens.css v1.4 + ../components.css v1.7, untouched.
+     Composition: artifact-compositions.css (quiet recipe, rails, ledgers,
+     citations, static provenance tape) + page-local .fm-* below.
+
+     Verify:  uv run --with playwright python experiments/verify-artifact.py examples/field-manual.html
+     Package: uv run --with playwright python experiments/package-artifact.py examples/field-manual.html dist/field-manual.html -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run the desk — Open Outcry field manual</title>
+<meta name="description" content="Illustrated reference manual for the Open Outcry design language: hardware, signals, and the instructional-media contract, with section search and verified media.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<link rel="stylesheet" href="artifact-compositions.css">
+<style>
+  /* ── page-local composition; nothing here is contract ── */
+  .fm-skip {
+    position: absolute; left: -999px; top: 0; z-index: 30;
+    background-color: var(--r-pane); color: var(--r-voice);
+    padding: 12px 16px; font-size: 13px;
+  }
+  .fm-skip:focus { left: 0; }
+  .fm-mast { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; padding: 44px 0 36px; border-bottom: 1px solid var(--r-line); align-items: start; }
+  .fm-title { font-size: clamp(34px, 5vw, 64px); margin: 16px 0 10px; }
+  .fm-deck { font-size: 18px; line-height: 1.5; color: var(--r-fg); max-width: 30ch; }
+  .fm-mast-note { margin-top: 14px; font-size: 14px; color: var(--r-fg-dim); max-width: 46ch; }
+  .fm-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .fm-stamp { margin-top: 18px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--r-muted); }
+
+  /* tools: search is a control; controls are mono chrome, 44px floor */
+  .fm-tools {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px;
+    align-items: center; padding: 14px 0; border-bottom: 1px solid var(--r-line);
+  }
+  .fm-tools input {
+    font: inherit; font-size: 14px; color: var(--r-fg);
+    background-color: var(--r-pane); border: 1px solid var(--oo-pane-border);
+    border-radius: var(--oo-radius); min-height: 44px; padding: 8px 12px;
+    width: 100%; min-width: 0;
+  }
+  .fm-tools input:focus-visible,
+  .fm-navlink:focus-visible,
+  .fm-details summary:focus-visible { outline: 2px solid var(--r-voice); outline-offset: 2px; }
+  .fm-results { grid-column: 1 / -1; font-size: 12px; color: var(--r-muted); letter-spacing: .06em; }
+
+  /* layout: sticky section nav on desktop, grid strip on a phone */
+  .fm-layout { display: grid; grid-template-columns: 188px minmax(0, 1fr); gap: 28px; align-items: start; }
+  .fm-nav { position: sticky; top: 16px; display: grid; gap: 2px; padding-top: 26px; }
+  .fm-navlink {
+    display: flex; align-items: center; gap: 10px; min-height: 44px;
+    padding: 4px 10px; font-size: 12px; letter-spacing: .06em;
+    color: var(--r-fg-dim); text-decoration: none;
+    border: 1px solid transparent; border-left: 1px solid var(--r-line);
+  }
+  .fm-navlink span { color: var(--r-muted); font-size: 11px; }
+  .fm-navlink:hover { color: var(--r-voice); border-left-color: var(--r-voice-dim); }
+  .fm-navlink[aria-current] { color: var(--r-voice); border-left-color: var(--r-voice); }
+  .fm-section { padding: 30px 0 34px; border-bottom: 1px solid var(--r-line); }
+  .fm-section .art-h2 { margin: 6px 0 14px; }
+  .fm-empty { padding: 40px 0; color: var(--r-muted); }
+
+  /* figures: .oo-media supplies the law; this page supplies the frame */
+  .fm-figure { border: 1px solid var(--r-line); padding: 10px; margin: 22px 0 6px; }
+  .fm-figure img { width: 100%; }
+  .fm-figure + .art-cite { margin-bottom: 8px; }
+  .fm-crop { aspect-ratio: 32 / 7; }  /* the HOST declares the frame */
+
+  /* signal rows: sprite / name / mechanic — a row, not an icon pack */
+  .fm-signals { display: grid; margin-top: 18px; }
+  .fm-signal {
+    display: grid; grid-template-columns: 48px 148px minmax(0, 1fr); gap: 16px;
+    align-items: start; padding: 14px 0; border-top: 1px solid var(--r-line);
+  }
+  .fm-signal:last-child { border-bottom: 1px solid var(--r-line); }
+  .fm-signal-name { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding-top: 7px; }
+  .fm-signal p { font-size: 14px; line-height: 1.6; color: var(--r-fg-dim); padding-top: 6px; margin: 0; }
+  .fm-signal p b { color: var(--r-fg); }
+
+  /* hardware table: real table on desktop, labeled rows on a phone */
+  .fm-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 18px; }
+  .fm-table caption { text-align: left; font-size: 12px; color: var(--r-muted); letter-spacing: .08em; text-transform: uppercase; padding-bottom: 10px; }
+  .fm-table th, .fm-table td { text-align: left; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--r-line); vertical-align: top; }
+  .fm-table th { color: var(--r-voice); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  .fm-table td { color: var(--r-fg-dim); }
+  .fm-table td:first-child { color: var(--r-fg); white-space: nowrap; }
+
+  .fm-details { border: 1px solid var(--r-line); margin-top: 16px; }
+  .fm-details summary {
+    display: flex; align-items: center; min-height: 44px; padding: 8px 14px;
+    cursor: pointer; font-size: 13px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--r-voice); list-style: none;
+  }
+  .fm-details summary::before { content: "+ "; margin-right: 8px; color: var(--r-voice-dim); }
+  .fm-details[open] summary::before { content: "− "; }
+  .fm-details summary::-webkit-details-marker { display: none; }
+  .fm-details-body { padding: 2px 14px 16px; }
+  .fm-details-body p { font-size: 14px; line-height: 1.7; color: var(--r-fg-dim); max-width: 68ch; }
+  .fm-details-body p + p { margin-top: 10px; }
+  .fm-details-body code { color: var(--r-fg); }
+
+  .fm-foot { padding: 24px 0 8px; }
+
+  @media (max-width: 720px) {
+    .fm-mast { grid-template-columns: minmax(0, 1fr); padding-top: 28px; gap: 24px; }
+    .fm-actions .oo-btn { flex: 1 1 100%; justify-content: center; }
+    .fm-layout { display: block; }
+    .fm-nav { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 18px 0 6px; }
+    .fm-navlink { border: 1px solid var(--r-line); }
+    .fm-tools { grid-template-columns: minmax(0, 1fr); }
+    .fm-signal { grid-template-columns: 48px minmax(0, 1fr); }
+    .fm-signal p { grid-column: 2; }
+    /* labeled rows: the header row is hidden, each cell restates its label */
+    .fm-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .fm-table, .fm-table tbody, .fm-table tr, .fm-table td { display: block; }
+    .fm-table caption { display: block; }
+    .fm-table tr { border: 1px solid var(--oo-pane-border); margin-bottom: 12px; }
+    .fm-table td { border-bottom: 1px solid var(--r-line); padding: 9px 12px; white-space: normal; }
+    .fm-table tr td:last-child { border-bottom: none; }
+    .fm-table td::before { content: attr(data-label); display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--r-voice); margin-bottom: 4px; }
+  }
+  @media print {
+    .fm-nav, .fm-tools, .fm-actions, .fm-skip { display: none; }
+    .fm-layout { display: block; }
+  }
+</style>
+</head>
+<body class="reg-console art-quiet">
+<a class="fm-skip" href="#manual">Skip to sections</a>
+<div class="oo-stage">
+
+  <header class="oo-rail art-rail">
+    <span><span class="art-rail-path">OPEN OUTCRY / EXAMPLES / FIELD-MANUAL</span><span class="art-rail-short">FIELD-MANUAL</span></span>
+    <span class="art-rail-right"><span>ILLUSTRATED REFERENCE</span><span class="art-nowrap">FROZEN 2026-09-19</span></span>
+  </header>
+
+  <section class="fm-mast">
+    <div>
+      <div class="oo-kicker">// field manual · desk operations</div>
+      <h1 class="oo-display-console fm-title">Run the desk.</h1>
+      <p class="fm-deck">Hardware, signals, and the media discipline — one manual, searchable, verified.</p>
+      <p class="fm-mast-note">A reusable illustrated-manual composition: desktop section navigation that reflows on a phone, explanatory imagery under the v1.7 instructional-media contract, sprite/name/mechanic rows, a labeled responsive table, section search, and optional disclosures.</p>
+      <div class="fm-actions">
+        <a class="oo-btn oo-pane oo-pane--armed oo-hover" href="#hardware">[ Hardware ]</a>
+        <a class="oo-btn oo-pane oo-hover" href="#signals">[ Signals ]</a>
+        <a class="oo-btn oo-pane oo-hover" href="#media">[ Media rules ]</a>
+      </div>
+      <p class="fm-stamp">tokens v1.4 · components v1.7 · illustrative specimen</p>
+    </div>
+    <figure class="oo-media fm-figure">
+      <img src="field-manual-assets/brandbook-contract-1280.png" width="1280" height="720"
+           alt="Open Outcry brand book opening: Tape navigation on the left, the Open Outcry serif lockup, the thesis paragraph, and the start of the amber cat CONTRACT block.">
+      <figcaption class="oo-media-caption">Fig. 01 — The desk you are learning: the brand book's opening bell as rendered. Shown whole; colors untouched.</figcaption>
+    </figure>
+  </section>
+
+  <div class="fm-tools" role="search">
+    <input id="search" type="search" placeholder="Search sections — try “crop”, “focus”, “sprite”" aria-label="Search manual sections">
+    <button id="clear" class="oo-btn oo-pane oo-hover" type="button">[ Clear ]</button>
+    <p class="fm-results" id="results" aria-live="polite"></p>
+  </div>
+
+  <div class="fm-layout">
+    <nav class="fm-nav" aria-label="Manual sections">
+      <a class="fm-navlink" href="#desk"><span>01</span>The desk</a>
+      <a class="fm-navlink" href="#hardware"><span>02</span>Hardware</a>
+      <a class="fm-navlink" href="#signals"><span>03</span>Signals</a>
+      <a class="fm-navlink" href="#media"><span>04</span>Media rules</a>
+      <a class="fm-navlink" href="#adoption"><span>05</span>Adoption</a>
+    </nav>
+
+    <div id="manual">
+
+      <section class="fm-section" id="desk" aria-labelledby="h-desk">
+        <span class="art-secnum">01 / THE DESK</span>
+        <h2 class="oo-display-console art-h2" id="h-desk">One identity, two registers.</h2>
+        <p class="art-lede"><b>Broadcast</b> carries judgment, <b>Console</b> carries mechanism, and the <b>Tape</b> binds both to state. Every artifact picks one dominant register and quotes the other at most once — this manual is Console, quiet recipe: no crawl, no cursor, no liveness a dated document cannot honestly claim.</p>
+        <figure class="oo-media fm-figure">
+          <img src="field-manual-assets/brandbook-ledger-1280.png" width="1280" height="720"
+               alt="Brand book Act IV: THE LEDGER in amber pixel display type, a jump-to rail, and the token ledger table listing --oo-void, --oo-console-stage and --oo-console-pane with swatches.">
+          <figcaption class="oo-media-caption">Fig. 02 — Dense content under the system: the token ledger, cells abutting at gap 0 under <code>.oo-frame</code> hairlines.</figcaption>
+        </figure>
+        <p class="art-cite">examples/field-manual-assets/PROVENANCE.md · capture of this repository's index.html, commit 0b352bc + v1.7 working tree</p>
+      </section>
+
+      <section class="fm-section" id="hardware" aria-labelledby="h-hardware">
+        <span class="art-secnum">02 / HARDWARE</span>
+        <h2 class="oo-display-console art-h2" id="h-hardware">Square hardware, one stroke.</h2>
+        <p class="art-read">Corners stay at 0–2px, strokes stay thin, and every control keeps mono chrome, a visible focus ring, and a 44px floor. The table reflows into labeled rows below 720px — the header row is visually removed, and each cell restates its column so a phone reader never loses which number is which.</p>
+        <table class="fm-table">
+          <caption>Contract hardware — class, role, composition</caption>
+          <thead>
+            <tr><th scope="col">Class</th><th scope="col">Role</th><th scope="col">Composes with</th></tr>
+          </thead>
+          <tbody>
+            <tr><td data-label="Class">.oo-pane</td><td data-label="Role">Smoky square hardware: cards, receipts, warnings, stats</td><td data-label="Composes with">.oo-pane--armed for the primary state</td></tr>
+            <tr><td data-label="Class">.oo-frame</td><td data-label="Role">Hairline as four shadows — abutting cells at gap 0 keep a one-stroke seam</td><td data-label="Composes with">ledgers, token tables, heat fields</td></tr>
+            <tr><td data-label="Class">.oo-btn</td><td data-label="Role">Control chrome: mono, uppercase, 44px minimum, focus ring</td><td data-label="Composes with">.oo-pane + .oo-hover</td></tr>
+            <tr><td data-label="Class">.oo-rail / .oo-tape</td><td data-label="Role">Path and state chrome; ticker strip with real counts</td><td data-label="Composes with">.oo-rail--foot, .art-static-strip (quiet)</td></tr>
+            <tr><td data-label="Class">.oo-plate-figure</td><td data-label="Role">Decorative atmosphere: masked engraving, register-tinted, aria-hidden</td><td data-label="Composes with">broadcast openers only — never content</td></tr>
+            <tr><td data-label="Class">.oo-media</td><td data-label="Role">Instructional content: original colors, intrinsic proportions, captioned</td><td data-label="Composes with">--crop (declared), --pixel (sprites), .oo-media-caption</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="fm-section" id="signals" aria-labelledby="h-signals">
+        <span class="art-secnum">03 / SIGNALS</span>
+        <h2 class="oo-display-console art-h2" id="h-signals">Read the tape.</h2>
+        <p class="art-read">Color is earned by function. Six signals cover the whole semantic ramp; anything else is decoration and does not ship. Sprites are original 16px specimens rendered at an integer 3× through <code>.oo-media--pixel</code> — recognition rows, not an icon pack.</p>
+        <div class="fm-signals">
+          <div class="fm-signal">
+            <figure class="oo-media oo-media--pixel"><img src="field-manual-assets/signal-live.png" width="48" height="48" alt="Pixel sprite: green lamp radiating light"></figure>
+            <span class="fm-signal-name up">Live</span>
+            <p><b>Green is state, not paint.</b> A live dot means a real feed; a green number means up. A zero stays base ink — a red or green zero is a false alarm.</p>
+          </div>
+          <div class="fm-signal">
+            <figure class="oo-media oo-media--pixel"><img src="field-manual-assets/signal-halt.png" width="48" height="48" alt="Pixel sprite: red octagon with a double bar"></figure>
+            <span class="fm-signal-name down">Halt</span>
+            <p><b>Red marks footguns and downside.</b> Warnings get red boundary ink on square hardware — never modal panic styling.</p>
+          </div>
+          <div class="fm-signal">
+            <figure class="oo-media oo-media--pixel"><img src="field-manual-assets/signal-armed.png" width="48" height="48" alt="Pixel sprite: amber double chevron pointing right"></figure>
+            <span class="fm-signal-name voice">Armed</span>
+            <p><b>Amber is the Console voice.</b> The armed pane border marks the primary action; hover ignites, active inverts to black-on-voice.</p>
+          </div>
+          <div class="fm-signal">
+            <figure class="oo-media oo-media--pixel"><img src="field-manual-assets/signal-quote.png" width="48" height="48" alt="Pixel sprite: two pairs of peach quotation marks"></figure>
+            <span class="fm-signal-name" style="color:var(--oo-peach)">Quote</span>
+            <p><b>The other register appears as a quotation.</b> A Console pane quoted in Broadcast (or the reverse) is labeled machine output — never a 50/50 mix.</p>
+          </div>
+          <div class="fm-signal">
+            <figure class="oo-media oo-media--pixel"><img src="field-manual-assets/signal-evidence.png" width="48" height="48" alt="Pixel sprite: blue magnifying glass"></figure>
+            <span class="fm-signal-name" style="color:var(--oo-blue)">Evidence</span>
+            <p><b>Blue is rare search-and-evidence ink.</b> Never a background, surface, or glow — the one blue thing on a plate is the citation.</p>
+          </div>
+          <div class="fm-signal">
+            <figure class="oo-media oo-media--pixel"><img src="field-manual-assets/signal-provider.png" width="48" height="48" alt="Pixel sprite: violet two-prong plug"></figure>
+            <span class="fm-signal-name" style="color:var(--oo-violet)">Provider</span>
+            <p><b>Violet marks external systems.</b> Provider ink names the outside dependency; it never becomes atmosphere.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="fm-section" id="media" aria-labelledby="h-media">
+        <span class="art-secnum">04 / MEDIA RULES</span>
+        <h2 class="oo-display-console art-h2" id="h-media">Evidence is shown whole.</h2>
+        <p class="art-read">Two imagery classes, opposite laws. <code>.oo-plate-figure</code> is atmosphere: masked, register-tinted, opacity-capped, aria-hidden. <code>.oo-media</code> is content: a screenshot, a native asset, a diagram — original colors, intrinsic proportions, alt text, a caption, and provenance beside the artifact. The engraving-mask rules never touch an instructional image.</p>
+        <figure class="oo-media fm-figure">
+          <img src="field-manual-assets/brandbook-ledger-1280.png" width="1280" height="720"
+               alt="Brand book token ledger, full frame: masthead, jump rail and three token rows all visible.">
+          <figcaption class="oo-media-caption">Contain is the default — the full 16:9 frame at any container width. The width/height attributes reserve layout, and the contract's <code>height: auto; aspect-ratio: auto</code> keeps the loaded image's real ratio in charge.</figcaption>
+        </figure>
+        <figure class="oo-media fm-figure">
+          <div class="oo-media--crop fm-crop">
+            <img src="field-manual-assets/brandbook-contract-1280.png" width="1280" height="720"
+                 alt="Editorial strip cropped from the brand book opening, centered on the navigation and lockup.">
+          </div>
+          <figcaption class="oo-media-caption">Editorial crop, declared: the inner host states a 32:7 frame and <code>.oo-media--crop</code> covers it. Atmosphere framing only — cropping a screenshot you cite as evidence is falsification.</figcaption>
+        </figure>
+        <details class="fm-details">
+          <summary>Why height:auto + aspect-ratio:auto is law</summary>
+          <div class="fm-details-body">
+            <p>The bug class this kills, measured on a production field manual: illustrations carried <code>width: 100%</code> in CSS while their markup kept a fixed <code>height="1080"</code> attribute. CSS width overrode the attribute width; the attribute height stayed. Every screenshot rendered vertically stretched, the cover cropped — and the overflow check stayed green, because a distorted image overflows nothing.</p>
+            <p>The correction keeps the attributes (they reserve layout and prevent shift) but takes their authority away: <code>height: auto</code> plus <code>aspect-ratio: auto</code> means the rendered box follows <code>naturalWidth</code>/<code>naturalHeight</code> at every container width. Verification then compares each rendered content box against the intrinsic ratio — borders subtracted, subpixel rounding tolerated — and fresh screenshots are inspected visually. Zero overflow alone is not sign-off.</p>
+          </div>
+        </details>
+        <details class="fm-details">
+          <summary>Pixel art: integer scale, never down</summary>
+          <div class="fm-details-body">
+            <p>A native sprite scales up crisp under <code>image-rendering: pixelated</code> at integer multiples (the signal rows above are 16px specimens at 3×). It never scales down: a downscaled sprite averages into grey mush — the same physics that makes the engraving mask crop rather than shrink.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="fm-section" id="adoption" aria-labelledby="h-adoption">
+        <span class="art-secnum">05 / ADOPTION</span>
+        <h2 class="oo-display-console art-h2" id="h-adoption">Take the contract, not the page.</h2>
+        <p class="art-read">Two files, in order: <code>tokens.css</code> then <code>components.css</code>. Put the dominant register on the consumer root, load the declared fonts, and keep composition page-local until two independent production consumers converge on the same shape — that is how <code>.oo-media</code> itself got in.</p>
+        <dl class="art-ledger" style="margin-top:18px;">
+          <div><dt>Contract</dt><dd><a class="oo-link" href="../tokens.css">../tokens.css</a> v1.4 · <a class="oo-link" href="../components.css">../components.css</a> v1.7</dd></div>
+          <div><dt>Design rules</dt><dd><a class="oo-link" href="../DESIGN.md">../DESIGN.md</a> — registers, media discipline, traps</dd></div>
+          <div><dt>Verify</dt><dd>experiments/verify-artifact.py — images, fonts, overflow, proportions, focus, interactions at 390/768/1440</dd></div>
+          <div><dt>Package</dt><dd>experiments/package-artifact.py — self-contained export, fonts embedded, provenance sidecar, offline re-verification</dd></div>
+          <div><dt>Media provenance</dt><dd><a class="oo-link" href="field-manual-assets/PROVENANCE.md">field-manual-assets/PROVENANCE.md</a> — sources, hashes, licenses for every image above</dd></div>
+        </dl>
+        <ul class="art-sources" style="margin-top:22px;">
+          <li><span>brandbook-contract-1280.png · brandbook-ledger-1280.png</span><span class="art-role">content screenshots of this repository's index.html · sha256 in PROVENANCE.md</span></li>
+          <li><span>signal-*.png × 6</span><span class="art-role">original 16px pixel specimens on the token palette · CC-with-repo</span></li>
+          <li><span>Fraunces · Pixelify Sans · JetBrains Mono</span><span class="art-role">SIL OFL 1.1 · this page loads Pixelify Sans + JetBrains Mono</span></li>
+        </ul>
+      </section>
+
+      <p class="fm-empty" id="empty" hidden>No sections match. <button id="empty-clear" class="oo-btn oo-pane oo-hover" type="button">[ Clear the search ]</button></p>
+
+    </div>
+  </div>
+
+  <footer class="fm-foot">
+    <div class="oo-tape"><span class="art-static-strip">STATIC PROVENANCE · 5 SECTIONS · 10 IMAGE ELEMENTS · 8 ASSET HASHES IN PROVENANCE.MD · VERIFIED IN CHROMIUM AT 390 / 768 / 1440 · NO LIVE FEEDS CLAIMED</span></div>
+    <div class="oo-rail oo-rail--foot art-rail">
+      <span>open-outcry · illustrated manual example</span>
+      <span class="art-rail-right"><span class="art-nowrap">tokens v1.4 · components v1.7</span></span>
+    </div>
+  </footer>
+
+</div>
+<script>
+  // Section search: filter on text, count out loud, restore on clear.
+  // Anchors into a filtered-out section clear the filter first (hash reveal).
+  const sections = [...document.querySelectorAll('.fm-section')];
+  const q = document.getElementById('search');
+  const results = document.getElementById('results');
+  const empty = document.getElementById('empty');
+
+  function filter() {
+    const terms = q.value.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    for (const s of sections) {
+      const hit = terms.every(t => s.textContent.toLocaleLowerCase().includes(t));
+      s.hidden = !hit;
+      if (hit) shown++;
+    }
+    empty.hidden = shown !== 0;
+    results.textContent = `${shown} of ${sections.length} sections shown` + (q.value ? ` for “${q.value}”` : '');
+  }
+  function clearSearch() { q.value = ''; filter(); q.focus(); }
+
+  q.addEventListener('input', filter);
+  document.getElementById('clear').addEventListener('click', clearSearch);
+  document.getElementById('empty-clear').addEventListener('click', clearSearch);
+
+  function revealHash() {
+    const target = document.getElementById(location.hash.slice(1));
+    if (!target) return;
+    if (target.closest('.fm-section')?.hidden || target.hidden) { q.value = ''; filter(); }
+    for (const a of document.querySelectorAll('.fm-navlink')) {
+      if (a.hash === location.hash) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    }
+    requestAnimationFrame(() => target.scrollIntoView());
+  }
+  window.addEventListener('hashchange', revealHash);
+  for (const a of document.querySelectorAll('a[href^="#"]')) {
+    a.addEventListener('click', () => {
+      const s = document.querySelector(a.getAttribute('href'));
+      if (s?.closest('.fm-section')?.hidden || s?.hidden) { q.value = ''; filter(); }
+    });
+  }
+  filter();
+  if (location.hash) revealHash();
+</script>
+</body>
+</html>
